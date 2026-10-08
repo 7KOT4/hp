@@ -14,7 +14,7 @@
     }
 
     body {
-      background-color: #030005;
+      background-color: #020005;
       overflow: hidden;
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
       color: #fff;
@@ -34,29 +34,32 @@
       cursor: grabbing;
     }
 
-    /* Подсказка снизу как на tlanex.com */
+    /* Подсказка снизу как на видео */
     #start-hint {
       position: fixed;
-      bottom: 35px;
+      bottom: 30px;
       left: 50%;
       transform: translateX(-50%);
       z-index: 30;
-      font-size: 0.85rem;
-      letter-spacing: 2.5px;
+      font-size: 0.82rem;
+      letter-spacing: 2px;
       text-transform: uppercase;
-      color: rgba(255, 180, 210, 0.85);
-      background: rgba(20, 2, 10, 0.45);
-      padding: 10px 22px;
+      font-weight: 500;
+      color: rgba(255, 170, 205, 0.85);
+      background: rgba(25, 2, 12, 0.55);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      padding: 10px 24px;
       border-radius: 30px;
       border: 1px solid rgba(255, 77, 109, 0.35);
-      box-shadow: 0 0 20px rgba(255, 42, 95, 0.3);
+      box-shadow: 0 0 25px rgba(255, 42, 95, 0.35);
       pointer-events: none;
-      animation: pulseHint 2s infinite ease-in-out;
+      animation: pulseHint 2.2s infinite ease-in-out;
       transition: opacity 0.8s ease;
     }
 
     @keyframes pulseHint {
-      0%, 100% { opacity: 0.55; transform: translateX(-50%) scale(0.98); }
+      0%, 100% { opacity: 0.5; transform: translateX(-50%) scale(0.97); }
       50% { opacity: 1; transform: translateX(-50%) scale(1.02); }
     }
 
@@ -74,7 +77,7 @@
       pointer-events: none;
       opacity: 0;
       transition: opacity 0.4s ease;
-      background: radial-gradient(circle at center, rgba(35, 3, 16, 0.6) 0%, rgba(0, 0, 0, 0.8) 100%);
+      background: radial-gradient(circle at center, rgba(35, 3, 16, 0.6) 0%, rgba(0, 0, 0, 0.85) 100%);
       backdrop-filter: blur(6px);
       -webkit-backdrop-filter: blur(6px);
     }
@@ -85,7 +88,7 @@
     }
 
     .memory-card {
-      background: rgba(18, 2, 8, 0.92);
+      background: rgba(18, 2, 8, 0.94);
       border: 1px solid rgba(255, 64, 129, 0.45);
       box-shadow: 0 0 50px rgba(255, 30, 90, 0.4);
       border-radius: 26px;
@@ -160,13 +163,13 @@
 </head>
 <body>
 
-  <!-- Музыка -->
+  <!-- Аудио -->
   <audio id="bg-music" src="music.mp3" loop preload="auto"></audio>
 
-  <!-- Подсказка на старте -->
+  <!-- Подсказка старта -->
   <div id="start-hint">ТОРКНІТЬСЯ ЕКРАНА, ЩОБ РОЗПОЧАТИ ПОДОРОЖ</div>
 
-  <!-- Модальное окно просмотра фото -->
+  <!-- Модальное окно фото -->
   <div id="photo-card-container">
     <div class="memory-card">
       <img id="card-img" src="" alt="Спогад">
@@ -182,7 +185,6 @@
   <canvas id="webgl-canvas"></canvas>
 
   <script>
-    // Воспоминания
     const memories = [
       {
         title: "Кохання Мого Життя ❤️",
@@ -221,11 +223,10 @@
 
     // 1. Сцена и Камера
     const scene = new THREE.Scene();
-    scene.fog = new THREE.FogExp2(0x030005, 0.008);
+    scene.fog = new THREE.FogExp2(0x020005, 0.008);
 
     const camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 1000);
-    // Стартуем прямо по центру туннеля
-    camera.position.set(0, 0, 52);
+    camera.position.set(0, 0, 60);
 
     const renderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: true, alpha: true });
     renderer.setSize(window.innerWidth, window.innerHeight);
@@ -237,7 +238,6 @@
     controls.maxDistance = 110;
     controls.minDistance = 12;
 
-    // Группа основной системы
     const galaxyWorld = new THREE.Group();
     galaxyWorld.scale.set(0.001, 0.001, 0.001);
     scene.add(galaxyWorld);
@@ -252,49 +252,95 @@
     const bgStarsMat = new THREE.PointsMaterial({ color: 0xffaacc, size: 0.35, transparent: true, opacity: 0.8 });
     scene.add(new THREE.Points(bgStarsGeo, bgStarsMat));
 
-    // 3. НАЧАЛЬНЫЙ СПИРАЛЬНЫЙ ТУННЕЛЬ СЛОВ (как на видео tlanex.com)
-    function createLoveWordSprite(text, fontSize = 38) {
+    // ==============================================================
+    // 3. ПРАВИЛЬНАЯ ДИНАМИЧЕСКАЯ СПИРАЛЬ СЛОВ (ВОРОНКА КАК В TLANEX)
+    // ==============================================================
+    function createTextCanvasTexture(text) {
       const c = document.createElement('canvas');
-      c.width = 380;
-      c.height = 90;
+      c.width = 300;
+      c.height = 70;
       const ctx = c.getContext('2d');
-      ctx.fillStyle = "#ff4d88";
-      ctx.shadowColor = "#ff1464";
-      ctx.shadowBlur = 12;
-      ctx.font = `600 ${fontSize}px sans-serif`;
+
+      ctx.font = "bold 32px -apple-system, BlinkMacSystemFont, sans-serif";
       ctx.textAlign = "center";
       ctx.textBaseline = "middle";
-      ctx.fillText(text, 190, 45);
+
+      // Мягкий нежный розовый неон
+      ctx.shadowColor = "#ff2a6d";
+      ctx.shadowBlur = 10;
+      ctx.fillStyle = "#ff6599";
+      ctx.fillText(text, 150, 35);
 
       const tex = new THREE.CanvasTexture(c);
-      const mat = new THREE.SpriteMaterial({ map: tex, transparent: true, opacity: 0.95 });
+      return tex;
+    }
+
+    const phrases = ["Te amo", "I love you", "Кохаю тебе", "Te quiero", "Ti amo", "Je t'aime"];
+    const phraseTextures = phrases.map(p => createTextCanvasTexture(p));
+
+    const spiralGroup = new THREE.Group();
+    scene.add(spiralGroup);
+
+    const SPIRAL_ITEMS_COUNT = 140;
+    const spiralSprites = [];
+
+    // Создаем элементы спирали
+    for (let i = 0; i < SPIRAL_ITEMS_COUNT; i++) {
+      const tex = phraseTextures[i % phraseTextures.length];
+      const mat = new THREE.SpriteMaterial({
+        map: tex,
+        transparent: true,
+        opacity: 0.9,
+        blending: THREE.AdditiveBlending
+      });
       const sprite = new THREE.Sprite(mat);
-      sprite.scale.set(6, 1.4, 1);
-      return sprite;
+
+      // Прогресс вдоль вихря от 0 (центр воронки) до 1 (край у камеры)
+      const u = i / SPIRAL_ITEMS_COUNT;
+
+      sprite.userData = {
+        progress: u,
+        speed: 0.0016 // базовая скорость движения наружу
+      };
+
+      spiralSprites.push(sprite);
+      spiralGroup.add(sprite);
     }
 
-    const tunnelGroup = new THREE.Group();
-    scene.add(tunnelGroup);
+    // Расчет математической траектории спирали Архимеда в глубь экрана
+    function updateSpiralPosition(sprite, p) {
+      // p: от 0 (далеко в центре) до 1 (близко у камеры)
+      const turns = 7.5; // количество витков
+      const angle = p * Math.PI * 2 * turns;
+      
+      // Радиус плавно растет наружу по спирали
+      const radius = 1.0 + Math.pow(p, 1.25) * 26.0;
+      
+      // Глубина: от -45 в глубине до +15 прямо перед экраном
+      const z = -45.0 + Math.pow(p, 1.4) * 60.0;
 
-    const tunnelPhrases = ["Я тебе кохаю", "Te amo", "I love you", "Кохаю", "Ti amo", "Je t'aime"];
-    const tunnelSpritesCount = 110;
+      sprite.position.x = Math.cos(angle) * radius;
+      sprite.position.y = Math.sin(angle) * radius;
+      sprite.position.z = z;
 
-    for (let i = 0; i < tunnelSpritesCount; i++) {
-      const phrase = tunnelPhrases[i % tunnelPhrases.length];
-      const sprite = createLoveWordSprite(phrase, 36);
+      // Размер и прозрачность растут по мере приближения к зрителю
+      const scale = 1.2 + p * 6.5;
+      sprite.scale.set(scale, scale * 0.24, 1);
 
-      // Логарифмическая спираль вглубь экрана
-      const t = i / tunnelSpritesCount;
-      const angle = t * Math.PI * 14; // витки
-      const radius = 2.2 + t * 24;
-      const z = (1 - t) * -65 + t * 35; // глубина по Z
-
-      sprite.position.set(Math.cos(angle) * radius, Math.sin(angle) * radius, z);
-      sprite.scale.multiplyScalar(0.5 + t * 0.9);
-      tunnelGroup.add(sprite);
+      // Плавное растворение в самом центре и у самых краев экрана
+      if (p < 0.1) {
+        sprite.material.opacity = p / 0.1;
+      } else if (p > 0.88) {
+        sprite.material.opacity = (1 - p) / 0.12;
+      } else {
+        sprite.material.opacity = 0.92;
+      }
     }
 
-    // 4. Спиральная Галактика
+    // Первичная инициализация координат
+    spiralSprites.forEach(s => updateSpiralPosition(s, s.userData.progress));
+
+    // 4. Спиральная Галактика (основная сцена)
     const galaxyCount = 38000;
     const galaxyGeo = new THREE.BufferGeometry();
     const positions = new Float32Array(galaxyCount * 3);
@@ -362,8 +408,8 @@
     const heart = new THREE.Points(heartGeo, heartMat);
     galaxyWorld.add(heart);
 
-    // 6. Надписи в системе
-    function createTextSprite(text) {
+    // 6. Надписи на орбите
+    function createOrbitTextSprite(text) {
       const c = document.createElement('canvas');
       const ctx = c.getContext('2d');
       c.width = 512;
@@ -387,7 +433,7 @@
     galaxyWorld.add(labelsGroup);
 
     words.forEach((w, idx) => {
-      const s = createTextSprite(w);
+      const s = createOrbitTextSprite(w);
       const angle = (idx / words.length) * Math.PI * 2;
       s.position.set(Math.cos(angle) * 22, -2, Math.sin(angle) * 22);
       labelsGroup.add(s);
@@ -463,7 +509,6 @@
     });
 
     window.addEventListener('pointerup', (e) => {
-      // Первый клик по экрану — запуск путешествия
       if (!journeyStarted) {
         startJourney();
         return;
@@ -472,7 +517,7 @@
       if (cardContainer.classList.contains('active')) return;
 
       const dist = Math.hypot(e.clientX - pStartX, e.clientY - pStartY);
-      if (dist > 6) return; // Свайп, а не клик
+      if (dist > 6) return;
 
       mouse.x = (e.clientX / window.innerWidth) * 2 - 1;
       mouse.y = -(e.clientY / window.innerHeight) * 2 + 1;
@@ -509,11 +554,11 @@
       if (e.target === cardContainer) cardContainer.classList.remove('active');
     });
 
-    // 9. ЛОГИКА ПЕРЕХОДА: ВЛЕТ СКВОЗЬ СПИРАЛЬ К ГАЛАКТИКЕ
+    // 9. СТАРТ И КИНЕМАТОГРАФИЧНЫЙ ГИПЕРПРЫЖОК
     let journeyStarted = false;
     let transitionProgress = 0;
     const targetCameraPos = new THREE.Vector3(0, 26, 56);
-    const initialCameraPos = new THREE.Vector3(0, 0, 52);
+    const initialCameraPos = new THREE.Vector3(0, 0, 60);
 
     function startJourney() {
       journeyStarted = true;
@@ -521,7 +566,7 @@
       setTimeout(() => startHint.remove(), 800);
 
       if (bgMusic) {
-        bgMusic.play().catch(e => console.log("Music play:", e));
+        bgMusic.play().catch(e => console.log("Music waiting:", e));
       }
     }
 
@@ -532,36 +577,48 @@
       requestAnimationFrame(animate);
       const t = clock.getElapsedTime();
 
-      // Вращение начальной спирали фраз
-      if (tunnelGroup.parent) {
-        tunnelGroup.rotation.z = t * 0.15;
+      // Движение воронки слов
+      if (spiralGroup.parent) {
+        // Медленное вращение всего вихря
+        spiralGroup.rotation.z = -t * 0.22;
+
+        // Скорость потока (при старте ускоряется для гиперпрыжка)
+        const flowSpeed = journeyStarted ? 0.006 : 0.0016;
+
+        spiralSprites.forEach(sprite => {
+          sprite.userData.progress += flowSpeed;
+          if (sprite.userData.progress > 1.0) {
+            sprite.userData.progress -= 1.0;
+          }
+          updateSpiralPosition(sprite, sprite.userData.progress);
+        });
       }
 
-      // Переход сквозь спираль
+      // Плавный переход сквозь поток в галактику
       if (journeyStarted && transitionProgress < 1) {
-        transitionProgress += 0.012; // плавный тайминг
+        transitionProgress += 0.012;
         const p = Math.min(transitionProgress, 1);
         const ease = 1 - Math.pow(1 - p, 3);
 
-        // Полет камеры под рабочий ракурс
+        // Полет камеры под ракурс обзора
         camera.position.lerpVectors(initialCameraPos, targetCameraPos, ease);
 
-        // Раскрутка галактики
+        // Раскрытие галактики
         galaxyWorld.scale.set(ease, ease, ease);
-        galaxy.rotation.y += (1 - p) * 0.08;
+        galaxy.rotation.y += (1 - p) * 0.06;
 
-        // Растворение туннеля слов
-        tunnelGroup.children.forEach(c => {
-          c.material.opacity = Math.max(0, 1 - p * 1.3);
+        // Растворение спирали
+        spiralSprites.forEach(s => {
+          s.material.opacity = Math.max(0, s.material.opacity * (1 - p * 0.08));
         });
 
         if (p >= 1) {
-          scene.remove(tunnelGroup);
+          scene.remove(spiralGroup);
           galaxyWorld.scale.set(1, 1, 1);
         }
       }
 
-      // Обычное вращение галактики после старта
+      // Жизнь основной галактики
       if (journeyStarted) {
         galaxy.rotation.y += 0.002;
         labelsGroup.rotation.y = -t * 0.08;

@@ -14,7 +14,7 @@
     }
 
     body {
-      background-color: #030005;
+      background-color: #010002;
       overflow: hidden;
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
       color: #fff;
@@ -34,76 +34,88 @@
       cursor: grabbing;
     }
 
-    /* Стартовий екран */
+    /* Стартовий екран точно як на відео */
     #start-screen {
       position: fixed;
       top: 0;
       left: 0;
       width: 100vw;
       height: 100vh;
-      background: radial-gradient(circle at center, #260212 0%, #030005 100%);
+      background: radial-gradient(circle at center, #230110 0%, #010002 100%);
       display: flex;
       justify-content: center;
       align-items: center;
       z-index: 50;
-      transition: opacity 0.8s ease, visibility 0.8s ease;
+      transition: opacity 1.2s cubic-bezier(0.4, 0, 0.2, 1);
     }
 
     .card-start {
-      background: rgba(255, 255, 255, 0.04);
+      background: rgba(255, 255, 255, 0.03);
       backdrop-filter: blur(25px);
       -webkit-backdrop-filter: blur(25px);
-      border: 1px solid rgba(255, 77, 109, 0.3);
-      padding: 35px 25px;
-      border-radius: 28px;
+      border: 1px solid rgba(255, 77, 109, 0.35);
+      padding: 38px 28px;
+      border-radius: 30px;
       text-align: center;
-      box-shadow: 0 15px 45px rgba(255, 20, 90, 0.25);
+      box-shadow: 0 15px 50px rgba(255, 20, 90, 0.3), inset 0 0 20px rgba(255, 20, 90, 0.1);
       max-width: 320px;
-      width: 85%;
+      width: 86%;
     }
 
     .title {
-      font-size: 2.1rem;
-      font-weight: 700;
+      font-size: 2.2rem;
+      font-weight: 800;
+      letter-spacing: 1px;
       color: #fff;
-      text-shadow: 0 0 18px rgba(255, 77, 109, 0.8);
-      margin-bottom: 15px;
+      text-shadow: 0 0 20px rgba(255, 77, 109, 0.9), 0 0 40px rgba(255, 20, 90, 0.5);
+      margin-bottom: 12px;
     }
 
     .mascot {
-      font-size: 65px;
-      margin: 15px 0 25px 0;
-      animation: floatMascot 2.5s ease-in-out infinite alternate;
-      display: inline-block;
+      width: 130px;
+      height: 110px;
+      margin: 10px auto 20px auto;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      animation: floatMascot 2.8s ease-in-out infinite alternate;
+    }
+
+    .mascot img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      filter: drop-shadow(0 0 15px rgba(255, 105, 180, 0.6));
     }
 
     @keyframes floatMascot {
       0% { transform: translateY(0px) scale(1); }
-      100% { transform: translateY(-10px) scale(1.05); }
+      100% { transform: translateY(-10px) scale(1.04); }
     }
 
     .btn-start {
-      background: linear-gradient(135deg, #ff2a5f, #ff758c);
+      background: linear-gradient(135deg, #ff1753, #ff6584);
       border: none;
       color: white;
-      font-size: 1.1rem;
-      font-weight: 600;
-      padding: 13px 36px;
+      font-size: 1.05rem;
+      font-weight: 700;
+      letter-spacing: 1px;
+      padding: 13px 38px;
       border-radius: 50px;
       cursor: pointer;
-      box-shadow: 0 0 25px rgba(255, 42, 95, 0.65);
-      transition: transform 0.25s ease, box-shadow 0.25s ease;
+      box-shadow: 0 0 30px rgba(255, 23, 83, 0.7);
+      transition: 0.25s all;
       display: inline-flex;
       align-items: center;
       gap: 10px;
     }
 
     .btn-start:hover {
-      transform: scale(1.05);
-      box-shadow: 0 0 35px rgba(255, 42, 95, 0.9);
+      transform: scale(1.06);
+      box-shadow: 0 0 45px rgba(255, 23, 83, 0.95);
     }
 
-    /* Модальне вікно для фото */
+    /* Карточка перегляду спогаду */
     #photo-card-container {
       position: fixed;
       top: 0;
@@ -117,7 +129,7 @@
       pointer-events: none;
       opacity: 0;
       transition: opacity 0.4s ease;
-      background: radial-gradient(circle at center, rgba(35, 3, 16, 0.6) 0%, rgba(0, 0, 0, 0.85) 100%);
+      background: radial-gradient(circle at center, rgba(30, 2, 14, 0.6) 0%, rgba(0, 0, 0, 0.85) 100%);
       backdrop-filter: blur(8px);
       -webkit-backdrop-filter: blur(8px);
     }
@@ -128,16 +140,16 @@
     }
 
     .memory-card {
-      background: rgba(18, 2, 8, 0.94);
+      background: rgba(15, 1, 7, 0.92);
       border: 1px solid rgba(255, 64, 129, 0.5);
-      box-shadow: 0 0 50px rgba(255, 30, 90, 0.45);
+      box-shadow: 0 0 50px rgba(255, 30, 90, 0.45), inset 0 0 25px rgba(255, 30, 90, 0.15);
       border-radius: 26px;
       padding: 22px 20px;
-      max-width: 320px;
+      max-width: 330px;
       width: 86%;
       text-align: center;
       transform: scale(0.7) translateY(40px);
-      transition: transform 0.4s cubic-bezier(0.19, 1, 0.22, 1);
+      transition: transform 0.45s cubic-bezier(0.19, 1, 0.22, 1);
     }
 
     #photo-card-container.active .memory-card {
@@ -146,28 +158,27 @@
 
     .memory-card img {
       width: 100%;
-      height: 200px;
+      height: 210px;
       object-fit: cover;
       border-radius: 18px;
       border: 1px solid rgba(255, 255, 255, 0.2);
       margin-bottom: 14px;
-      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.6);
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.6);
     }
 
     .memory-card h2 {
-      font-size: 1.25rem;
+      font-size: 1.3rem;
       font-weight: 700;
       margin-bottom: 8px;
       color: #ff4d6d;
-      text-shadow: 0 0 10px rgba(255, 77, 109, 0.5);
+      text-shadow: 0 0 15px rgba(255, 77, 109, 0.6);
     }
 
     .memory-card p {
-      font-size: 0.92rem;
-      color: #e0d0d8;
+      font-size: 0.94rem;
+      color: #f0e2ea;
       line-height: 1.45;
       margin-bottom: 18px;
-      padding: 0 4px;
     }
 
     .card-actions {
@@ -181,16 +192,16 @@
       border: 1px solid rgba(255, 77, 109, 0.35);
       color: #fff;
       font-size: 0.88rem;
-      padding: 8px 18px;
-      border-radius: 20px;
+      padding: 9px 20px;
+      border-radius: 25px;
       cursor: pointer;
       transition: 0.2s all;
     }
 
     .btn-action.next {
-      background: linear-gradient(135deg, #ff2a5f, #ff758c);
+      background: linear-gradient(135deg, #ff1753, #ff6584);
       border: none;
-      box-shadow: 0 0 15px rgba(255, 42, 95, 0.5);
+      box-shadow: 0 0 20px rgba(255, 23, 83, 0.6);
     }
 
     .btn-action:hover {
@@ -204,8 +215,15 @@
     }
   </style>
 
+  <!-- Three.js + PostProcessing Bloom для неонового свічення як на відео -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/postprocessing/EffectComposer.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/postprocessing/RenderPass.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/postprocessing/ShaderPass.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/shaders/CopyShader.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/shaders/LuminosityHighPassShader.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/postprocessing/UnrealBloomPass.js"></script>
 </head>
 <body>
 
@@ -215,15 +233,18 @@
   <!-- Стартовий екран -->
   <div id="start-screen">
     <div class="card-start">
-      <h1 class="title">Галактика Кохання</h1>
-      <div class="mascot">🐱❤️🕷️</div>
+      <h1 class="title">Galaxy Love</h1>
+      <div class="mascot">
+        <!-- Гарний арт Hello Kitty & Spider-Man -->
+        <img src="https://i.ibb.co/VMyh4wQ/spidey-kitty.png" onerror="this.src='https://cdn-icons-png.flaticon.com/512/833/833472.png'" alt="Love">
+      </div>
       <button class="btn-start" id="start-btn">
         РОЗПОЧАТИ 💌
       </button>
     </div>
   </div>
 
-  <!-- Модальне вікно для показу фото -->
+  <!-- Модальне вікно для фото -->
   <div id="photo-card-container">
     <div class="memory-card">
       <img id="card-img" src="" alt="Спогад">
@@ -239,26 +260,28 @@
   <canvas id="webgl-canvas"></canvas>
 
   <script>
+    // ==========================================
     // ВАШІ ФОТО ТА ПІДПИСИ
+    // ==========================================
     const memories = [
       {
         title: "Кохання Мого Життя ❤️",
-        desc: "Що більше часу ми разом, то сильніше я тебе кохаю.",
+        desc: "Cuanto más tiempo estamos juntos, más te amo.",
         image: "https://images.unsplash.com/photo-1518199266791-5375a83190b7?w=700"
       },
       {
         title: "Ти Моє Серденько ✨",
-        desc: "Якби я міг обрати найбезпечніше місце у світі — це було б поруч із тобою.",
+        desc: "Si pudiera elegir un lugar seguro, sería a tu lado.",
         image: "https://images.unsplash.com/photo-1522673607200-164d1b6ce486?w=700"
       },
       {
         title: "Нескінченність ♾️",
-        desc: "У будь-якій галактиці та в кожному житті я знову й знову обираю тебе.",
+        desc: "En cada galaxia y en cada vida te volvería a elegir.",
         image: "https://images.unsplash.com/photo-1516589178581-6cd7833ae3b2?w=700"
       },
       {
         title: "Ти і Я 🪐",
-        desc: "Ти — моя найяскравіша зірка у всьому цьому безмежному всесвіті.",
+        desc: "Ти — моя найяскравіша зірка у всьому цьому всесвіті.",
         image: "https://images.unsplash.com/photo-1529333166437-7750a6dd5a70?w=700"
       }
     ];
@@ -279,340 +302,288 @@
 
     // 1. Сцена та Камера
     const scene = new THREE.Scene();
-    scene.fog = new THREE.FogExp2(0x030005, 0.007);
 
     const camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 1000);
-    camera.position.set(0, 26, 56);
+    camera.position.set(0, 24, 48);
 
-    const renderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: true, alpha: true });
+    const renderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: true, powerPreference: "high-performance" });
     renderer.setSize(window.innerWidth, window.innerHeight);
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    renderer.toneMapping = THREE.ReinhardToneMapping;
+    renderer.toneMappingExposure = 1.3;
+
+    // Справжній BLOOM ефект (неонове світіння як у відео!)
+    const renderScene = new THREE.RenderPass(scene, camera);
+    const bloomPass = new THREE.UnrealBloomPass(
+      new THREE.Vector2(window.innerWidth, window.innerHeight),
+      1.6,  // Сила світіння
+      0.45, // Радіус
+      0.15  // Поріг яскравості
+    );
+
+    const composer = new THREE.EffectComposer(renderer);
+    composer.addPass(renderScene);
+    composer.addPass(bloomPass);
 
     const controls = new THREE.OrbitControls(camera, renderer.domElement);
     controls.enableDamping = true;
     controls.dampingFactor = 0.06;
-    controls.maxDistance = 110;
-    controls.minDistance = 12;
+    controls.maxDistance = 90;
+    controls.minDistance = 15;
 
-    const galaxyWorld = new THREE.Group();
-    galaxyWorld.scale.set(0.001, 0.001, 0.001);
-    scene.add(galaxyWorld);
+    // Світова група для анімації народження
+    const worldGroup = new THREE.Group();
+    worldGroup.scale.set(0.001, 0.001, 0.001);
+    scene.add(worldGroup);
 
-    // 2. Фоновий зоряний пил
-    const bgStarsGeo = new THREE.BufferGeometry();
-    const bgPos = new Float32Array(2500 * 3);
-    for (let i = 0; i < 2500 * 3; i++) {
-      bgPos[i] = (Math.random() - 0.5) * 220;
+    // Текстура круглої частинки (щоб не було квадратних точок!)
+    function getParticleTexture() {
+      const c = document.createElement('canvas');
+      c.width = 64; c.height = 64;
+      const ctx = c.getContext('2d');
+      const grad = ctx.createRadialGradient(32, 32, 0, 32, 32, 32);
+      grad.addColorStop(0, 'rgba(255, 255, 255, 1)');
+      grad.addColorStop(0.2, 'rgba(255, 60, 120, 0.8)');
+      grad.addColorStop(0.6, 'rgba(255, 20, 80, 0.2)');
+      grad.addColorStop(1, 'rgba(0, 0, 0, 0)');
+      ctx.fillStyle = grad;
+      ctx.fillRect(0, 0, 64, 64);
+      return new THREE.CanvasTexture(c);
     }
-    bgStarsGeo.setAttribute('position', new THREE.BufferAttribute(bgPos, 3));
-    const bgStarsMat = new THREE.PointsMaterial({ color: 0xffaacc, size: 0.35, transparent: true, opacity: 0.8 });
-    scene.add(new THREE.Points(bgStarsGeo, bgStarsMat));
+    const particleTex = getParticleTexture();
 
-    // 3. Спіральна Галактика
-    const galaxyCount = 38000;
+    // 2. Глибокий космос (зорі)
+    const starGeo = new THREE.BufferGeometry();
+    const starPos = new Float32Array(4000 * 3);
+    for (let i = 0; i < 4000 * 3; i++) {
+      starPos[i] = (Math.random() - 0.5) * 300;
+    }
+    starGeo.setAttribute('position', new THREE.BufferAttribute(starPos, 3));
+    const starMat = new THREE.PointsMaterial({
+      color: 0xffaacc,
+      size: 0.6,
+      map: particleTex,
+      transparent: true,
+      blending: THREE.AdditiveBlending,
+      depthWrite: false
+    });
+    scene.add(new THREE.Points(starGeo, starMat));
+
+    // 3. ЧОРНА ДИРА В ЦЕНТРІ (Gargantua Singularity)
+    // Смоляна чорна сфера поглинання
+    const holeGeo = new THREE.SphereGeometry(3.6, 64, 64);
+    const holeMat = new THREE.MeshBasicMaterial({ color: 0x000000 });
+    const blackHole = new THREE.Mesh(holeGeo, holeMat);
+    worldGroup.add(blackHole);
+
+    // Світлове гравітаційне кільце (фотонна сфера)
+    const ringGeo = new THREE.RingGeometry(3.6, 4.3, 64);
+    const ringMat = new THREE.MeshBasicMaterial({
+      color: 0xff3366,
+      side: THREE.DoubleSide,
+      transparent: true,
+      opacity: 0.95
+    });
+    const photonRing = new THREE.Mesh(ringGeo, ringMat);
+    photonRing.rotation.x = Math.PI / 2;
+    worldGroup.add(photonRing);
+
+    // 4. СПІРАЛЬНИЙ АККРЕЦІЙНИЙ ДИСК (60 000 частинок)
+    const galaxyCount = 55000;
     const galaxyGeo = new THREE.BufferGeometry();
     const positions = new Float32Array(galaxyCount * 3);
     const colors = new Float32Array(galaxyCount * 3);
-    const colorInside = new THREE.Color('#ff2050');
-    const colorOutside = new THREE.Color('#2b0014');
+
+    const cCenter = new THREE.Color('#ffffff');
+    const cMid = new THREE.Color('#ff0d55');
+    const cOuter = new THREE.Color('#380016');
 
     for (let i = 0; i < galaxyCount; i++) {
       const i3 = i * 3;
-      const radius = Math.random() * 34;
-      const spin = radius * 1.6;
-      const branchAngle = ((i % 3) * 2 * Math.PI) / 3;
+      // Розподіл від горизонту подій назовні
+      const radius = 4.2 + Math.pow(Math.random(), 1.6) * 30;
+      const spin = radius * 1.8;
+      const branchAngle = ((i % 4) * 2 * Math.PI) / 4;
 
-      const rx = Math.pow(Math.random(), 3) * (Math.random() < 0.5 ? 1 : -1) * 0.3 * radius;
-      const ry = Math.pow(Math.random(), 3) * (Math.random() < 0.5 ? 1 : -1) * 0.12 * radius;
-      const rz = Math.pow(Math.random(), 3) * (Math.random() < 0.5 ? 1 : -1) * 0.3 * radius;
+      const randomX = Math.pow(Math.random(), 3) * (Math.random() < 0.5 ? 1 : -1) * 0.28 * radius;
+      const randomY = Math.pow(Math.random(), 3) * (Math.random() < 0.5 ? 1 : -1) * 0.1 * radius;
+      const randomZ = Math.pow(Math.random(), 3) * (Math.random() < 0.5 ? 1 : -1) * 0.28 * radius;
 
-      positions[i3] = Math.cos(branchAngle + spin) * radius + rx;
-      positions[i3 + 1] = ry - 4.5;
-      positions[i3 + 2] = Math.sin(branchAngle + spin) * radius + rz;
+      positions[i3] = Math.cos(branchAngle + spin) * radius + randomX;
+      positions[i3 + 1] = randomY;
+      positions[i3 + 2] = Math.sin(branchAngle + spin) * radius + randomZ;
 
-      const mixed = colorInside.clone().lerp(colorOutside, radius / 34);
-      colors[i3] = mixed.r;
-      colors[i3 + 1] = mixed.g;
-      colors[i3 + 2] = mixed.b;
+      // Градієнт кольору
+      let col = cMid.clone();
+      const normR = (radius - 4.2) / 30;
+      if (normR < 0.2) {
+        col.lerpColors(cCenter, cMid, normR / 0.2);
+      } else {
+        col.lerpColors(cMid, cOuter, (normR - 0.2) / 0.8);
+      }
+
+      colors[i3] = col.r;
+      colors[i3 + 1] = col.g;
+      colors[i3 + 2] = col.b;
     }
+
     galaxyGeo.setAttribute('position', new THREE.BufferAttribute(positions, 3));
     galaxyGeo.setAttribute('color', new THREE.BufferAttribute(colors, 3));
 
     const galaxyMat = new THREE.PointsMaterial({
-      size: 0.18,
+      size: 0.55,
+      map: particleTex,
       vertexColors: true,
       blending: THREE.AdditiveBlending,
       depthWrite: false,
       transparent: true
     });
     const galaxy = new THREE.Points(galaxyGeo, galaxyMat);
-    galaxyWorld.add(galaxy);
+    worldGroup.add(galaxy);
 
-    // 4. Сяюче 3D-серце
-    const heartCount = 6500;
+    // 5. ГУСТЕ СЯЮЧЕ 3D-СЕРЦЕ З ЧАСТИНОК
+    const heartCount = 12000;
     const heartGeo = new THREE.BufferGeometry();
     const heartPos = new Float32Array(heartCount * 3);
+    const heartColors = new Float32Array(heartCount * 3);
+
+    const hColor1 = new THREE.Color('#ff0055');
+    const hColor2 = new THREE.Color('#ff9ebb');
 
     for (let i = 0; i < heartCount; i++) {
       const i3 = i * 3;
       const t = Math.PI * 2 * Math.random();
+      // Кардіоїда
       const x = 16 * Math.pow(Math.sin(t), 3);
       const y = 13 * Math.cos(t) - 5 * Math.cos(2 * t) - 2 * Math.cos(3 * t) - Math.cos(4 * t);
       const z = (Math.random() - 0.5) * 8;
-      const scale = 0.65;
+      const scale = 0.58 * (0.8 + 0.2 * Math.random());
 
       heartPos[i3] = x * scale;
-      heartPos[i3 + 1] = y * scale + 6.5;
+      heartPos[i3 + 1] = y * scale + 6.2;
       heartPos[i3 + 2] = z * scale;
+
+      const mix = hColor1.clone().lerp(hColor2, Math.random());
+      heartColors[i3] = mix.r;
+      heartColors[i3 + 1] = mix.g;
+      heartColors[i3 + 2] = mix.b;
     }
+
     heartGeo.setAttribute('position', new THREE.BufferAttribute(heartPos, 3));
+    heartGeo.setAttribute('color', new THREE.BufferAttribute(heartColors, 3));
+
     const heartMat = new THREE.PointsMaterial({
-      color: 0xff1447,
-      size: 0.28,
+      size: 0.65,
+      map: particleTex,
+      vertexColors: true,
       blending: THREE.AdditiveBlending,
       transparent: true,
-      opacity: 0.95
+      depthWrite: false
     });
     const heart = new THREE.Points(heartGeo, heartMat);
-    galaxyWorld.add(heart);
+    worldGroup.add(heart);
 
-    // ==============================================================
-    // 5. ДЕТАЛІЗОВАНА ГРАФІКА HELLO KITTY ТА SPIDER-MAN (3D СТИЛЬ)
-    // ==============================================================
-    function createDetailedKittyTexture() {
+    // 6. НЕОНОВІ НАПИСИ В СТИЛІ 3D (INFINITO ∞, TE AMO, AMOR ETERNO)
+    function createNeonTextSprite(text) {
       const c = document.createElement('canvas');
-      c.width = 256;
-      c.height = 256;
+      c.width = 512;
+      c.height = 128;
       const ctx = c.getContext('2d');
 
-      // М'яке неонове світіння
-      ctx.shadowColor = 'rgba(255, 105, 180, 0.8)';
-      ctx.shadowBlur = 20;
+      ctx.font = "900 40px 'Segoe UI', Arial, sans-serif";
+      ctx.textAlign = "center";
+      ctx.textBaseline = "middle";
 
-      // Тіло та рожеве платтячко
-      ctx.fillStyle = '#ff6584';
-      ctx.beginPath();
-      ctx.ellipse(128, 185, 45, 52, 0, 0, Math.PI * 2);
-      ctx.fill();
-
-      // Ручки
-      ctx.fillStyle = '#ffffff';
-      ctx.beginPath();
-      ctx.arc(80, 180, 16, 0, Math.PI * 2);
-      ctx.arc(176, 180, 16, 0, Math.PI * 2);
-      ctx.fill();
-
-      // Голова (біла з об'ємом)
-      const gradHead = ctx.createRadialGradient(115, 95, 10, 128, 110, 65);
-      gradHead.addColorStop(0, '#ffffff');
-      gradHead.addColorStop(1, '#f0e6ed');
-      ctx.fillStyle = gradHead;
-
-      ctx.beginPath();
-      ctx.ellipse(128, 110, 65, 52, 0, 0, Math.PI * 2);
-      ctx.fill();
-
-      // Вушка
-      ctx.beginPath();
-      ctx.moveTo(75, 75);
-      ctx.lineTo(92, 40);
-      ctx.lineTo(108, 65);
-      ctx.fill();
-
-      ctx.beginPath();
-      ctx.moveTo(181, 75);
-      ctx.lineTo(164, 40);
-      ctx.lineTo(148, 65);
-      ctx.fill();
-
-      // Рожевий фірмовий бантик
-      ctx.fillStyle = '#ff1493';
-      ctx.beginPath();
-      ctx.arc(88, 58, 11, 0, Math.PI * 2);
-      ctx.arc(70, 52, 14, 0, Math.PI * 2);
-      ctx.arc(106, 52, 14, 0, Math.PI * 2);
-      ctx.fill();
-      ctx.fillStyle = '#ffffff';
-      ctx.beginPath();
-      ctx.arc(88, 58, 4, 0, Math.PI * 2);
-      ctx.fill();
-
-      // Оченята
-      ctx.fillStyle = '#222222';
-      ctx.beginPath();
-      ctx.ellipse(104, 115, 6, 9, 0, 0, Math.PI * 2);
-      ctx.ellipse(152, 115, 6, 9, 0, 0, Math.PI * 2);
-      ctx.fill();
-
-      // Носик
-      ctx.fillStyle = '#ffb703';
-      ctx.beginPath();
-      ctx.ellipse(128, 124, 7, 5, 0, 0, Math.PI * 2);
-      ctx.fill();
-
-      // Вуса
-      ctx.strokeStyle = '#222222';
-      ctx.lineWidth = 3.5;
-      ctx.lineCap = 'round';
-      // ліві
-      ctx.beginPath(); ctx.moveTo(68, 110); ctx.lineTo(90, 112); ctx.stroke();
-      ctx.beginPath(); ctx.moveTo(66, 122); ctx.lineTo(88, 122); ctx.stroke();
-      // праві
-      ctx.beginPath(); ctx.moveTo(188, 110); ctx.lineTo(166, 112); ctx.stroke();
-      ctx.beginPath(); ctx.moveTo(190, 122); ctx.lineTo(168, 122); ctx.stroke();
-
-      return new THREE.CanvasTexture(c);
-    }
-
-    function createDetailedSpideyTexture() {
-      const c = document.createElement('canvas');
-      c.width = 256;
-      c.height = 256;
-      const ctx = c.getContext('2d');
-
-      // Неоновий ореол павука
-      ctx.shadowColor = 'rgba(0, 212, 255, 0.7)';
-      ctx.shadowBlur = 20;
-
-      // Тіло (синьо-червоне)
-      ctx.fillStyle = '#0056b3';
-      ctx.beginPath();
-      ctx.ellipse(128, 185, 38, 48, 0, 0, Math.PI * 2);
-      ctx.fill();
-
-      ctx.fillStyle = '#d90429';
-      ctx.beginPath();
-      ctx.ellipse(128, 175, 26, 40, 0, 0, Math.PI * 2);
-      ctx.fill();
-
-      // Маленький павучок на грудях
-      ctx.fillStyle = '#111';
-      ctx.beginPath();
-      ctx.arc(128, 175, 5, 0, Math.PI * 2);
-      ctx.fill();
-
-      // Голова в масці (об'ємний градієнт)
-      const gradHead = ctx.createRadialGradient(115, 95, 10, 128, 105, 55);
-      gradHead.addColorStop(0, '#ef233c');
-      gradHead.addColorStop(1, '#9b0018');
-      ctx.fillStyle = gradHead;
-
-      ctx.beginPath();
-      ctx.ellipse(128, 105, 52, 60, 0, 0, Math.PI * 2);
-      ctx.fill();
-
-      // Павутина на масці
-      ctx.strokeStyle = 'rgba(20, 20, 20, 0.45)';
+      // Багатошаровий неоновий глоу
+      ctx.shadowColor = "#ff0055";
+      ctx.shadowBlur = 25;
+      ctx.fillStyle = "#ffffff";
+      ctx.fillText(text, 256, 64);
+      ctx.strokeStyle = "#ff2a6d";
       ctx.lineWidth = 2.5;
-      ctx.beginPath();
-      ctx.arc(128, 105, 24, 0, Math.PI * 2);
-      ctx.arc(128, 105, 42, 0, Math.PI * 2);
-      ctx.stroke();
+      ctx.strokeText(text, 256, 64);
 
-      // Фірмові білі очі з чорним обведенням
-      function drawSpideyEye(x, y, scaleX) {
-        ctx.save();
-        ctx.translate(x, y);
-        ctx.scale(scaleX, 1);
-
-        ctx.fillStyle = '#111111';
-        ctx.beginPath();
-        ctx.moveTo(0, -18);
-        ctx.quadraticCurveTo(34, -4, 28, 22);
-        ctx.quadraticCurveTo(8, 12, 0, 0);
-        ctx.closePath();
-        ctx.fill();
-
-        ctx.fillStyle = '#ffffff';
-        ctx.beginPath();
-        ctx.moveTo(2, -14);
-        ctx.quadraticCurveTo(28, -2, 23, 18);
-        ctx.quadraticCurveTo(7, 9, 2, 0);
-        ctx.closePath();
-        ctx.fill();
-        ctx.restore();
-      }
-
-      drawSpideyEye(114, 102, -1);
-      drawSpideyEye(142, 102, 1);
-
-      return new THREE.CanvasTexture(c);
-    }
-
-    const kittyTex = createDetailedKittyTexture();
-    const spideyTex = createDetailedSpideyTexture();
-
-    const characters = [];
-    const charactersGroup = new THREE.Group();
-    galaxyWorld.add(charactersGroup);
-
-    // Розподіляємо персонажів по кількох кільцях навколо серця
-    const totalChars = 36;
-    for (let i = 0; i < totalChars; i++) {
-      const isKitty = i % 2 === 0;
+      const tex = new THREE.CanvasTexture(c);
       const mat = new THREE.SpriteMaterial({
-        map: isKitty ? kittyTex : spideyTex,
-        transparent: true
+        map: tex,
+        transparent: true,
+        blending: THREE.AdditiveBlending
       });
       const sprite = new THREE.Sprite(mat);
-      sprite.scale.set(3.4, 3.4, 1);
-
-      const ring = (i % 3);
-      const radius = 15.5 + ring * 5.2 + Math.random() * 1.5;
-      const angle = (i / totalChars) * Math.PI * 2;
-      const yOffset = -2.5 + (Math.random() - 0.5) * 2.8;
-
-      sprite.position.set(Math.cos(angle) * radius, yOffset, Math.sin(angle) * radius);
-      sprite.userData = {
-        baseAngle: angle,
-        radius: radius,
-        speed: (ring === 0 ? 0.08 : (ring === 1 ? 0.06 : 0.04)) * (1 + (i % 3) * 0.1),
-        yBase: yOffset,
-        floatFreq: 1.8 + Math.random()
-      };
-
-      characters.push(sprite);
-      charactersGroup.add(sprite);
+      sprite.scale.set(8.5, 2.1, 1);
+      return sprite;
     }
 
-    // ==============================================================
-    // 6. ІНТЕРАКТИВНІ ФОТО-МЕДАЛЬЙОНИ (ЗОЛОТИЙ ОРЕОЛ)
-    // ==============================================================
-    function createMiniBadge(imgUrl, callback) {
+    const words = ["INFINITO ∞", "TE AMO", "AMOR DE MI VIDA", "AMOR ETERNO"];
+    const labelsGroup = new THREE.Group();
+    worldGroup.add(labelsGroup);
+
+    words.forEach((w, idx) => {
+      const s = createNeonTextSprite(w);
+      const angle = (idx / words.length) * Math.PI * 2;
+      s.position.set(Math.cos(angle) * 22, -0.5, Math.sin(angle) * 22);
+      labelsGroup.add(s);
+    });
+
+    // 7. СПРАЙТИ ПЕРСОНАЖІВ HELLO KITTY & SPIDER-MAN НА ОРБІТІ
+    // Якісні PNG спрайти з акуратним неоновим сяйвом
+    const characters = [];
+    const charGroup = new THREE.Group();
+    worldGroup.add(charGroup);
+
+    const textureLoader = new THREE.TextureLoader();
+    const kittyUrl = "https://i.ibb.co/6P3XyX2/hello-kitty-love.png";
+    const spideyUrl = "https://i.ibb.co/VMyh4wQ/spidey-kitty.png";
+
+    // Створюємо 8 пар персонажів, що кружляють навколо чорної діри
+    textureLoader.load(spideyUrl, (spideyTex) => {
+      for (let i = 0; i < 6; i++) {
+        const mat = new THREE.SpriteMaterial({ map: spideyTex, transparent: true });
+        const sprite = new THREE.Sprite(mat);
+        sprite.scale.set(4.5, 3.8, 1);
+
+        const angle = (i / 6) * Math.PI * 2 + 0.5;
+        const radius = 17;
+        sprite.position.set(Math.cos(angle) * radius, 1, Math.sin(angle) * radius);
+        sprite.userData = { angle: angle, radius: radius, speed: 0.08, yBase: 1 };
+
+        characters.push(sprite);
+        charGroup.add(sprite);
+      }
+    });
+
+    // 8. ЗОЛОТІ СЯЮЧІ МЕДАЛЬЙОНИ З ВАШИМИ ФОТО
+    function createPhotoMedallion(imgUrl, callback) {
       const img = new Image();
       img.crossOrigin = "anonymous";
       img.src = imgUrl;
       img.onload = () => {
         const c = document.createElement('canvas');
-        c.width = 180;
-        c.height = 180;
+        c.width = 256; c.height = 256;
         const ctx = c.getContext('2d');
 
-        // Золотисте сяйво
-        ctx.beginPath();
-        ctx.arc(90, 90, 78, 0, Math.PI * 2);
-        ctx.fillStyle = '#ff2050';
-        ctx.shadowColor = '#ffd166';
-        ctx.shadowBlur = 22;
-        ctx.fill();
+        // Неонове світіння рамки
+        ctx.shadowColor = '#ff2a6d';
+        ctx.shadowBlur = 30;
 
-        // Кругле фото
-        ctx.save();
+        // Золотий контур
         ctx.beginPath();
-        ctx.arc(90, 90, 70, 0, Math.PI * 2);
-        ctx.clip();
-        ctx.drawImage(img, 0, 0, 180, 180);
-        ctx.restore();
-
-        // Золота рамка
-        ctx.beginPath();
-        ctx.arc(90, 90, 70, 0, Math.PI * 2);
-        ctx.lineWidth = 7;
+        ctx.arc(128, 128, 105, 0, Math.PI * 2);
         ctx.strokeStyle = '#ffeaa7';
+        ctx.lineWidth = 10;
         ctx.stroke();
 
-        ctx.font = '26px sans-serif';
-        ctx.fillText('❤️', 135, 155);
+        // Кругла фотографія
+        ctx.save();
+        ctx.beginPath();
+        ctx.arc(128, 128, 98, 0, Math.PI * 2);
+        ctx.clip();
+        ctx.drawImage(img, 0, 0, 256, 256);
+        ctx.restore();
+
+        // Маленьке сердечко
+        ctx.font = '36px sans-serif';
+        ctx.fillText('💖', 190, 220);
 
         const tex = new THREE.CanvasTexture(c);
         callback(tex);
@@ -621,40 +592,36 @@
 
     const miniBadges = [];
     const badgesGroup = new THREE.Group();
-    galaxyWorld.add(badgesGroup);
+    worldGroup.add(badgesGroup);
 
     memories.forEach((mem, index) => {
-      createMiniBadge(mem.image, (texture) => {
+      createPhotoMedallion(mem.image, (texture) => {
         const mat = new THREE.SpriteMaterial({ map: texture, transparent: true });
         const sprite = new THREE.Sprite(mat);
-        sprite.scale.set(3.6, 3.6, 1);
+        sprite.scale.set(4.2, 4.2, 1);
 
-        const angle = (index / memories.length) * Math.PI * 2 + 0.35;
-        const radius = 20.5;
-        sprite.position.set(Math.cos(angle) * radius, -2.2, Math.sin(angle) * radius);
-
+        const angle = (index / memories.length) * Math.PI * 2 + 0.2;
+        const radius = 19;
+        sprite.position.set(Math.cos(angle) * radius, -0.5, Math.sin(angle) * radius);
         sprite.userData = { index: index, baseAngle: angle, radius: radius };
+
         miniBadges.push(sprite);
         badgesGroup.add(sprite);
       });
     });
 
-    // 7. Кліки без хибних спрацьовувань при свайпі
+    // 9. Відкриття фото по кліку без зривів обертання
     const raycaster = new THREE.Raycaster();
     const mouse = new THREE.Vector2();
-    let pointerStartX = 0;
-    let pointerStartY = 0;
+    let pStartX = 0, pStartY = 0;
 
     window.addEventListener('pointerdown', (e) => {
-      pointerStartX = e.clientX;
-      pointerStartY = e.clientY;
+      pStartX = e.clientX; pStartY = e.clientY;
     });
 
     window.addEventListener('pointerup', (e) => {
       if (cardContainer.classList.contains('active')) return;
-
-      const dist = Math.hypot(e.clientX - pointerStartX, e.clientY - pointerStartY);
-      if (dist > 6) return;
+      if (Math.hypot(e.clientX - pStartX, e.clientY - pStartY) > 6) return;
 
       mouse.x = (e.clientX / window.innerWidth) * 2 - 1;
       mouse.y = -(e.clientY / window.innerHeight) * 2 + 1;
@@ -688,69 +655,71 @@
     });
 
     cardContainer.addEventListener('click', (e) => {
-      if (e.target === cardContainer) {
-        cardContainer.classList.remove('active');
-      }
+      if (e.target === cardContainer) cardContainer.classList.remove('active');
     });
 
-    // 8. Анімація появи
+    // 10. АНІМАЦІЯ ПОЯВИ З ПРИСКОРЕННЯМ (WARP SPEED TO SINGULARITY)
     let isSpawning = false;
     let spawnStartTime = 0;
 
     startBtn.addEventListener('click', () => {
       startScreen.classList.add('hidden');
       if (bgMusic) {
-        bgMusic.play().catch(e => console.log("Audio waiting:", e));
+        bgMusic.play().catch(e => console.log(e));
       }
 
       isSpawning = true;
       spawnStartTime = performance.now();
     });
 
-    // 9. Анімаційний цикл
+    // 11. Головний цикл відтворення
     const clock = new THREE.Clock();
 
     function animate() {
       requestAnimationFrame(animate);
       const t = clock.getElapsedTime();
 
+      // Народження системи
       if (isSpawning) {
-        const progress = Math.min((performance.now() - spawnStartTime) / 2200, 1);
+        const progress = Math.min((performance.now() - spawnStartTime) / 2400, 1);
         const scaleVal = 1 - Math.pow(1 - progress, 3);
-        galaxyWorld.scale.set(scaleVal, scaleVal, scaleVal);
-        galaxy.rotation.y += (1 - progress) * 0.05;
+        worldGroup.scale.set(scaleVal, scaleVal, scaleVal);
+        galaxy.rotation.y += (1 - progress) * 0.08;
 
         if (progress >= 1) {
-          galaxyWorld.scale.set(1, 1, 1);
+          worldGroup.scale.set(1, 1, 1);
           isSpawning = false;
         }
       }
 
-      galaxy.rotation.y += 0.002;
+      // Постійне обертання аккреційного диска
+      galaxy.rotation.y += 0.003;
+      photonRing.rotation.z += 0.01;
+      labelsGroup.rotation.y = -t * 0.08;
 
-      // Плавний рух фігурок Hello Kitty та Spider-Man
+      // Рух персонажів
       characters.forEach((char) => {
         const d = char.userData;
-        const curAngle = d.baseAngle + t * d.speed;
+        const curAngle = d.angle + t * d.speed;
         char.position.x = Math.cos(curAngle) * d.radius;
         char.position.z = Math.sin(curAngle) * d.radius;
-        char.position.y = d.yBase + Math.sin(t * d.floatFreq) * 0.45;
+        char.position.y = d.yBase + Math.sin(t * 2.2) * 0.4;
       });
 
-      // Рух ваших фото-медальйонів
+      // Рух фото-медальйонів
       miniBadges.forEach((b, i) => {
-        const curAngle = b.userData.baseAngle + t * 0.07;
+        const curAngle = b.userData.baseAngle + t * 0.06;
         b.position.x = Math.cos(curAngle) * b.userData.radius;
         b.position.z = Math.sin(curAngle) * b.userData.radius;
-        b.position.y = -2.2 + Math.sin(t * 2 + i) * 0.35;
+        b.position.y = -0.5 + Math.sin(t * 2 + i) * 0.35;
       });
 
-      // Пульсація серця
-      const beat = 1 + Math.sin(t * 3.2) * 0.06;
+      // Густе пульсування серця
+      const beat = 1 + Math.sin(t * 3.4) * 0.07;
       heart.scale.set(beat, beat, beat);
 
       controls.update();
-      renderer.render(scene, camera);
+      composer.render();
     }
     animate();
 
@@ -758,7 +727,7 @@
       camera.aspect = window.innerWidth / window.innerHeight;
       camera.updateProjectionMatrix();
       renderer.setSize(window.innerWidth, window.innerHeight);
-      renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+      composer.setSize(window.innerWidth, window.innerHeight);
     });
   </script>
 </body>

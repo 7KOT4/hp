@@ -71,7 +71,7 @@
     }
 
     .mascot {
-      font-size: 70px;
+      font-size: 65px;
       margin: 15px 0 25px 0;
       animation: floatMascot 2.5s ease-in-out infinite alternate;
       display: inline-block;
@@ -117,9 +117,9 @@
       pointer-events: none;
       opacity: 0;
       transition: opacity 0.4s ease;
-      background: radial-gradient(circle at center, rgba(35, 3, 16, 0.6) 0%, rgba(0, 0, 0, 0.8) 100%);
-      backdrop-filter: blur(6px);
-      -webkit-backdrop-filter: blur(6px);
+      background: radial-gradient(circle at center, rgba(35, 3, 16, 0.6) 0%, rgba(0, 0, 0, 0.85) 100%);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
     }
 
     #photo-card-container.active {
@@ -128,9 +128,9 @@
     }
 
     .memory-card {
-      background: rgba(18, 2, 8, 0.92);
-      border: 1px solid rgba(255, 64, 129, 0.45);
-      box-shadow: 0 0 50px rgba(255, 30, 90, 0.4);
+      background: rgba(18, 2, 8, 0.94);
+      border: 1px solid rgba(255, 64, 129, 0.5);
+      box-shadow: 0 0 50px rgba(255, 30, 90, 0.45);
       border-radius: 26px;
       padding: 22px 20px;
       max-width: 320px;
@@ -149,9 +149,9 @@
       height: 200px;
       object-fit: cover;
       border-radius: 18px;
-      border: 1px solid rgba(255, 255, 255, 0.15);
+      border: 1px solid rgba(255, 255, 255, 0.2);
       margin-bottom: 14px;
-      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.5);
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.6);
     }
 
     .memory-card h2 {
@@ -216,14 +216,14 @@
   <div id="start-screen">
     <div class="card-start">
       <h1 class="title">Галактика Кохання</h1>
-      <div class="mascot">🐰🤍🐱</div>
+      <div class="mascot">🐱❤️🕷️</div>
       <button class="btn-start" id="start-btn">
         РОЗПОЧАТИ 💌
       </button>
     </div>
   </div>
 
-  <!-- Модальне вікно для фото -->
+  <!-- Модальне вікно для показу фото -->
   <div id="photo-card-container">
     <div class="memory-card">
       <img id="card-img" src="" alt="Спогад">
@@ -239,9 +239,7 @@
   <canvas id="webgl-canvas"></canvas>
 
   <script>
-    // ==========================================
     // ВАШІ ФОТО ТА ПІДПИСИ
-    // ==========================================
     const memories = [
       {
         title: "Кохання Мого Життя ❤️",
@@ -281,7 +279,7 @@
 
     // 1. Сцена та Камера
     const scene = new THREE.Scene();
-    scene.fog = new THREE.FogExp2(0x030005, 0.008);
+    scene.fog = new THREE.FogExp2(0x030005, 0.007);
 
     const camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 1000);
     camera.position.set(0, 26, 56);
@@ -379,46 +377,177 @@
     galaxyWorld.add(heart);
 
     // ==============================================================
-    // 5. ГЕНЕРАЦІЯ HELLO KITTY ТА SPIDER-MAN
+    // 5. ДЕТАЛІЗОВАНА ГРАФІКА HELLO KITTY ТА SPIDER-MAN (3D СТИЛЬ)
     // ==============================================================
-    function generateCharacterTexture(type) {
+    function createDetailedKittyTexture() {
       const c = document.createElement('canvas');
-      c.width = 140;
-      c.height = 140;
+      c.width = 256;
+      c.height = 256;
       const ctx = c.getContext('2d');
-      ctx.textAlign = 'center';
-      ctx.textBaseline = 'middle';
 
-      // Ніжний рожевий/неоновий ореол
-      ctx.shadowColor = (type === 'kitty') ? '#ff70a6' : '#00d4ff';
-      ctx.shadowBlur = 18;
+      // М'яке неонове світіння
+      ctx.shadowColor = 'rgba(255, 105, 180, 0.8)';
+      ctx.shadowBlur = 20;
 
-      if (type === 'kitty') {
-        // Hello Kitty
-        ctx.font = '72px sans-serif';
-        ctx.fillText('🐱', 70, 75);
-        ctx.font = '32px sans-serif';
-        ctx.fillText('🎀', 48, 38);
-      } else {
-        // Spider-Man
-        ctx.font = '72px sans-serif';
-        ctx.fillText('🕷️', 70, 75);
-        ctx.font = '30px sans-serif';
-        ctx.fillText('🕸️', 100, 45);
-      }
+      // Тіло та рожеве платтячко
+      ctx.fillStyle = '#ff6584';
+      ctx.beginPath();
+      ctx.ellipse(128, 185, 45, 52, 0, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Ручки
+      ctx.fillStyle = '#ffffff';
+      ctx.beginPath();
+      ctx.arc(80, 180, 16, 0, Math.PI * 2);
+      ctx.arc(176, 180, 16, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Голова (біла з об'ємом)
+      const gradHead = ctx.createRadialGradient(115, 95, 10, 128, 110, 65);
+      gradHead.addColorStop(0, '#ffffff');
+      gradHead.addColorStop(1, '#f0e6ed');
+      ctx.fillStyle = gradHead;
+
+      ctx.beginPath();
+      ctx.ellipse(128, 110, 65, 52, 0, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Вушка
+      ctx.beginPath();
+      ctx.moveTo(75, 75);
+      ctx.lineTo(92, 40);
+      ctx.lineTo(108, 65);
+      ctx.fill();
+
+      ctx.beginPath();
+      ctx.moveTo(181, 75);
+      ctx.lineTo(164, 40);
+      ctx.lineTo(148, 65);
+      ctx.fill();
+
+      // Рожевий фірмовий бантик
+      ctx.fillStyle = '#ff1493';
+      ctx.beginPath();
+      ctx.arc(88, 58, 11, 0, Math.PI * 2);
+      ctx.arc(70, 52, 14, 0, Math.PI * 2);
+      ctx.arc(106, 52, 14, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.fillStyle = '#ffffff';
+      ctx.beginPath();
+      ctx.arc(88, 58, 4, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Оченята
+      ctx.fillStyle = '#222222';
+      ctx.beginPath();
+      ctx.ellipse(104, 115, 6, 9, 0, 0, Math.PI * 2);
+      ctx.ellipse(152, 115, 6, 9, 0, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Носик
+      ctx.fillStyle = '#ffb703';
+      ctx.beginPath();
+      ctx.ellipse(128, 124, 7, 5, 0, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Вуса
+      ctx.strokeStyle = '#222222';
+      ctx.lineWidth = 3.5;
+      ctx.lineCap = 'round';
+      // ліві
+      ctx.beginPath(); ctx.moveTo(68, 110); ctx.lineTo(90, 112); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(66, 122); ctx.lineTo(88, 122); ctx.stroke();
+      // праві
+      ctx.beginPath(); ctx.moveTo(188, 110); ctx.lineTo(166, 112); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(190, 122); ctx.lineTo(168, 122); ctx.stroke();
 
       return new THREE.CanvasTexture(c);
     }
 
-    const kittyTex = generateCharacterTexture('kitty');
-    const spideyTex = generateCharacterTexture('spidey');
+    function createDetailedSpideyTexture() {
+      const c = document.createElement('canvas');
+      c.width = 256;
+      c.height = 256;
+      const ctx = c.getContext('2d');
+
+      // Неоновий ореол павука
+      ctx.shadowColor = 'rgba(0, 212, 255, 0.7)';
+      ctx.shadowBlur = 20;
+
+      // Тіло (синьо-червоне)
+      ctx.fillStyle = '#0056b3';
+      ctx.beginPath();
+      ctx.ellipse(128, 185, 38, 48, 0, 0, Math.PI * 2);
+      ctx.fill();
+
+      ctx.fillStyle = '#d90429';
+      ctx.beginPath();
+      ctx.ellipse(128, 175, 26, 40, 0, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Маленький павучок на грудях
+      ctx.fillStyle = '#111';
+      ctx.beginPath();
+      ctx.arc(128, 175, 5, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Голова в масці (об'ємний градієнт)
+      const gradHead = ctx.createRadialGradient(115, 95, 10, 128, 105, 55);
+      gradHead.addColorStop(0, '#ef233c');
+      gradHead.addColorStop(1, '#9b0018');
+      ctx.fillStyle = gradHead;
+
+      ctx.beginPath();
+      ctx.ellipse(128, 105, 52, 60, 0, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Павутина на масці
+      ctx.strokeStyle = 'rgba(20, 20, 20, 0.45)';
+      ctx.lineWidth = 2.5;
+      ctx.beginPath();
+      ctx.arc(128, 105, 24, 0, Math.PI * 2);
+      ctx.arc(128, 105, 42, 0, Math.PI * 2);
+      ctx.stroke();
+
+      // Фірмові білі очі з чорним обведенням
+      function drawSpideyEye(x, y, scaleX) {
+        ctx.save();
+        ctx.translate(x, y);
+        ctx.scale(scaleX, 1);
+
+        ctx.fillStyle = '#111111';
+        ctx.beginPath();
+        ctx.moveTo(0, -18);
+        ctx.quadraticCurveTo(34, -4, 28, 22);
+        ctx.quadraticCurveTo(8, 12, 0, 0);
+        ctx.closePath();
+        ctx.fill();
+
+        ctx.fillStyle = '#ffffff';
+        ctx.beginPath();
+        ctx.moveTo(2, -14);
+        ctx.quadraticCurveTo(28, -2, 23, 18);
+        ctx.quadraticCurveTo(7, 9, 2, 0);
+        ctx.closePath();
+        ctx.fill();
+        ctx.restore();
+      }
+
+      drawSpideyEye(114, 102, -1);
+      drawSpideyEye(142, 102, 1);
+
+      return new THREE.CanvasTexture(c);
+    }
+
+    const kittyTex = createDetailedKittyTexture();
+    const spideyTex = createDetailedSpideyTexture();
 
     const characters = [];
     const charactersGroup = new THREE.Group();
     galaxyWorld.add(charactersGroup);
 
-    // Створюємо 2 кільця персонажів (внутрішнє і зовнішнє)
-    const totalChars = 32;
+    // Розподіляємо персонажів по кількох кільцях навколо серця
+    const totalChars = 36;
     for (let i = 0; i < totalChars; i++) {
       const isKitty = i % 2 === 0;
       const mat = new THREE.SpriteMaterial({
@@ -426,19 +555,18 @@
         transparent: true
       });
       const sprite = new THREE.Sprite(mat);
-      sprite.scale.set(3.2, 3.2, 1);
+      sprite.scale.set(3.4, 3.4, 1);
 
-      // Розподіл по двом орбітам
-      const ring = (i % 4 === 0 || i % 4 === 1) ? 1 : 2;
-      const radius = (ring === 1) ? 16 + Math.random() * 2 : 23 + Math.random() * 3;
+      const ring = (i % 3);
+      const radius = 15.5 + ring * 5.2 + Math.random() * 1.5;
       const angle = (i / totalChars) * Math.PI * 2;
-      const yOffset = -2.5 + (Math.random() - 0.5) * 3;
+      const yOffset = -2.5 + (Math.random() - 0.5) * 2.8;
 
       sprite.position.set(Math.cos(angle) * radius, yOffset, Math.sin(angle) * radius);
       sprite.userData = {
         baseAngle: angle,
         radius: radius,
-        speed: (ring === 1 ? 0.08 : 0.05) * (1 + (i % 3) * 0.1),
+        speed: (ring === 0 ? 0.08 : (ring === 1 ? 0.06 : 0.04)) * (1 + (i % 3) * 0.1),
         yBase: yOffset,
         floatFreq: 1.8 + Math.random()
       };
@@ -448,7 +576,7 @@
     }
 
     // ==============================================================
-    // 6. ІНТЕРАКТИВНІ ФОТО-БЕЙДЖІ (ЗОЛОТИЙ ОРЕОЛ)
+    // 6. ІНТЕРАКТИВНІ ФОТО-МЕДАЛЬЙОНИ (ЗОЛОТИЙ ОРЕОЛ)
     // ==============================================================
     function createMiniBadge(imgUrl, callback) {
       const img = new Image();
@@ -456,35 +584,35 @@
       img.src = imgUrl;
       img.onload = () => {
         const c = document.createElement('canvas');
-        c.width = 160;
-        c.height = 160;
+        c.width = 180;
+        c.height = 180;
         const ctx = c.getContext('2d');
 
-        // Золотисто-рожеве сяйво
+        // Золотисте сяйво
         ctx.beginPath();
-        ctx.arc(80, 80, 72, 0, Math.PI * 2);
-        ctx.fillStyle = '#ff3366';
+        ctx.arc(90, 90, 78, 0, Math.PI * 2);
+        ctx.fillStyle = '#ff2050';
         ctx.shadowColor = '#ffd166';
-        ctx.shadowBlur = 18;
+        ctx.shadowBlur = 22;
         ctx.fill();
 
-        // Кругла маска під фото
+        // Кругле фото
         ctx.save();
         ctx.beginPath();
-        ctx.arc(80, 80, 64, 0, Math.PI * 2);
+        ctx.arc(90, 90, 70, 0, Math.PI * 2);
         ctx.clip();
-        ctx.drawImage(img, 0, 0, 160, 160);
+        ctx.drawImage(img, 0, 0, 180, 180);
         ctx.restore();
 
-        // Золота окантовка
+        // Золота рамка
         ctx.beginPath();
-        ctx.arc(80, 80, 64, 0, Math.PI * 2);
-        ctx.lineWidth = 6;
+        ctx.arc(90, 90, 70, 0, Math.PI * 2);
+        ctx.lineWidth = 7;
         ctx.strokeStyle = '#ffeaa7';
         ctx.stroke();
 
-        ctx.font = '24px sans-serif';
-        ctx.fillText('❤️', 120, 138);
+        ctx.font = '26px sans-serif';
+        ctx.fillText('❤️', 135, 155);
 
         const tex = new THREE.CanvasTexture(c);
         callback(tex);
@@ -499,10 +627,10 @@
       createMiniBadge(mem.image, (texture) => {
         const mat = new THREE.SpriteMaterial({ map: texture, transparent: true });
         const sprite = new THREE.Sprite(mat);
-        sprite.scale.set(3.4, 3.4, 1);
+        sprite.scale.set(3.6, 3.6, 1);
 
-        const angle = (index / memories.length) * Math.PI * 2 + 0.3;
-        const radius = 19.5;
+        const angle = (index / memories.length) * Math.PI * 2 + 0.35;
+        const radius = 20.5;
         sprite.position.set(Math.cos(angle) * radius, -2.2, Math.sin(angle) * radius);
 
         sprite.userData = { index: index, baseAngle: angle, radius: radius };
@@ -586,7 +714,6 @@
       requestAnimationFrame(animate);
       const t = clock.getElapsedTime();
 
-      // Народження галактики
       if (isSpawning) {
         const progress = Math.min((performance.now() - spawnStartTime) / 2200, 1);
         const scaleVal = 1 - Math.pow(1 - progress, 3);
@@ -601,7 +728,7 @@
 
       galaxy.rotation.y += 0.002;
 
-      // Рух Hello Kitty та Spider-Man
+      // Плавний рух фігурок Hello Kitty та Spider-Man
       characters.forEach((char) => {
         const d = char.userData;
         const curAngle = d.baseAngle + t * d.speed;
@@ -610,7 +737,7 @@
         char.position.y = d.yBase + Math.sin(t * d.floatFreq) * 0.45;
       });
 
-      // Рух ваших фото
+      // Рух ваших фото-медальйонів
       miniBadges.forEach((b, i) => {
         const curAngle = b.userData.baseAngle + t * 0.07;
         b.position.x = Math.cos(curAngle) * b.userData.radius;

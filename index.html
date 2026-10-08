@@ -239,6 +239,9 @@
   <canvas id="webgl-canvas"></canvas>
 
   <script>
+    // ==========================================
+    // ВАШІ ФОТО ТА ПІДПИСИ
+    // ==========================================
     const memories = [
       {
         title: "Кохання Мого Життя ❤️",
@@ -276,7 +279,7 @@
     const nextBtn = document.getElementById('next-btn');
     const closeBtn = document.getElementById('close-btn');
 
-    // 1. Сцена та Камера (стабільне налаштування як було раніше)
+    // 1. Сцена та Камера
     const scene = new THREE.Scene();
     scene.fog = new THREE.FogExp2(0x030005, 0.008);
 
@@ -287,16 +290,14 @@
     renderer.setSize(window.innerWidth, window.innerHeight);
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 
-    // OrbitControls: вільне обертання без скидання назад
     const controls = new THREE.OrbitControls(camera, renderer.domElement);
     controls.enableDamping = true;
     controls.dampingFactor = 0.06;
     controls.maxDistance = 110;
     controls.minDistance = 12;
 
-    // Головна група всієї галактики (для плавної анімації розгортання)
     const galaxyWorld = new THREE.Group();
-    galaxyWorld.scale.set(0.001, 0.001, 0.001); // Початково в точці
+    galaxyWorld.scale.set(0.001, 0.001, 0.001);
     scene.add(galaxyWorld);
 
     // 2. Фоновий зоряний пил
@@ -377,38 +378,78 @@
     const heart = new THREE.Points(heartGeo, heartMat);
     galaxyWorld.add(heart);
 
-    // 5. Текстові написи
-    function createTextSprite(text) {
+    // ==============================================================
+    // 5. ГЕНЕРАЦІЯ HELLO KITTY ТА SPIDER-MAN
+    // ==============================================================
+    function generateCharacterTexture(type) {
       const c = document.createElement('canvas');
+      c.width = 140;
+      c.height = 140;
       const ctx = c.getContext('2d');
-      c.width = 512;
-      c.height = 128;
-      ctx.fillStyle = "rgba(255, 45, 95, 0.95)";
-      ctx.shadowColor = "#ff0055";
-      ctx.shadowBlur = 18;
-      ctx.font = "Bold 34px sans-serif";
-      ctx.textAlign = "center";
-      ctx.fillText(text, 256, 75);
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
 
-      const tex = new THREE.CanvasTexture(c);
-      const mat = new THREE.SpriteMaterial({ map: tex, transparent: true });
-      const sprite = new THREE.Sprite(mat);
-      sprite.scale.set(7.5, 1.85, 1);
-      return sprite;
+      // Ніжний рожевий/неоновий ореол
+      ctx.shadowColor = (type === 'kitty') ? '#ff70a6' : '#00d4ff';
+      ctx.shadowBlur = 18;
+
+      if (type === 'kitty') {
+        // Hello Kitty
+        ctx.font = '72px sans-serif';
+        ctx.fillText('🐱', 70, 75);
+        ctx.font = '32px sans-serif';
+        ctx.fillText('🎀', 48, 38);
+      } else {
+        // Spider-Man
+        ctx.font = '72px sans-serif';
+        ctx.fillText('🕷️', 70, 75);
+        ctx.font = '30px sans-serif';
+        ctx.fillText('🕸️', 100, 45);
+      }
+
+      return new THREE.CanvasTexture(c);
     }
 
-    const words = ["КОХАЮ ТЕБЕ", "НАЗАВЖДИ ∞", "МОЄ СЕРДЕНЬКО", "ВІЧНЕ КОХАННЯ"];
-    const labelsGroup = new THREE.Group();
-    galaxyWorld.add(labelsGroup);
+    const kittyTex = generateCharacterTexture('kitty');
+    const spideyTex = generateCharacterTexture('spidey');
 
-    words.forEach((w, idx) => {
-      const s = createTextSprite(w);
-      const angle = (idx / words.length) * Math.PI * 2;
-      s.position.set(Math.cos(angle) * 22, -2, Math.sin(angle) * 22);
-      labelsGroup.add(s);
-    });
+    const characters = [];
+    const charactersGroup = new THREE.Group();
+    galaxyWorld.add(charactersGroup);
 
-    // 6. Міні-аватарки в дискі
+    // Створюємо 2 кільця персонажів (внутрішнє і зовнішнє)
+    const totalChars = 32;
+    for (let i = 0; i < totalChars; i++) {
+      const isKitty = i % 2 === 0;
+      const mat = new THREE.SpriteMaterial({
+        map: isKitty ? kittyTex : spideyTex,
+        transparent: true
+      });
+      const sprite = new THREE.Sprite(mat);
+      sprite.scale.set(3.2, 3.2, 1);
+
+      // Розподіл по двом орбітам
+      const ring = (i % 4 === 0 || i % 4 === 1) ? 1 : 2;
+      const radius = (ring === 1) ? 16 + Math.random() * 2 : 23 + Math.random() * 3;
+      const angle = (i / totalChars) * Math.PI * 2;
+      const yOffset = -2.5 + (Math.random() - 0.5) * 3;
+
+      sprite.position.set(Math.cos(angle) * radius, yOffset, Math.sin(angle) * radius);
+      sprite.userData = {
+        baseAngle: angle,
+        radius: radius,
+        speed: (ring === 1 ? 0.08 : 0.05) * (1 + (i % 3) * 0.1),
+        yBase: yOffset,
+        floatFreq: 1.8 + Math.random()
+      };
+
+      characters.push(sprite);
+      charactersGroup.add(sprite);
+    }
+
+    // ==============================================================
+    // 6. ІНТЕРАКТИВНІ ФОТО-БЕЙДЖІ (ЗОЛОТИЙ ОРЕОЛ)
+    // ==============================================================
     function createMiniBadge(imgUrl, callback) {
       const img = new Image();
       img.crossOrigin = "anonymous";
@@ -419,13 +460,15 @@
         c.height = 160;
         const ctx = c.getContext('2d');
 
+        // Золотисто-рожеве сяйво
         ctx.beginPath();
-        ctx.arc(80, 80, 70, 0, Math.PI * 2);
-        ctx.fillStyle = '#ff2060';
-        ctx.shadowColor = '#ff2060';
-        ctx.shadowBlur = 15;
+        ctx.arc(80, 80, 72, 0, Math.PI * 2);
+        ctx.fillStyle = '#ff3366';
+        ctx.shadowColor = '#ffd166';
+        ctx.shadowBlur = 18;
         ctx.fill();
 
+        // Кругла маска під фото
         ctx.save();
         ctx.beginPath();
         ctx.arc(80, 80, 64, 0, Math.PI * 2);
@@ -433,14 +476,15 @@
         ctx.drawImage(img, 0, 0, 160, 160);
         ctx.restore();
 
+        // Золота окантовка
         ctx.beginPath();
         ctx.arc(80, 80, 64, 0, Math.PI * 2);
         ctx.lineWidth = 6;
-        ctx.strokeStyle = '#ffffff';
+        ctx.strokeStyle = '#ffeaa7';
         ctx.stroke();
 
         ctx.font = '24px sans-serif';
-        ctx.fillText('💖', 120, 140);
+        ctx.fillText('❤️', 120, 138);
 
         const tex = new THREE.CanvasTexture(c);
         callback(tex);
@@ -455,12 +499,11 @@
       createMiniBadge(mem.image, (texture) => {
         const mat = new THREE.SpriteMaterial({ map: texture, transparent: true });
         const sprite = new THREE.Sprite(mat);
+        sprite.scale.set(3.4, 3.4, 1);
 
-        sprite.scale.set(2.8, 2.8, 1);
-
-        const angle = (index / memories.length) * Math.PI * 2;
-        const radius = 15.5;
-        sprite.position.set(Math.cos(angle) * radius, -2.5, Math.sin(angle) * radius);
+        const angle = (index / memories.length) * Math.PI * 2 + 0.3;
+        const radius = 19.5;
+        sprite.position.set(Math.cos(angle) * radius, -2.2, Math.sin(angle) * radius);
 
         sprite.userData = { index: index, baseAngle: angle, radius: radius };
         miniBadges.push(sprite);
@@ -468,7 +511,7 @@
       });
     });
 
-    // 7. Чітке розпізнавання кліку (щоб не плутати клік зі свайпом/обертанням)
+    // 7. Кліки без хибних спрацьовувань при свайпі
     const raycaster = new THREE.Raycaster();
     const mouse = new THREE.Vector2();
     let pointerStartX = 0;
@@ -482,7 +525,6 @@
     window.addEventListener('pointerup', (e) => {
       if (cardContainer.classList.contains('active')) return;
 
-      // Якщо палець/миша зрушились більше ніж на 6 пікселів — це було обертання сцени, НЕ клік!
       const dist = Math.hypot(e.clientX - pointerStartX, e.clientY - pointerStartY);
       if (dist > 6) return;
 
@@ -523,7 +565,7 @@
       }
     });
 
-    // 8. Анімація появи всієї системи при кліку на «РОЗПОЧАТИ»
+    // 8. Анімація появи
     let isSpawning = false;
     let spawnStartTime = 0;
 
@@ -544,14 +586,11 @@
       requestAnimationFrame(animate);
       const t = clock.getElapsedTime();
 
-      // Плавне розгортання галактики з центру при старті
+      // Народження галактики
       if (isSpawning) {
         const progress = Math.min((performance.now() - spawnStartTime) / 2200, 1);
-        // Кубічне виринання з м'яким відскоком (overshoot)
         const scaleVal = 1 - Math.pow(1 - progress, 3);
         galaxyWorld.scale.set(scaleVal, scaleVal, scaleVal);
-
-        // Прискорене розкручування диска на старті
         galaxy.rotation.y += (1 - progress) * 0.05;
 
         if (progress >= 1) {
@@ -560,23 +599,29 @@
         }
       }
 
-      // Постійний рух галактики
       galaxy.rotation.y += 0.002;
-      labelsGroup.rotation.y = -t * 0.08;
 
-      // Рух і покачування маленьких фото
-      miniBadges.forEach((b, i) => {
-        const curAngle = b.userData.baseAngle + t * 0.1;
-        b.position.x = Math.cos(curAngle) * b.userData.radius;
-        b.position.z = Math.sin(curAngle) * b.userData.radius;
-        b.position.y = -2.5 + Math.sin(t * 2 + i) * 0.4;
+      // Рух Hello Kitty та Spider-Man
+      characters.forEach((char) => {
+        const d = char.userData;
+        const curAngle = d.baseAngle + t * d.speed;
+        char.position.x = Math.cos(curAngle) * d.radius;
+        char.position.z = Math.sin(curAngle) * d.radius;
+        char.position.y = d.yBase + Math.sin(t * d.floatFreq) * 0.45;
       });
 
-      // Живе серцебиття (пульсація)
+      // Рух ваших фото
+      miniBadges.forEach((b, i) => {
+        const curAngle = b.userData.baseAngle + t * 0.07;
+        b.position.x = Math.cos(curAngle) * b.userData.radius;
+        b.position.z = Math.sin(curAngle) * b.userData.radius;
+        b.position.y = -2.2 + Math.sin(t * 2 + i) * 0.35;
+      });
+
+      // Пульсація серця
       const beat = 1 + Math.sin(t * 3.2) * 0.06;
       heart.scale.set(beat, beat, beat);
 
-      // Оновлення обертання сцени
       controls.update();
       renderer.render(scene, camera);
     }

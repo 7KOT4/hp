@@ -46,7 +46,13 @@
       justify-content: center;
       align-items: center;
       z-index: 50;
-      transition: opacity 0.8s ease, visibility 0.8s ease;
+      transition: opacity 1s cubic-bezier(0.4, 0, 0.2, 1), transform 1s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    #start-screen.fading-out {
+      opacity: 0;
+      transform: scale(1.15);
+      pointer-events: none;
     }
 
     .card-start {
@@ -103,7 +109,7 @@
       box-shadow: 0 0 35px rgba(255, 42, 95, 0.9);
     }
 
-    /* Модальна картка спогадів */
+    /* Модальне вікно для фото */
     #photo-card-container {
       position: fixed;
       top: 0;
@@ -196,12 +202,6 @@
     .btn-action:hover {
       transform: scale(1.05);
     }
-
-    .hidden {
-      opacity: 0 !important;
-      visibility: hidden !important;
-      pointer-events: none !important;
-    }
   </style>
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
@@ -209,7 +209,7 @@
 </head>
 <body>
 
-  <!-- Аудіофайл music.mp3 -->
+  <!-- Аудіо music.mp3 -->
   <audio id="bg-music" src="music.mp3" loop preload="auto"></audio>
 
   <!-- Стартовий екран -->
@@ -223,7 +223,7 @@
     </div>
   </div>
 
-  <!-- Вікно спогадів (збільшене фото і текст) -->
+  <!-- Вікно фото та тексту -->
   <div id="photo-card-container">
     <div class="memory-card">
       <img id="card-img" src="" alt="Спогад">
@@ -239,10 +239,6 @@
   <canvas id="webgl-canvas"></canvas>
 
   <script>
-    // ==============================================================
-    // СПИСОК ТВОЇХ ФОТО ТА ПІДПИСІВ
-    // Замість тестових посилань можна вписати імена своїх файлів (наприклад 'photo1.jpg')
-    // ==============================================================
     const memories = [
       {
         title: "Кохання Мого Життя ❤️",
@@ -268,7 +264,6 @@
 
     let currentMemoryIndex = 0;
 
-    // DOM Елементи
     const canvas = document.getElementById('webgl-canvas');
     const startScreen = document.getElementById('start-screen');
     const startBtn = document.getElementById('start-btn');
@@ -281,12 +276,13 @@
     const nextBtn = document.getElementById('next-btn');
     const closeBtn = document.getElementById('close-btn');
 
-    // Сцена Three.js
+    // Сцена
     const scene = new THREE.Scene();
-    scene.fog = new THREE.FogExp2(0x030005, 0.009);
+    scene.fog = new THREE.FogExp2(0x030005, 0.008);
 
+    // Камера стартує здалеку для ефекту гіперстрибка
     const camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 1000);
-    camera.position.set(0, 26, 56);
+    camera.position.set(0, 8, 250);
 
     const renderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: true });
     renderer.setSize(window.innerWidth, window.innerHeight);
@@ -295,18 +291,28 @@
     const controls = new THREE.OrbitControls(camera, renderer.domElement);
     controls.enableDamping = true;
     controls.dampingFactor = 0.05;
-    controls.maxDistance = 100;
+    controls.maxDistance = 110;
     controls.minDistance = 12;
+    controls.enabled = false; // Вимикаємо до закінчення вступної анімації
 
-    // 1. Фоновий зоряний пил
-    const bgStarsGeo = new THREE.BufferGeometry();
-    const bgPos = new Float32Array(2500 * 3);
-    for (let i = 0; i < 2500 * 3; i++) {
-      bgPos[i] = (Math.random() - 0.5) * 220;
+    // 1. Частинки гіперстрибка / тунелю
+    const warpCount = 3500;
+    const warpGeo = new THREE.BufferGeometry();
+    const warpPos = new Float32Array(warpCount * 3);
+    for (let i = 0; i < warpCount; i++) {
+      warpPos[i * 3] = (Math.random() - 0.5) * 80;
+      warpPos[i * 3 + 1] = (Math.random() - 0.5) * 80;
+      warpPos[i * 3 + 2] = (Math.random() - 0.5) * 400;
     }
-    bgStarsGeo.setAttribute('position', new THREE.BufferAttribute(bgPos, 3));
-    const bgStarsMat = new THREE.PointsMaterial({ color: 0xffaacc, size: 0.35, transparent: true, opacity: 0.8 });
-    scene.add(new THREE.Points(bgStarsGeo, bgStarsMat));
+    warpGeo.setAttribute('position', new THREE.BufferAttribute(warpPos, 3));
+    const warpMat = new THREE.PointsMaterial({
+      color: 0xff4d79,
+      size: 0.5,
+      transparent: true,
+      opacity: 0.85
+    });
+    const warpField = new THREE.Points(warpGeo, warpMat);
+    scene.add(warpField);
 
     // 2. Спіральна Галактика
     const galaxyCount = 38000;
@@ -343,9 +349,11 @@
       vertexColors: true,
       blending: THREE.AdditiveBlending,
       depthWrite: false,
-      transparent: true
+      transparent: true,
+      opacity: 0 // Починає невидимою для анімації появи
     });
     const galaxy = new THREE.Points(galaxyGeo, galaxyMat);
+    galaxy.scale.set(0.001, 0.001, 0.001); // Починає стиснутою в точку
     scene.add(galaxy);
 
     // 3. Сяюче 3D-серце
@@ -371,12 +379,14 @@
       size: 0.28,
       blending: THREE.AdditiveBlending,
       transparent: true,
-      opacity: 0.95
+      opacity: 0
     });
     const heart = new THREE.Points(heartGeo, heartMat);
+    heart.scale.set(0.001, 0.001, 0.001);
+    heart.position.y = -10; // Потім підніметься у спалаху
     scene.add(heart);
 
-    // 4. Текстові написи українською на орбіті
+    // 4. Текстові написи
     function createTextSprite(text) {
       const c = document.createElement('canvas');
       const ctx = c.getContext('2d');
@@ -390,7 +400,7 @@
       ctx.fillText(text, 256, 75);
 
       const tex = new THREE.CanvasTexture(c);
-      const mat = new THREE.SpriteMaterial({ map: tex, transparent: true });
+      const mat = new THREE.SpriteMaterial({ map: tex, transparent: true, opacity: 0 });
       const sprite = new THREE.Sprite(mat);
       sprite.scale.set(7.5, 1.85, 1);
       return sprite;
@@ -407,7 +417,7 @@
       labelsGroup.add(s);
     });
 
-    // 5. Маленькі круглі аватарки в галактиці
+    // 5. Міні-аватарки
     function createMiniBadge(imgUrl, callback) {
       const img = new Image();
       img.crossOrigin = "anonymous";
@@ -418,7 +428,6 @@
         c.height = 160;
         const ctx = c.getContext('2d');
 
-        // Рожеве сяйво
         ctx.beginPath();
         ctx.arc(80, 80, 70, 0, Math.PI * 2);
         ctx.fillStyle = '#ff2060';
@@ -426,7 +435,6 @@
         ctx.shadowBlur = 15;
         ctx.fill();
 
-        // Кругла маска
         ctx.save();
         ctx.beginPath();
         ctx.arc(80, 80, 64, 0, Math.PI * 2);
@@ -434,7 +442,6 @@
         ctx.drawImage(img, 0, 0, 160, 160);
         ctx.restore();
 
-        // Окантовка
         ctx.beginPath();
         ctx.arc(80, 80, 64, 0, Math.PI * 2);
         ctx.lineWidth = 6;
@@ -455,10 +462,9 @@
 
     memories.forEach((mem, index) => {
       createMiniBadge(mem.image, (texture) => {
-        const mat = new THREE.SpriteMaterial({ map: texture, transparent: true });
+        const mat = new THREE.SpriteMaterial({ map: texture, transparent: true, opacity: 0 });
         const sprite = new THREE.Sprite(mat);
-
-        sprite.scale.set(2.8, 2.8, 1);
+        sprite.scale.set(0.001, 0.001, 1);
 
         const angle = (index / memories.length) * Math.PI * 2;
         const radius = 15.5;
@@ -470,7 +476,7 @@
       });
     });
 
-    // Кліки на аватарки
+    // Керування кліками по аватарках
     const raycaster = new THREE.Raycaster();
     const mouse = new THREE.Vector2();
 
@@ -497,8 +503,7 @@
       const hits = raycaster.intersectObjects(miniBadges);
 
       if (hits.length > 0) {
-        const idx = hits[0].object.userData.index;
-        showMemory(idx);
+        showMemory(hits[0].object.userData.index);
       }
     }
 
@@ -526,14 +531,23 @@
       }
     });
 
-    // Запуск сцени та музики
+    // ==============================================================
+    // АНІМАЦІЯ ПОЯВИ ВСІЄЇ СИСТЕМИ (WARP FLIGHT & GALAXY BIRTH)
+    // ==============================================================
+    let introStarted = false;
+    let introStartTime = 0;
+    const targetCamPos = new THREE.Vector3(0, 26, 56);
+
     startBtn.addEventListener('click', () => {
-      startScreen.classList.add('hidden');
+      startScreen.classList.add('fading-out');
+      setTimeout(() => { startScreen.style.display = 'none'; }, 1000);
+
       if (bgMusic) {
-        bgMusic.play().catch(err => {
-          console.log("Audio waiting:", err);
-        });
+        bgMusic.play().catch(e => console.log(e));
       }
+
+      introStarted = true;
+      introStartTime = performance.now();
     });
 
     // Анімаційний цикл
@@ -543,7 +557,55 @@
       requestAnimationFrame(animate);
       const t = clock.getElapsedTime();
 
-      galaxy.rotation.y = t * 0.12;
+      // Логіка кінематографічного старту
+      if (introStarted) {
+        const progress = Math.min((performance.now() - introStartTime) / 4000, 1); // 4 секунди еволюції
+
+        // 1. Політ камери крізь тунель
+        const ease = 1 - Math.pow(1 - progress, 3);
+        camera.position.x = THREE.MathUtils.lerp(0, targetCamPos.x, ease);
+        camera.position.y = THREE.MathUtils.lerp(8, targetCamPos.y, ease);
+        camera.position.z = THREE.MathUtils.lerp(250, targetCamPos.z, ease);
+
+        // 2. Народження Галактики (розгортання зі швидким обертанням)
+        const galaxyScale = Math.min(progress * 1.25, 1);
+        galaxy.scale.set(galaxyScale, galaxyScale, galaxyScale);
+        galaxyMat.opacity = Math.min(progress * 1.5, 1);
+        galaxy.rotation.y += 0.08 * (1 - progress * 0.7);
+
+        // 3. Підйом та розквіт 3D-серця (від 40% до 85% часу)
+        if (progress > 0.35) {
+          const heartProg = Math.min((progress - 0.35) / 0.45, 1);
+          const hScale = Math.sin(heartProg * Math.PI * 0.5);
+          heart.scale.set(hScale, hScale, hScale);
+          heart.position.y = THREE.MathUtils.lerp(-10, 0, heartProg);
+          heartMat.opacity = heartProg * 0.95;
+        }
+
+        // 4. Поява тексту та аватарок (ближче до кінця)
+        if (progress > 0.65) {
+          const elemProg = Math.min((progress - 0.65) / 0.35, 1);
+          labelsGroup.children.forEach(l => l.material.opacity = elemProg);
+          miniBadges.forEach(b => {
+            b.material.opacity = elemProg;
+            b.scale.set(2.8 * elemProg, 2.8 * elemProg, 1);
+          });
+        }
+
+        // Завершення: вмикаємо ручне керування камерою
+        if (progress >= 1 && !controls.enabled) {
+          controls.enabled = true;
+          // Плавне розчинення тунелю частинок
+          warpMat.opacity = Math.max(0, warpMat.opacity - 0.02);
+          if (warpMat.opacity <= 0) scene.remove(warpField);
+        }
+      } else {
+        // До старту повільно крутимо частинки
+        warpField.rotation.z = t * 0.2;
+      }
+
+      // Постійне обертання та пульсація
+      galaxy.rotation.y += 0.002;
       labelsGroup.rotation.y = -t * 0.08;
 
       miniBadges.forEach((b, i) => {
@@ -553,8 +615,10 @@
         b.position.y = -2.5 + Math.sin(t * 2 + i) * 0.4;
       });
 
-      const beat = 1 + Math.sin(t * 3.2) * 0.06;
-      heart.scale.set(beat, beat, beat);
+      if (introStarted && heartMat.opacity > 0) {
+        const beat = 1 + Math.sin(t * 3.2) * 0.06;
+        heart.scale.set(beat, beat, beat);
+      }
 
       controls.update();
       renderer.render(scene, camera);

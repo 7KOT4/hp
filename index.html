@@ -116,8 +116,8 @@
       z-index: 40;
       pointer-events: none;
       opacity: 0;
-      transition: opacity 0.5s ease;
-      background: radial-gradient(circle at center, rgba(35, 3, 16, 0.5) 0%, rgba(0, 0, 0, 0.75) 100%);
+      transition: opacity 0.4s ease;
+      background: radial-gradient(circle at center, rgba(35, 3, 16, 0.6) 0%, rgba(0, 0, 0, 0.8) 100%);
       backdrop-filter: blur(6px);
       -webkit-backdrop-filter: blur(6px);
     }
@@ -128,16 +128,16 @@
     }
 
     .memory-card {
-      background: rgba(18, 2, 8, 0.88);
+      background: rgba(18, 2, 8, 0.92);
       border: 1px solid rgba(255, 64, 129, 0.45);
       box-shadow: 0 0 50px rgba(255, 30, 90, 0.4);
       border-radius: 26px;
-      padding: 22px 20px 20px 20px;
+      padding: 22px 20px;
       max-width: 320px;
       width: 86%;
       text-align: center;
       transform: scale(0.7) translateY(40px);
-      transition: transform 0.5s cubic-bezier(0.19, 1, 0.22, 1);
+      transition: transform 0.4s cubic-bezier(0.19, 1, 0.22, 1);
     }
 
     #photo-card-container.active .memory-card {
@@ -223,7 +223,7 @@
     </div>
   </div>
 
-  <!-- Вікно фото та тексту -->
+  <!-- Модальне вікно для фото -->
   <div id="photo-card-container">
     <div class="memory-card">
       <img id="card-img" src="" alt="Спогад">
@@ -276,7 +276,7 @@
     const nextBtn = document.getElementById('next-btn');
     const closeBtn = document.getElementById('close-btn');
 
-    // Сцена Three.js
+    // 1. Сцена та Камера (стабільне налаштування як було раніше)
     const scene = new THREE.Scene();
     scene.fog = new THREE.FogExp2(0x030005, 0.008);
 
@@ -287,14 +287,19 @@
     renderer.setSize(window.innerWidth, window.innerHeight);
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 
+    // OrbitControls: вільне обертання без скидання назад
     const controls = new THREE.OrbitControls(camera, renderer.domElement);
     controls.enableDamping = true;
-    controls.dampingFactor = 0.05;
+    controls.dampingFactor = 0.06;
     controls.maxDistance = 110;
     controls.minDistance = 12;
-    controls.target.set(0, 0, 0);
 
-    // 1. Фоновий зоряний пил
+    // Головна група всієї галактики (для плавної анімації розгортання)
+    const galaxyWorld = new THREE.Group();
+    galaxyWorld.scale.set(0.001, 0.001, 0.001); // Початково в точці
+    scene.add(galaxyWorld);
+
+    // 2. Фоновий зоряний пил
     const bgStarsGeo = new THREE.BufferGeometry();
     const bgPos = new Float32Array(2500 * 3);
     for (let i = 0; i < 2500 * 3; i++) {
@@ -304,7 +309,7 @@
     const bgStarsMat = new THREE.PointsMaterial({ color: 0xffaacc, size: 0.35, transparent: true, opacity: 0.8 });
     scene.add(new THREE.Points(bgStarsGeo, bgStarsMat));
 
-    // 2. Спіральна Галактика
+    // 3. Спіральна Галактика
     const galaxyCount = 38000;
     const galaxyGeo = new THREE.BufferGeometry();
     const positions = new Float32Array(galaxyCount * 3);
@@ -342,9 +347,9 @@
       transparent: true
     });
     const galaxy = new THREE.Points(galaxyGeo, galaxyMat);
-    scene.add(galaxy);
+    galaxyWorld.add(galaxy);
 
-    // 3. Сяюче 3D-серце
+    // 4. Сяюче 3D-серце
     const heartCount = 6500;
     const heartGeo = new THREE.BufferGeometry();
     const heartPos = new Float32Array(heartCount * 3);
@@ -370,9 +375,9 @@
       opacity: 0.95
     });
     const heart = new THREE.Points(heartGeo, heartMat);
-    scene.add(heart);
+    galaxyWorld.add(heart);
 
-    // 4. Текстові написи
+    // 5. Текстові написи
     function createTextSprite(text) {
       const c = document.createElement('canvas');
       const ctx = c.getContext('2d');
@@ -394,7 +399,7 @@
 
     const words = ["КОХАЮ ТЕБЕ", "НАЗАВЖДИ ∞", "МОЄ СЕРДЕНЬКО", "ВІЧНЕ КОХАННЯ"];
     const labelsGroup = new THREE.Group();
-    scene.add(labelsGroup);
+    galaxyWorld.add(labelsGroup);
 
     words.forEach((w, idx) => {
       const s = createTextSprite(w);
@@ -403,7 +408,7 @@
       labelsGroup.add(s);
     });
 
-    // 5. Міні-аватарки
+    // 6. Міні-аватарки в дискі
     function createMiniBadge(imgUrl, callback) {
       const img = new Image();
       img.crossOrigin = "anonymous";
@@ -444,7 +449,7 @@
 
     const miniBadges = [];
     const badgesGroup = new THREE.Group();
-    scene.add(badgesGroup);
+    galaxyWorld.add(badgesGroup);
 
     memories.forEach((mem, index) => {
       createMiniBadge(mem.image, (texture) => {
@@ -463,9 +468,34 @@
       });
     });
 
-    // Кліки
+    // 7. Чітке розпізнавання кліку (щоб не плутати клік зі свайпом/обертанням)
     const raycaster = new THREE.Raycaster();
     const mouse = new THREE.Vector2();
+    let pointerStartX = 0;
+    let pointerStartY = 0;
+
+    window.addEventListener('pointerdown', (e) => {
+      pointerStartX = e.clientX;
+      pointerStartY = e.clientY;
+    });
+
+    window.addEventListener('pointerup', (e) => {
+      if (cardContainer.classList.contains('active')) return;
+
+      // Якщо палець/миша зрушились більше ніж на 6 пікселів — це було обертання сцени, НЕ клік!
+      const dist = Math.hypot(e.clientX - pointerStartX, e.clientY - pointerStartY);
+      if (dist > 6) return;
+
+      mouse.x = (e.clientX / window.innerWidth) * 2 - 1;
+      mouse.y = -(e.clientY / window.innerHeight) * 2 + 1;
+
+      raycaster.setFromCamera(mouse, camera);
+      const hits = raycaster.intersectObjects(miniBadges);
+
+      if (hits.length > 0) {
+        showMemory(hits[0].object.userData.index);
+      }
+    });
 
     function showMemory(index) {
       currentMemoryIndex = index;
@@ -475,31 +505,6 @@
       cardDesc.textContent = data.desc;
       cardContainer.classList.add('active');
     }
-
-    function checkClick(e) {
-      if (cardContainer.classList.contains('active')) return;
-
-      const clientX = e.clientX || (e.touches && e.touches[0].clientX);
-      const clientY = e.clientY || (e.touches && e.touches[0].clientY);
-      if (!clientX || !clientY) return;
-
-      mouse.x = (clientX / window.innerWidth) * 2 - 1;
-      mouse.y = -(clientY / window.innerHeight) * 2 + 1;
-
-      raycaster.setFromCamera(mouse, camera);
-      const hits = raycaster.intersectObjects(miniBadges);
-
-      if (hits.length > 0) {
-        showMemory(hits[0].object.userData.index);
-      }
-    }
-
-    window.addEventListener('click', checkClick);
-    window.addEventListener('touchend', (e) => {
-      if (e.changedTouches && e.changedTouches.length > 0) {
-        checkClick(e.changedTouches[0]);
-      }
-    });
 
     nextBtn.addEventListener('click', (e) => {
       e.stopPropagation();
@@ -518,31 +523,45 @@
       }
     });
 
-    // ==========================================
-    // НАДІЙНИЙ СТАРТ І ЕФЕКТ ПОЯВИ
-    // ==========================================
-    let isIntro = false;
-    let introStartTime = 0;
+    // 8. Анімація появи всієї системи при кліку на «РОЗПОЧАТИ»
+    let isSpawning = false;
+    let spawnStartTime = 0;
 
     startBtn.addEventListener('click', () => {
       startScreen.classList.add('hidden');
       if (bgMusic) {
-        bgMusic.play().catch(err => console.log("Audio waiting:", err));
+        bgMusic.play().catch(e => console.log("Audio waiting:", e));
       }
 
-      // Запускаємо плавне розкриття сцени
-      isIntro = true;
-      introStartTime = performance.now();
+      isSpawning = true;
+      spawnStartTime = performance.now();
     });
 
+    // 9. Анімаційний цикл
     const clock = new THREE.Clock();
 
     function animate() {
       requestAnimationFrame(animate);
       const t = clock.getElapsedTime();
 
-      // Обертання галактики та написів
-      galaxy.rotation.y = t * 0.12;
+      // Плавне розгортання галактики з центру при старті
+      if (isSpawning) {
+        const progress = Math.min((performance.now() - spawnStartTime) / 2200, 1);
+        // Кубічне виринання з м'яким відскоком (overshoot)
+        const scaleVal = 1 - Math.pow(1 - progress, 3);
+        galaxyWorld.scale.set(scaleVal, scaleVal, scaleVal);
+
+        // Прискорене розкручування диска на старті
+        galaxy.rotation.y += (1 - progress) * 0.05;
+
+        if (progress >= 1) {
+          galaxyWorld.scale.set(1, 1, 1);
+          isSpawning = false;
+        }
+      }
+
+      // Постійний рух галактики
+      galaxy.rotation.y += 0.002;
       labelsGroup.rotation.y = -t * 0.08;
 
       // Рух і покачування маленьких фото
@@ -553,22 +572,11 @@
         b.position.y = -2.5 + Math.sin(t * 2 + i) * 0.4;
       });
 
-      // Анімація появи відразу після натискання кнопки
-      let scaleMult = 1;
-      if (isIntro) {
-        const elapsed = (performance.now() - introStartTime) / 2000; // 2 секунди
-        if (elapsed < 1) {
-          scaleMult = Math.sin(elapsed * Math.PI * 0.5); // Плавний розквіт від 0 до 1
-        } else {
-          isIntro = false;
-        }
-      }
-
-      // Пульсація серця (завжди працює і б'ється!)
-      const beat = (1 + Math.sin(t * 3.2) * 0.06) * scaleMult;
+      // Живе серцебиття (пульсація)
+      const beat = 1 + Math.sin(t * 3.2) * 0.06;
       heart.scale.set(beat, beat, beat);
 
-      // Оновлення OrbitControls (обертання сцени завжди вільне)
+      // Оновлення обертання сцени
       controls.update();
       renderer.render(scene, camera);
     }

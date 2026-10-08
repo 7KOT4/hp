@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html lang="uk">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Galaxy Love ❤️</title>
+  <title>Галактика Кохання ❤️</title>
   <style>
     * {
       margin: 0;
@@ -34,7 +34,7 @@
       cursor: grabbing;
     }
 
-    /* Стартовый экран */
+    /* Стартовий екран */
     #start-screen {
       position: fixed;
       top: 0;
@@ -103,7 +103,7 @@
       box-shadow: 0 0 35px rgba(255, 42, 95, 0.9);
     }
 
-    /* Модальная карточка с воспоминанием (как на видео) */
+    /* Модальна картка спогадів */
     #photo-card-container {
       position: fixed;
       top: 0;
@@ -209,29 +209,29 @@
 </head>
 <body>
 
-  <!-- Аудиофайл (лежит рядом в репозитории как music.mp3) -->
+  <!-- Аудіофайл music.mp3 -->
   <audio id="bg-music" src="music.mp3" loop preload="auto"></audio>
 
-  <!-- Стартовый экран -->
+  <!-- Стартовий екран -->
   <div id="start-screen">
     <div class="card-start">
-      <h1 class="title">Galaxy Love</h1>
+      <h1 class="title">Галактика Кохання</h1>
       <div class="mascot">🐰🤍🐱</div>
       <button class="btn-start" id="start-btn">
-        INICIAR 💌
+        РОЗПОЧАТИ 💌
       </button>
     </div>
   </div>
 
-  <!-- Модальное окно с увеличенным фото и текстом -->
+  <!-- Вікно спогадів (збільшене фото і текст) -->
   <div id="photo-card-container">
     <div class="memory-card">
-      <img id="card-img" src="" alt="Memory">
+      <img id="card-img" src="" alt="Спогад">
       <h2 id="card-title"></h2>
       <p id="card-desc"></p>
       <div class="card-actions">
-        <button class="btn-action next" id="next-btn">СЛЕДУЮЩЕЕ 💌</button>
-        <button class="btn-action" id="close-btn">ЗАКРЫТЬ ✕</button>
+        <button class="btn-action next" id="next-btn">ДАЛІ 💌</button>
+        <button class="btn-action" id="close-btn">ЗАКРИТИ ✕</button>
       </div>
     </div>
   </div>
@@ -240,36 +240,35 @@
 
   <script>
     // ==============================================================
-    // СПИСОК ТВОИХ ФОТО И ПОДПИСЕЙ
-    // Можешь указать ссылки на файлы из репозитория (например 'photo1.jpg')
-    // или ссылки из интернета. Маленькие значки-аватарки в 3D генерируются сами!
+    // СПИСОК ТВОЇХ ФОТО ТА ПІДПИСІВ
+    // Замість тестових посилань можна вписати імена своїх файлів (наприклад 'photo1.jpg')
     // ==============================================================
     const memories = [
       {
-        title: "Amor de mi Vida ❤️",
-        desc: "Cuanto más tiempo estamos juntos, más te amo.",
+        title: "Кохання Мого Життя ❤️",
+        desc: "Що більше часу ми разом, то сильніше я тебе кохаю.",
         image: "https://images.unsplash.com/photo-1518199266791-5375a83190b7?w=700"
       },
       {
-        title: "Me Encantas ✨",
-        desc: "Si pudiera elegir un lugar seguro, sería a tu lado.",
+        title: "Ти Моє Серденько ✨",
+        desc: "Якби я міг обрати найбезпечніше місце у світі — це було б поруч із тобою.",
         image: "https://images.unsplash.com/photo-1522673607200-164d1b6ce486?w=700"
       },
       {
-        title: "Infinito Amor ♾️",
-        desc: "En cada galaxia y en cada vida te volvería a elegir.",
+        title: "Нескінченність ♾️",
+        desc: "У будь-якій галактиці та в кожному житті я знову й знову обираю тебе.",
         image: "https://images.unsplash.com/photo-1516589178581-6cd7833ae3b2?w=700"
       },
       {
-        title: "Tú y Yo 🪐",
-        desc: "Eres mi estrella favorita en todo este universo.",
+        title: "Ти і Я 🪐",
+        desc: "Ти — моя найяскравіша зірка у всьому цьому безмежному всесвіті.",
         image: "https://images.unsplash.com/photo-1529333166437-7750a6dd5a70?w=700"
       }
     ];
 
     let currentMemoryIndex = 0;
 
-    // DOM Элементы
+    // DOM Елементи
     const canvas = document.getElementById('webgl-canvas');
     const startScreen = document.getElementById('start-screen');
     const startBtn = document.getElementById('start-btn');
@@ -282,7 +281,7 @@
     const nextBtn = document.getElementById('next-btn');
     const closeBtn = document.getElementById('close-btn');
 
-    // Настройка сцены Three.js
+    // Сцена Three.js
     const scene = new THREE.Scene();
     scene.fog = new THREE.FogExp2(0x030005, 0.009);
 
@@ -299,7 +298,7 @@
     controls.maxDistance = 100;
     controls.minDistance = 12;
 
-    // 1. Космическая пыль и фоновые звезды
+    // 1. Фоновий зоряний пил
     const bgStarsGeo = new THREE.BufferGeometry();
     const bgPos = new Float32Array(2500 * 3);
     for (let i = 0; i < 2500 * 3; i++) {
@@ -309,7 +308,7 @@
     const bgStarsMat = new THREE.PointsMaterial({ color: 0xffaacc, size: 0.35, transparent: true, opacity: 0.8 });
     scene.add(new THREE.Points(bgStarsGeo, bgStarsMat));
 
-    // 2. Спиральная Галактика (аккреционный диск)
+    // 2. Спіральна Галактика
     const galaxyCount = 38000;
     const galaxyGeo = new THREE.BufferGeometry();
     const positions = new Float32Array(galaxyCount * 3);
@@ -349,7 +348,7 @@
     const galaxy = new THREE.Points(galaxyGeo, galaxyMat);
     scene.add(galaxy);
 
-    // 3. Светящееся 3D-сердце из частиц над центром
+    // 3. Сяюче 3D-серце
     const heartCount = 6500;
     const heartGeo = new THREE.BufferGeometry();
     const heartPos = new Float32Array(heartCount * 3);
@@ -377,7 +376,7 @@
     const heart = new THREE.Points(heartGeo, heartMat);
     scene.add(heart);
 
-    // 4. Текстовые светящиеся бейджи на орбите
+    // 4. Текстові написи українською на орбіті
     function createTextSprite(text) {
       const c = document.createElement('canvas');
       const ctx = c.getContext('2d');
@@ -386,7 +385,7 @@
       ctx.fillStyle = "rgba(255, 45, 95, 0.95)";
       ctx.shadowColor = "#ff0055";
       ctx.shadowBlur = 18;
-      ctx.font = "Bold 36px sans-serif";
+      ctx.font = "Bold 34px sans-serif";
       ctx.textAlign = "center";
       ctx.fillText(text, 256, 75);
 
@@ -397,7 +396,7 @@
       return sprite;
     }
 
-    const words = ["TE AMO", "INFINITO ∞", "AMOR DE MI VIDA", "AMOR ETERNO"];
+    const words = ["КОХАЮ ТЕБЕ", "НАЗАВЖДИ ∞", "МОЄ СЕРДЕНЬКО", "ВІЧНЕ КОХАННЯ"];
     const labelsGroup = new THREE.Group();
     scene.add(labelsGroup);
 
@@ -408,8 +407,7 @@
       labelsGroup.add(s);
     });
 
-    // 5. МАЛЕНЬКИЕ круглые светящиеся значки фото в диске галактики
-    // Создаем круглую светящуюся текстуру-бейдж с картинкой и рамкой-сердечком
+    // 5. Маленькі круглі аватарки в галактиці
     function createMiniBadge(imgUrl, callback) {
       const img = new Image();
       img.crossOrigin = "anonymous";
@@ -420,7 +418,7 @@
         c.height = 160;
         const ctx = c.getContext('2d');
 
-        // Розовое свечение вокруг
+        // Рожеве сяйво
         ctx.beginPath();
         ctx.arc(80, 80, 70, 0, Math.PI * 2);
         ctx.fillStyle = '#ff2060';
@@ -428,7 +426,7 @@
         ctx.shadowBlur = 15;
         ctx.fill();
 
-        // Круглая маска под мини-фото
+        // Кругла маска
         ctx.save();
         ctx.beginPath();
         ctx.arc(80, 80, 64, 0, Math.PI * 2);
@@ -436,14 +434,13 @@
         ctx.drawImage(img, 0, 0, 160, 160);
         ctx.restore();
 
-        // Белая окантовка
+        // Окантовка
         ctx.beginPath();
         ctx.arc(80, 80, 64, 0, Math.PI * 2);
         ctx.lineWidth = 6;
         ctx.strokeStyle = '#ffffff';
         ctx.stroke();
 
-        // Маленькое сердечко в углу значка
         ctx.font = '24px sans-serif';
         ctx.fillText('💖', 120, 140);
 
@@ -461,11 +458,10 @@
         const mat = new THREE.SpriteMaterial({ map: texture, transparent: true });
         const sprite = new THREE.Sprite(mat);
 
-        // Маленький размер в 3D (как на видео)
         sprite.scale.set(2.8, 2.8, 1);
 
         const angle = (index / memories.length) * Math.PI * 2;
-        const radius = 15.5; // прямо в плоскости аккреционного диска
+        const radius = 15.5;
         sprite.position.set(Math.cos(angle) * radius, -2.5, Math.sin(angle) * radius);
 
         sprite.userData = { index: index, baseAngle: angle, radius: radius };
@@ -474,7 +470,7 @@
       });
     });
 
-    // Клик по маленьким значкам в Three.js
+    // Кліки на аватарки
     const raycaster = new THREE.Raycaster();
     const mouse = new THREE.Vector2();
 
@@ -513,7 +509,6 @@
       }
     });
 
-    // Переключение воспоминаний в карточке
     nextBtn.addEventListener('click', (e) => {
       e.stopPropagation();
       currentMemoryIndex = (currentMemoryIndex + 1) % memories.length;
@@ -531,7 +526,7 @@
       }
     });
 
-    // Запуск проекта и музыки
+    // Запуск сцени та музики
     startBtn.addEventListener('click', () => {
       startScreen.classList.add('hidden');
       if (bgMusic) {
@@ -541,27 +536,23 @@
       }
     });
 
-    // Анимационный цикл
+    // Анімаційний цикл
     const clock = new THREE.Clock();
 
     function animate() {
       requestAnimationFrame(animate);
       const t = clock.getElapsedTime();
 
-      // Медленное величественное вращение галактики
       galaxy.rotation.y = t * 0.12;
       labelsGroup.rotation.y = -t * 0.08;
 
-      // Маленькие бейджи парят в диске со слегка покачивающейся траекторией
       miniBadges.forEach((b, i) => {
         const curAngle = b.userData.baseAngle + t * 0.1;
         b.position.x = Math.cos(curAngle) * b.userData.radius;
         b.position.z = Math.sin(curAngle) * b.userData.radius;
-        // Легкое покачивание вверх-вниз по оси Y
         b.position.y = -2.5 + Math.sin(t * 2 + i) * 0.4;
       });
 
-      // Пульсация сердца
       const beat = 1 + Math.sin(t * 3.2) * 0.06;
       heart.scale.set(beat, beat, beat);
 

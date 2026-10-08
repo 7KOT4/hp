@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>С днем народження</title>
+  <title>Галактика Кохання ❤️</title>
   <style>
     * {
       margin: 0;
@@ -157,17 +157,20 @@
 </head>
 <body>
 
+  <!-- Аудиофайл (положи рядом в репозиторий как music.mp3) -->
   <audio id="bg-music" src="music.mp3" loop preload="auto"></audio>
 
-  <div id="start-hint">ЖМАКАЙ ЩОБ ПОДИВИТИСЬ</div>
+  <!-- Подсказка старта -->
+  <div id="start-hint">ТОРКНІТЬСЯ ЕКРАНА, ЩОБ РОЗПОЧАТИ ПОДОРОЖ</div>
 
+  <!-- Модальное окно просмотра воспоминаний -->
   <div id="photo-card-container">
     <div class="memory-card">
       <img id="card-img" src="" alt="Спогад">
       <h2 id="card-title"></h2>
       <p id="card-desc"></p>
       <div class="card-actions">
-        <button class="btn-action next" id="next-btn">ДАЛІ 😉</button>
+        <button class="btn-action next" id="next-btn">ДАЛІ 💌</button>
         <button class="btn-action" id="close-btn">ЗАКРИТИ ✕</button>
       </div>
     </div>
@@ -176,6 +179,9 @@
   <canvas id="webgl-canvas"></canvas>
 
   <script>
+    // ==========================================
+    // ВАШИ ФОТО И ЗАПИСКИ
+    // ==========================================
     const memories = [
       {
         title: "Кохання Мого Життя ❤️",
@@ -217,7 +223,6 @@
     scene.fog = new THREE.FogExp2(0x000002, 0.007);
 
     const camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 1000);
-    // Стартовая позиция в упор к спирали
     camera.position.set(0, 0, 36);
 
     const renderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: true, alpha: true });
@@ -229,7 +234,6 @@
     controls.dampingFactor = 0.06;
     controls.maxDistance = 110;
     controls.minDistance = 12;
-    // Цель ВСЕГДА в центре сердца (0, 0, 0), чтобы не было телепортации!
     controls.target.set(0, 0, 0);
     controls.enabled = false;
 
@@ -244,7 +248,7 @@
     scene.add(new THREE.Points(bgStarsGeo, bgStarsMat));
 
     // =========================================================================
-    // 3. СПИРАЛЬ СЛОВ (Расположена прямо в плоскости Z=0)
+    // 3. СПИРАЛЬ СЛОВ ЛЮБВИ (TLANEX)
     // =========================================================================
     function createLoveWordTex(text) {
       const c = document.createElement('canvas');
@@ -303,10 +307,10 @@
     }
 
     // =========================================================================
-    // 4. МИР СЕРДЦА И ГАЛАКТИКИ (В ТОЧКЕ 0,0,0)
+    // 4. МИР СЕРДЦА И ГАЛАКТИКИ (В ЕДИНОМ ЦЕНТРЕ 0,0,0)
     // =========================================================================
     const galaxyWorld = new THREE.Group();
-    galaxyWorld.position.set(0, 0, 0); // В том же центре!
+    galaxyWorld.position.set(0, 0, 0);
     galaxyWorld.scale.set(0.001, 0.001, 0.001);
     scene.add(galaxyWorld);
 
@@ -350,35 +354,109 @@
     const galaxy = new THREE.Points(galaxyGeo, galaxyMat);
     galaxyWorld.add(galaxy);
 
-    // 3D-Сердце
-    const heartCount = 6500;
+    // =========================================================================
+    // 5. ПЫЛАЮЩИЙ, ОБЪЕМНЫЙ ЦЕНТР СЕРДЦА
+    // =========================================================================
+    const heartCenterGroup = new THREE.Group();
+    galaxyWorld.add(heartCenterGroup);
+
+    // Точечный источник света
+    const heartLight = new THREE.PointLight(0xff2a6d, 3, 45);
+    heartLight.position.set(0, 6.5, 0);
+    heartCenterGroup.add(heartLight);
+
+    // Внутреннее светящееся ядро
+    const coreGeo = new THREE.SphereGeometry(3.2, 32, 32);
+    const coreMat = new THREE.MeshBasicMaterial({
+      color: 0xff1450,
+      transparent: true,
+      opacity: 0.35,
+      blending: THREE.AdditiveBlending
+    });
+    const innerCore = new THREE.Mesh(coreGeo, coreMat);
+    innerCore.position.set(0, 6.5, 0);
+    heartCenterGroup.add(innerCore);
+
+    // Объемное плотное сердце (14 000 частиц с заполнением объема)
+    const heartCount = 14000;
     const heartGeo = new THREE.BufferGeometry();
     const heartPos = new Float32Array(heartCount * 3);
+    const heartColors = new Float32Array(heartCount * 3);
+
+    const colEdge = new THREE.Color('#ff0d55');
+    const colInside = new THREE.Color('#ff85a2');
+    const colCore = new THREE.Color('#ffffff');
 
     for (let i = 0; i < heartCount; i++) {
       const i3 = i * 3;
       const t = Math.PI * 2 * Math.random();
-      const x = 16 * Math.pow(Math.sin(t), 3);
-      const y = 13 * Math.cos(t) - 5 * Math.cos(2 * t) - 2 * Math.cos(3 * t) - Math.cos(4 * t);
-      const z = (Math.random() - 0.5) * 8;
-      const scale = 0.65;
+      
+      const xBase = 16 * Math.pow(Math.sin(t), 3);
+      const yBase = 13 * Math.cos(t) - 5 * Math.cos(2 * t) - 2 * Math.cos(3 * t) - Math.cos(4 * t);
+      
+      const fill = Math.pow(Math.random(), 0.6);
+      const zDepth = (Math.random() - 0.5) * 8.5 * fill;
 
-      heartPos[i3] = x * scale;
-      heartPos[i3 + 1] = y * scale + 6.5;
-      heartPos[i3 + 2] = z * scale;
+      const scale = 0.68 * fill;
+      heartPos[i3] = xBase * scale;
+      heartPos[i3 + 1] = yBase * scale + 6.5;
+      heartPos[i3 + 2] = zDepth;
+
+      let c = colEdge.clone();
+      if (fill < 0.4) {
+        c.lerp(colCore, 1 - fill / 0.4);
+      } else {
+        c.lerp(colInside, 0.5);
+      }
+
+      heartColors[i3] = c.r;
+      heartColors[i3 + 1] = c.g;
+      heartColors[i3 + 2] = c.b;
     }
+
     heartGeo.setAttribute('position', new THREE.BufferAttribute(heartPos, 3));
+    heartGeo.setAttribute('color', new THREE.BufferAttribute(heartColors, 3));
+
     const heartMat = new THREE.PointsMaterial({
-      color: 0xff1447,
-      size: 0.28,
+      size: 0.32,
+      vertexColors: true,
       blending: THREE.AdditiveBlending,
       transparent: true,
-      opacity: 0.95
+      opacity: 0.95,
+      depthWrite: false
     });
     const heart = new THREE.Points(heartGeo, heartMat);
-    galaxyWorld.add(heart);
+    heartCenterGroup.add(heart);
 
-    // Текстовые орбиты
+    // Парящие искры, улетающие от сердца вверх
+    const embersCount = 450;
+    const embersGeo = new THREE.BufferGeometry();
+    const embersPos = new Float32Array(embersCount * 3);
+    const embersVelocity = [];
+
+    for (let i = 0; i < embersCount; i++) {
+      embersPos[i * 3] = (Math.random() - 0.5) * 16;
+      embersPos[i * 3 + 1] = 4 + Math.random() * 12;
+      embersPos[i * 3 + 2] = (Math.random() - 0.5) * 12;
+      embersVelocity.push({
+        y: 0.03 + Math.random() * 0.04,
+        x: (Math.random() - 0.5) * 0.015,
+        z: (Math.random() - 0.5) * 0.015
+      });
+    }
+
+    embersGeo.setAttribute('position', new THREE.BufferAttribute(embersPos, 3));
+    const embersMat = new THREE.PointsMaterial({
+      color: 0xff70a0,
+      size: 0.45,
+      blending: THREE.AdditiveBlending,
+      transparent: true,
+      opacity: 0.8
+    });
+    const embers = new THREE.Points(embersGeo, embersMat);
+    heartCenterGroup.add(embers);
+
+    // 6. Текстовые орбиты
     function createOrbitText(text) {
       const c = document.createElement('canvas');
       const ctx = c.getContext('2d');
@@ -409,7 +487,7 @@
       labelsGroup.add(s);
     });
 
-    // Медальоны фото
+    // 7. Медальоны фото
     function createMiniBadge(imgUrl, callback) {
       const img = new Image();
       img.crossOrigin = "anonymous";
@@ -525,12 +603,11 @@
     });
 
     // =========================================================================
-    // 5. БЕСШОВНЫЙ ПРОЛЕТ: ПРЯМО В СЕРДЦЕ БЕЗ ТЕЛЕПОРТАЦИИ
+    // 8. ПЛАВНЫЙ ПРОЛЕТ СКВОЗЬ СПИРАЛЬ
     // =========================================================================
     let flightActive = false;
     let flightProgress = 0;
     const startCamPos = new THREE.Vector3(0, 0, 36);
-    // Финальная идеальная точка орбиты вокруг сердца
     const endCamPos = new THREE.Vector3(0, 26, 56);
 
     function startHyperspaceFlight() {
@@ -549,29 +626,24 @@
       requestAnimationFrame(animate);
       const t = clock.getElapsedTime();
 
-      // До клика: спираль кружится
+      // До старта: спираль плавно вращается
       if (!flightActive && flightProgress === 0) {
         spiralGroup.rotation.z = -t * 0.16;
       }
 
-      // ВО ВРЕМЯ ПОЛЕТА: камера плавно по кривой Bezier/Smoothstep летит на орбиту сердца
+      // Во время полета
       if (flightActive) {
-        flightProgress += 0.012; // плавный темп
+        flightProgress += 0.012;
         const p = Math.min(flightProgress, 1);
-
-        // Функция плавности (Smoothstep)
         const ease = p * p * (3 - 2 * p);
 
-        // Траектория полета: камера летит вперед к центру и плавно поднимается на орбиту
-        // В первой половине летит сквозь центр воронки (z уменьшается), во второй — выходит наверх
+        // Плавный полет камеры без разрывов
         camera.position.x = (1 - ease) * startCamPos.x + ease * endCamPos.x;
         camera.position.y = Math.sin(ease * Math.PI * 0.5) * endCamPos.y;
         camera.position.z = THREE.MathUtils.lerp(startCamPos.z, endCamPos.z, ease);
-
-        // Камера строго направлена в центр сердца (0, 0, 0)
         camera.lookAt(0, 0, 0);
 
-        // Спираль слов разлетается в стороны и плавно исчезает
+        // Спираль расширяется и уходит в стороны
         spiralGroup.rotation.z -= (0.02 + ease * 0.1);
         spiralWords.forEach(s => {
           s.position.x = s.userData.baseX * (1 + ease * 4.0);
@@ -579,19 +651,18 @@
           s.material.opacity = Math.max(0, 0.98 - ease * 1.3);
         });
 
-        // Галактика и сердце плавно рождаются из центра
+        // Галактика раскрывается
         galaxyWorld.scale.set(ease, ease, ease);
         galaxy.rotation.y += (1 - p) * 0.08;
 
-        // Финал полета: передаем камеру в OrbitControls БЕЗ ЕДИНОГО РЫВКА
         if (p >= 1) {
           flightActive = false;
-          scene.remove(spiralGroup); // Освобождаем память
-          controls.enabled = true;   // Включаем вращение
+          scene.remove(spiralGroup);
+          controls.enabled = true;
         }
       }
 
-      // После перехода: спокойная жизнь галактики
+      // Обычная жизнь галактики
       if (flightProgress >= 1) {
         galaxy.rotation.y += 0.002;
         labelsGroup.rotation.y = -t * 0.08;
@@ -603,8 +674,26 @@
           b.position.y = -2.5 + Math.sin(t * 2 + i) * 0.4;
         });
 
-        const beat = 1 + Math.sin(t * 3.2) * 0.06;
+        // Пульсация сердца и света
+        const beat = 1 + Math.sin(t * 3.4) * 0.07;
         heart.scale.set(beat, beat, beat);
+        innerCore.scale.set(beat * 1.1, beat * 1.1, beat * 1.1);
+        heartLight.intensity = 2.5 + Math.sin(t * 3.4) * 1.5;
+
+        // Движение парящих искр
+        const posAttr = embersGeo.attributes.position;
+        for (let i = 0; i < embersCount; i++) {
+          posAttr.array[i * 3 + 1] += embersVelocity[i].y;
+          posAttr.array[i * 3] += embersVelocity[i].x;
+          posAttr.array[i * 3 + 2] += embersVelocity[i].z;
+
+          if (posAttr.array[i * 3 + 1] > 18) {
+            posAttr.array[i * 3 + 1] = 3.5;
+            posAttr.array[i * 3] = (Math.random() - 0.5) * 10;
+            posAttr.array[i * 3 + 2] = (Math.random() - 0.5) * 8;
+          }
+        }
+        posAttr.needsUpdate = true;
 
         controls.update();
       }

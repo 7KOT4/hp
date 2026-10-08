@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Galaxy Love ❤️</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      user-select: none;
+    }
+
+    body {
+      background-color: #030005;
+      overflow: hidden;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      color: #fff;
+    }
+
+    #webgl-canvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      z-index: 1;
+    }
+
+    /* Стартовый экран */
+    #start-screen {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: radial-gradient(circle at center, #2b0314 0%, #030005 100%);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 10;
+      transition: opacity 1s ease, visibility 1s ease;
+    }
+
+    .card {
+      background: rgba(255, 255, 255, 0.05);
+      backdrop-filter: blur(15px);
+      border: 1px solid rgba(255, 77, 109, 0.3);
+      padding: 35px 25px;
+      border-radius: 24px;
+      text-align: center;
+      box-shadow: 0 10px 40px rgba(255, 20, 90, 0.25);
+      max-width: 320px;
+      width: 90%;
+    }
+
+    .title {
+      font-size: 2.2rem;
+      font-weight: 700;
+      color: #fff;
+      text-shadow: 0 0 15px rgba(255, 77, 109, 0.8);
+      margin-bottom: 20px;
+    }
+
+    .mascot {
+      width: 120px;
+      height: 120px;
+      margin: 0 auto 15px auto;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 75px;
+      animation: float 2.5s ease-in-out infinite alternate;
+    }
+
+    @keyframes float {
+      0% { transform: translateY(0px) scale(1); }
+      100% { transform: translateY(-10px) scale(1.05); }
+    }
+
+    .btn-start {
+      background: linear-gradient(135deg, #ff2a5f, #ff758c);
+      border: none;
+      color: white;
+      font-size: 1.1rem;
+      font-weight: 600;
+      padding: 12px 35px;
+      border-radius: 50px;
+      cursor: pointer;
+      box-shadow: 0 0 20px rgba(255, 42, 95, 0.6);
+      transition: 0.3s transform, 0.3s box-shadow;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .btn-start:hover {
+      transform: scale(1.06);
+      box-shadow: 0 0 30px rgba(255, 42, 95, 0.9);
+    }
+
+    /* Всплывающие карточки с сообщениями */
+    #message-modal {
+      position: fixed;
+      bottom: 40px;
+      left: 50%;
+      transform: translateX(-50%) translateY(150px);
+      background: rgba(18, 2, 8, 0.85);
+      border: 1px solid rgba(255, 64, 129, 0.5);
+      backdrop-filter: blur(12px);
+      padding: 16px 26px;
+      border-radius: 18px;
+      box-shadow: 0 0 30px rgba(255, 64, 129, 0.35);
+      color: #fff;
+      font-size: 1.1rem;
+      font-weight: 500;
+      text-align: center;
+      z-index: 5;
+      transition: transform 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.6s ease;
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    #message-modal.active {
+      transform: translateX(-50%) translateY(0);
+      opacity: 1;
+    }
+
+    .hidden {
+      opacity: 0 !important;
+      visibility: hidden !important;
+      pointer-events: none !important;
+    }
+  </style>
+
+  <!-- Библиотека Three.js и OrbitControls -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+</head>
+<body>
+
+  <!-- Стартовое меню -->
+  <div id="start-screen">
+    <div class="card">
+      <h1 class="title">Galaxy Love</h1>
+      <div class="mascot">🐰🤍🐱</div>
+      <button class="btn-start" id="start-btn">
+        INICIAR 💌
+      </button>
+    </div>
+  </div>
+
+  <!-- Всплывающие послания -->
+  <div id="message-modal">
+    <span id="modal-text">Amor de mi Vida ❤️</span>
+  </div>
+
+  <canvas id="webgl-canvas"></canvas>
+
+  <script>
+    const canvas = document.getElementById('webgl-canvas');
+    const startScreen = document.getElementById('start-screen');
+    const startBtn = document.getElementById('start-btn');
+    const modal = document.getElementById('message-modal');
+    const modalText = document.getElementById('modal-text');
+
+    const phrases = [
+      "Amor de mi Vida ❤️",
+      "Me Encantas ✨",
+      "Infinito Amor ♾️",
+      "Eres Mi Mundo 🪐",
+      "Te Amo Por Siempre 💖"
+    ];
+
+    // Инициализация Three.js
+    const scene = new THREE.Scene();
+    scene.fog = new THREE.FogExp2(0x030005, 0.008);
+
+    const camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 1000);
+    camera.position.set(0, 30, 60);
+
+    const renderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: true });
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+
+    const controls = new THREE.OrbitControls(camera, renderer.domElement);
+    controls.enableDamping = true;
+    controls.dampingFactor = 0.05;
+    controls.maxDistance = 120;
+    controls.minDistance = 10;
+
+    // --- 1. Фоновые звезды ---
+    const bgStarsGeo = new THREE.BufferGeometry();
+    const bgStarsCount = 2000;
+    const bgPos = new Float32Array(bgStarsCount * 3);
+    for (let i = 0; i < bgStarsCount * 3; i++) {
+      bgPos[i] = (Math.random() - 0.5) * 200;
+    }
+    bgStarsGeo.setAttribute('position', new THREE.BufferAttribute(bgPos, 3));
+    const bgStarsMat = new THREE.PointsMaterial({
+      color: 0xffaacc,
+      size: 0.35,
+      transparent: true,
+      opacity: 0.7
+    });
+    const bgStars = new THREE.Points(bgStarsGeo, bgStarsMat);
+    scene.add(bgStars);
+
+    // --- 2. Спиральная Галактика (аккреционный диск) ---
+    const galaxyParams = {
+      count: 35000,
+      size: 0.18,
+      radius: 35,
+      branches: 3,
+      spin: 1.5,
+      randomness: 0.35,
+      insideColor: '#ff2050',
+      outsideColor: '#300215'
+    };
+
+    const galaxyGeo = new THREE.BufferGeometry();
+    const positions = new Float32Array(galaxyParams.count * 3);
+    const colors = new Float32Array(galaxyParams.count * 3);
+
+    const colorInside = new THREE.Color(galaxyParams.insideColor);
+    const colorOutside = new THREE.Color(galaxyParams.outsideColor);
+
+    for (let i = 0; i < galaxyParams.count; i++) {
+      const i3 = i * 3;
+      const radius = Math.random() * galaxyParams.radius;
+      const spinAngle = radius * galaxyParams.spin;
+      const branchAngle = ((i % galaxyParams.branches) * 2 * Math.PI) / galaxyParams.branches;
+
+      const randomX = Math.pow(Math.random(), 3) * (Math.random() < 0.5 ? 1 : -1) * galaxyParams.randomness * radius;
+      const randomY = Math.pow(Math.random(), 3) * (Math.random() < 0.5 ? 1 : -1) * (galaxyParams.randomness * 0.4) * radius;
+      const randomZ = Math.pow(Math.random(), 3) * (Math.random() < 0.5 ? 1 : -1) * galaxyParams.randomness * radius;
+
+      positions[i3] = Math.cos(branchAngle + spinAngle) * radius + randomX;
+      positions[i3 + 1] = randomY - 6; // Смещение вниз
+      positions[i3 + 2] = Math.sin(branchAngle + spinAngle) * radius + randomZ;
+
+      // Градиент цвета от центра к краям
+      const mixedColor = colorInside.clone().lerp(colorOutside, radius / galaxyParams.radius);
+      colors[i3] = mixedColor.r;
+      colors[i3 + 1] = mixedColor.g;
+      colors[i3 + 2] = mixedColor.b;
+    }
+
+    galaxyGeo.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+    galaxyGeo.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+
+    const galaxyMat = new THREE.PointsMaterial({
+      size: galaxyParams.size,
+      vertexColors: true,
+      blending: THREE.AdditiveBlending,
+      depthWrite: false,
+      transparent: true
+    });
+    const galaxy = new THREE.Points(galaxyGeo, galaxyMat);
+    scene.add(galaxy);
+
+    // --- 3. 3D Частицы сердца (формула кардиоиды) ---
+    const heartCount = 6000;
+    const heartGeo = new THREE.BufferGeometry();
+    const heartPositions = new Float32Array(heartCount * 3);
+
+    for (let i = 0; i < heartCount; i++) {
+      const i3 = i * 3;
+      const t = Math.PI * 2 * Math.random();
+      const u = Math.random();
+
+      // Математическая форма сердца
+      const x = 16 * Math.pow(Math.sin(t), 3);
+      const y = 13 * Math.cos(t) - 5 * Math.cos(2 * t) - 2 * Math.cos(3 * t) - Math.cos(4 * t);
+      const z = (Math.random() - 0.5) * 8;
+
+      const scale = 0.65 * (0.8 + 0.2 * Math.random());
+      heartPositions[i3] = x * scale;
+      heartPositions[i3 + 1] = y * scale + 6;
+      heartPositions[i3 + 2] = z * scale;
+    }
+
+    heartGeo.setAttribute('position', new THREE.BufferAttribute(heartPositions, 3));
+    const heartMat = new THREE.PointsMaterial({
+      color: 0xff1447,
+      size: 0.25,
+      blending: THREE.AdditiveBlending,
+      transparent: true,
+      opacity: 0.9
+    });
+    const heart = new THREE.Points(heartGeo, heartMat);
+    scene.add(heart);
+
+    // --- 4. 3D Текстовые бейджи на орбите ---
+    function createTextSprite(message) {
+      const canvasText = document.createElement('canvas');
+      const ctx = canvasText.getContext('2d');
+      canvasText.width = 512;
+      canvasText.height = 128;
+
+      ctx.fillStyle = "rgba(255, 30, 80, 0.9)";
+      ctx.shadowColor = "#ff0055";
+      ctx.shadowBlur = 15;
+      ctx.font = "Bold 36px 'Segoe UI', Arial";
+      ctx.textAlign = "center";
+      ctx.fillText(message, 256, 75);
+
+      const texture = new THREE.CanvasTexture(canvasText);
+      const spriteMaterial = new THREE.SpriteMaterial({ map: texture, transparent: true });
+      const sprite = new THREE.Sprite(spriteMaterial);
+      sprite.scale.set(8, 2, 1);
+      return sprite;
+    }
+
+    const words = ["TE AMO", "INFINITO ∞", "AMOR DE MI VIDA", "AMOR ETERNO", "ME ENCANTAS"];
+    const labelsGroup = new THREE.Group();
+    scene.add(labelsGroup);
+
+    words.forEach((word, idx) => {
+      const sprite = createTextSprite(word);
+      const angle = (idx / words.length) * Math.PI * 2;
+      const radius = 22;
+      sprite.position.set(Math.cos(angle) * radius, -1, Math.sin(angle) * radius);
+      labelsGroup.add(sprite);
+    });
+
+    // Анимационный цикл
+    let clock = new THREE.Clock();
+
+    function animate() {
+      requestAnimationFrame(animate);
+      const elapsedTime = clock.getElapsedTime();
+
+      // Вращение галактики и надписей
+      galaxy.rotation.y = elapsedTime * 0.12;
+      labelsGroup.rotation.y = -elapsedTime * 0.08;
+
+      // Пульсация сердца (биение)
+      const beat = 1 + Math.sin(elapsedTime * 3) * 0.06;
+      heart.scale.set(beat, beat, beat);
+      heart.rotation.y = Math.sin(elapsedTime * 0.5) * 0.1;
+
+      controls.update();
+      renderer.render(scene, camera);
+    }
+    animate();
+
+    // Запуск по клику на кнопку
+    startBtn.addEventListener('click', () => {
+      startScreen.classList.add('hidden');
+
+      // Показ всплывающих карточек с интервалом
+      let pIdx = 0;
+      setInterval(() => {
+        modalText.textContent = phrases[pIdx];
+        modal.classList.add('active');
+        setTimeout(() => {
+          modal.classList.remove('active');
+        }, 3200);
+        pIdx = (pIdx + 1) % phrases.length;
+      }, 5000);
+    });
+
+    // Адаптивность при изменении размера окна
+    window.addEventListener('resize', () => {
+      camera.aspect = window.innerWidth / window.innerHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(window.innerWidth, window.innerHeight);
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    });
+  </script>
+</body>
+</html>

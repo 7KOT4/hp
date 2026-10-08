@@ -30,7 +30,6 @@
       cursor: pointer;
     }
 
-    /* Подсказка снизу в точности как на tlanex.com */
     #start-hint {
       position: fixed;
       bottom: 35px;
@@ -51,7 +50,7 @@
       box-shadow: 0 0 25px rgba(255, 42, 95, 0.35);
       pointer-events: none;
       animation: pulseHint 2.4s infinite ease-in-out;
-      transition: opacity 0.6s ease;
+      transition: opacity 0.4s ease;
     }
 
     @keyframes pulseHint {
@@ -59,7 +58,6 @@
       50% { opacity: 1; transform: translateX(-50%) scale(1.02); }
     }
 
-    /* Всплывающая карточка с воспоминанием */
     #photo-card-container {
       position: fixed;
       top: 0;
@@ -159,13 +157,10 @@
 </head>
 <body>
 
-  <!-- Аудиофайл рядом с index.html -->
   <audio id="bg-music" src="music.mp3" loop preload="auto"></audio>
 
-  <!-- Подсказка -->
   <div id="start-hint">ТОРКНІТЬСЯ ЕКРАНА, ЩОБ РОЗПОЧАТИ ПОДОРОЖ</div>
 
-  <!-- Модалка просмотра -->
   <div id="photo-card-container">
     <div class="memory-card">
       <img id="card-img" src="" alt="Спогад">
@@ -222,8 +217,8 @@
     scene.fog = new THREE.FogExp2(0x000002, 0.007);
 
     const camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 1000);
-    // Начальная позиция: смотрим строго в упор на спираль слов
-    camera.position.set(0, 0, 75);
+    // Приближаем камеру ближе: теперь надписи спирали четко видны и читаются сразу
+    camera.position.set(0, 0, 36);
 
     const renderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: true, alpha: true });
     renderer.setSize(window.innerWidth, window.innerHeight);
@@ -234,7 +229,7 @@
     controls.dampingFactor = 0.06;
     controls.maxDistance = 110;
     controls.minDistance = 12;
-    controls.enabled = false; // До пролета не даем ломать ракурс
+    controls.enabled = false;
 
     // 2. Фоновые звезды
     const bgStarsGeo = new THREE.BufferGeometry();
@@ -247,20 +242,21 @@
     scene.add(new THREE.Points(bgStarsGeo, bgStarsMat));
 
     // =========================================================================
-    // 3. НАСТОЯЩАЯ СПИРАЛЬ TLANEX (Сотни плоских слов, закрученных улиткой)
+    // 3. БОЛЬШАЯ И ЧЕТКАЯ СПИРАЛЬ СЛОВ (КАК НА TLANEX.COM)
     // =========================================================================
     function createLoveWordTex(text) {
       const c = document.createElement('canvas');
-      c.width = 256;
-      c.height = 64;
+      c.width = 320;
+      c.height = 80;
       const ctx = c.getContext('2d');
-      ctx.font = "bold 28px -apple-system, sans-serif";
+      // Жирный четкий шрифт для легкого чтения
+      ctx.font = "bold 34px -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif";
       ctx.textAlign = "center";
       ctx.textBaseline = "middle";
-      ctx.fillStyle = "#ff5588";
-      ctx.shadowColor = "#ff1a53";
-      ctx.shadowBlur = 10;
-      ctx.fillText(text, 128, 32);
+      ctx.fillStyle = "#ff4d88";
+      ctx.shadowColor = "#ff0055";
+      ctx.shadowBlur = 12;
+      ctx.fillText(text, 160, 40);
       return new THREE.CanvasTexture(c);
     }
 
@@ -270,7 +266,7 @@
     const spiralGroup = new THREE.Group();
     scene.add(spiralGroup);
 
-    const SPIRAL_COUNT = 180;
+    const SPIRAL_COUNT = 150;
     const spiralWords = [];
 
     for (let i = 0; i < SPIRAL_COUNT; i++) {
@@ -278,23 +274,22 @@
       const mat = new THREE.SpriteMaterial({
         map: tex,
         transparent: true,
-        opacity: 0.95,
+        opacity: 0.98,
         blending: THREE.AdditiveBlending
       });
       const sprite = new THREE.Sprite(mat);
 
-      // Математика спирали Ферма/Архимеда (как в оригинале)
+      // Раскрутка спирали от самого центра наружу
       const t = i / SPIRAL_COUNT;
-      const angle = t * Math.PI * 16; // 8 полных оборотов
-      const radius = 1.8 + Math.pow(t, 1.1) * 32.0;
+      const angle = t * Math.PI * 14; 
+      const radius = 1.2 + Math.pow(t, 1.1) * 24.0;
 
-      // Располагаем в плоскости перед камерой
       sprite.position.x = Math.cos(angle) * radius;
       sprite.position.y = Math.sin(angle) * radius;
-      // Легкое смещение по Z для объема при пролете
-      sprite.position.z = 25 - t * 45;
+      sprite.position.z = 0; // Строго в плоскости обзора
 
-      const scale = 1.4 + t * 4.2;
+      // Крупный масштаб надписей
+      const scale = 1.8 + t * 4.6;
       sprite.scale.set(scale, scale * 0.25, 1);
 
       sprite.userData = {
@@ -310,14 +305,14 @@
     }
 
     // =========================================================================
-    // 4. МИР СЕРДЦА И ГАЛАКТИКИ (Прячется за спиралью и ждет пролета)
+    // 4. МИР СЕРДЦА И ГАЛАКТИКИ (Ждет в глубине за центром воронки)
     // =========================================================================
     const galaxyWorld = new THREE.Group();
-    galaxyWorld.position.set(0, 0, -40); // Расположен глубже в космосе
-    galaxyWorld.scale.set(0.001, 0.001, 0.001); // Скрыт до прилета
+    galaxyWorld.position.set(0, 0, -45); 
+    galaxyWorld.scale.set(0.001, 0.001, 0.001);
     scene.add(galaxyWorld);
 
-    // Спиральная Галактика частиц
+    // Спиральная Галактика
     const galaxyCount = 38000;
     const galaxyGeo = new THREE.BufferGeometry();
     const positions = new Float32Array(galaxyCount * 3);
@@ -357,7 +352,7 @@
     const galaxy = new THREE.Points(galaxyGeo, galaxyMat);
     galaxyWorld.add(galaxy);
 
-    // 3D-Сердце из светящихся частиц
+    // 3D-Сердце
     const heartCount = 6500;
     const heartGeo = new THREE.BufferGeometry();
     const heartPos = new Float32Array(heartCount * 3);
@@ -416,7 +411,7 @@
       labelsGroup.add(s);
     });
 
-    // Фото-медальоны с воспоминаниями
+    // Медальоны фото
     function createMiniBadge(imgUrl, callback) {
       const img = new Image();
       img.crossOrigin = "anonymous";
@@ -475,7 +470,7 @@
       });
     });
 
-    // Клики по медальонам без залипания
+    // Клики по фото
     const raycaster = new THREE.Raycaster();
     const mouse = new THREE.Vector2();
     let pStartX = 0, pStartY = 0;
@@ -486,7 +481,7 @@
     });
 
     window.addEventListener('pointerup', (e) => {
-      // Первый клик по экрану — начинаем гиперполет
+      // Клик по экрану запускает полет
       if (!flightActive && flightProgress === 0) {
         startHyperspaceFlight();
         return;
@@ -533,71 +528,71 @@
     });
 
     // =========================================================================
-    // 5. КИНЕМАТОГРАФИЧНЫЙ ПРОЛЕТ СКВОЗЬ СПИРАЛЬ
+    // 5. ДИНАМИКА: МГНОВЕННЫЙ ПРОЛЕТ В ЦЕНТР ПРИ НАЖАТИИ
     // =========================================================================
     let flightActive = false;
     let flightProgress = 0;
-    const startCamPos = new THREE.Vector3(0, 0, 75);
-    const endCamPos = new THREE.Vector3(0, 26, 16); // идеальный ракурс перед сердцем
+    const startCamPos = new THREE.Vector3(0, 0, 36);
+    const endCamPos = new THREE.Vector3(0, 24, 12); // Точка перед бьющимся сердцем
 
     function startHyperspaceFlight() {
       flightActive = true;
       startHint.style.opacity = '0';
-      setTimeout(() => startHint.remove(), 600);
+      setTimeout(() => startHint.remove(), 400);
 
       if (bgMusic) {
         bgMusic.play().catch(e => console.log("Music play:", e));
       }
     }
 
-    // 6. Анимационный цикл
     const clock = new THREE.Clock();
 
     function animate() {
       requestAnimationFrame(animate);
       const t = clock.getElapsedTime();
 
-      // До полета: спираль просто плавно кружится на месте
+      // До клика: спираль плавно и завораживающе кружится
       if (!flightActive && flightProgress === 0) {
-        spiralGroup.rotation.z = -t * 0.15;
+        spiralGroup.rotation.z = -t * 0.16;
       }
 
-      // ВО ВРЕМЯ ПОЛЕТА: камера с ускорением влетает прямо внутрь вихря
+      // В МОМЕНТ КЛИКА: стремителен полет камеры прямо в центр воронки
       if (flightActive) {
-        flightProgress += 0.01;
+        // Уверенная скорость пролета без зависаний
+        flightProgress += 0.014;
         const p = Math.min(flightProgress, 1);
 
-        // Плавный разгон и мягкий финал (Smoothstep / Cubic)
+        // Экспоненциальное ускорение (как падение в воронку)
         const ease = p * p * (3 - 2 * p);
 
-        // Вращение спирали бешено ускоряется во время пролета
-        spiralGroup.rotation.z -= (0.01 + (1 - p) * 0.08);
+        // Вращение спирали бешено раскручивается
+        spiralGroup.rotation.z -= (0.02 + ease * 0.12);
 
-        // Камера проносится сквозь слова и встает на орбиту сердца
+        // Камера несется прямо сквозь центр вглубь к сердцу
         camera.position.lerpVectors(startCamPos, endCamPos, ease);
 
-        // Слова спирали разлетаются в стороны мимо камеры и тают
+        // Слова расширяются в стороны мимо камеры и растворяются
         spiralWords.forEach(s => {
-          s.position.x = s.userData.baseX * (1 + ease * 3.5);
-          s.position.y = s.userData.baseY * (1 + ease * 3.5);
-          s.material.opacity = Math.max(0, 0.95 - ease * 1.3);
+          s.position.x = s.userData.baseX * (1 + ease * 4.5);
+          s.position.y = s.userData.baseY * (1 + ease * 4.5);
+          s.material.opacity = Math.max(0, 0.98 - ease * 1.25);
         });
 
-        // Мир галактики и сердца раскрывается прямо перед нами
-        const gScale = Math.min(ease * 1.2, 1);
+        // Галактика и сердце вырастают прямо перед экраном
+        const gScale = Math.min(ease * 1.15, 1);
         galaxyWorld.scale.set(gScale, gScale, gScale);
         galaxy.rotation.y += (1 - p) * 0.08;
 
-        // Финиш полета: управление камерой отдается пользователю
+        // Конец полета: активируем OrbitControls
         if (p >= 1) {
           flightActive = false;
-          scene.remove(spiralGroup); // Убираем спираль из памяти
-          controls.target.set(0, 0, -40); // Центр вращения привязываем к сердцу
-          controls.enabled = true; // Включаем свободное вращение
+          scene.remove(spiralGroup);
+          controls.target.set(0, 0, -45); // Точно центр сердца
+          controls.enabled = true; // Свободное вращение
         }
       }
 
-      // После завершения полета: свободная жизнь галактики
+      // После прилета: жизнь галактики
       if (flightProgress >= 1) {
         galaxy.rotation.y += 0.002;
         labelsGroup.rotation.y = -t * 0.08;

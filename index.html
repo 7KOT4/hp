@@ -34,7 +34,7 @@
       cursor: grabbing;
     }
 
-    /* Подсказка старта как на tlanex.com */
+    /* Подсказка старта tlanex */
     #start-hint {
       position: fixed;
       bottom: 35px;
@@ -219,21 +219,21 @@
     const nextBtn = document.getElementById('next-btn');
     const closeBtn = document.getElementById('close-btn');
 
-    // Мягкая альфа-текстура (убирает грязь и пиксели)
-    function createSoftDotTexture() {
+    // Процедурная текстура неонового свечения точки (никаких пиксельных квадратов)
+    function createGlowDotTexture() {
       const c = document.createElement('canvas');
       c.width = 64; c.height = 64;
       const ctx = c.getContext('2d');
       const grad = ctx.createRadialGradient(32, 32, 0, 32, 32, 32);
       grad.addColorStop(0, 'rgba(255, 255, 255, 1)');
-      grad.addColorStop(0.3, 'rgba(255, 60, 110, 0.8)');
-      grad.addColorStop(0.7, 'rgba(255, 20, 80, 0.15)');
+      grad.addColorStop(0.28, 'rgba(255, 65, 115, 0.85)');
+      grad.addColorStop(0.68, 'rgba(255, 15, 75, 0.2)');
       grad.addColorStop(1, 'rgba(0, 0, 0, 0)');
       ctx.fillStyle = grad;
       ctx.fillRect(0, 0, 64, 64);
       return new THREE.CanvasTexture(c);
     }
-    const softDotTex = createSoftDotTexture();
+    const glowDotTex = createGlowDotTexture();
 
     // 1. Сцена и Камера
     const scene = new THREE.Scene();
@@ -262,7 +262,7 @@
     const bgStars = new THREE.Points(bgStarsGeo, new THREE.PointsMaterial({
       color: 0xffb3c6,
       size: 0.65,
-      map: softDotTex,
+      map: glowDotTex,
       transparent: true,
       opacity: 0.75,
       blending: THREE.AdditiveBlending,
@@ -271,7 +271,7 @@
     scene.add(bgStars);
 
     // ==============================================================
-    // 2. ВОРОНКА СЛОВ TLANEX НА ВХОДЕ
+    // 2. ВОРОНКА СЛОВ TLANEX
     // ==============================================================
     function createLoveWordTex(text) {
       const c = document.createElement('canvas');
@@ -318,10 +318,11 @@
     galaxyWorld.scale.set(0.001, 0.001, 0.001);
     scene.add(galaxyWorld);
 
-    // Черная дыра
-    const holeGeo = new THREE.SphereGeometry(3.4, 32, 32);
-    const holeMat = new THREE.MeshBasicMaterial({ color: 0x000000 });
-    const blackHole = new THREE.Mesh(holeGeo, holeMat);
+    // Черная дыра в центре
+    const blackHole = new THREE.Mesh(
+      new THREE.SphereGeometry(3.4, 32, 32),
+      new THREE.MeshBasicMaterial({ color: 0x000000 })
+    );
     galaxyWorld.add(blackHole);
 
     // Фотонное кольцо света
@@ -363,7 +364,7 @@
 
     const galaxy = new THREE.Points(galaxyGeo, new THREE.PointsMaterial({
       size: 0.45,
-      map: softDotTex,
+      map: glowDotTex,
       vertexColors: true,
       blending: THREE.AdditiveBlending,
       depthWrite: false,
@@ -371,7 +372,7 @@
     }));
     galaxyWorld.add(galaxy);
 
-    // 4. Плотное 3D-сердце
+    // 4. Плотное 3D-сердце (16 000 частиц)
     const heartCenterGroup = new THREE.Group();
     galaxyWorld.add(heartCenterGroup);
 
@@ -417,7 +418,7 @@
 
     const heart = new THREE.Points(heartGeo, new THREE.PointsMaterial({
       size: 0.55,
-      map: softDotTex,
+      map: glowDotTex,
       vertexColors: true,
       blending: THREE.AdditiveBlending,
       transparent: true,
@@ -426,7 +427,7 @@
     }));
     heartCenterGroup.add(heart);
 
-    // Искры от сердца
+    // Парящие искры от сердца
     const embersCount = 450;
     const embersGeo = new THREE.BufferGeometry();
     const embersPos = new Float32Array(embersCount * 3);
@@ -441,7 +442,7 @@
     const embers = new THREE.Points(embersGeo, new THREE.PointsMaterial({
       color: 0xff70a0,
       size: 0.65,
-      map: softDotTex,
+      map: glowDotTex,
       blending: THREE.AdditiveBlending,
       transparent: true,
       opacity: 0.85,
@@ -552,7 +553,9 @@
       if (e.target === cardContainer) cardContainer.classList.remove('active');
     });
 
-    // 5. Бесшовный пролет в центр
+    // ==============================================================
+    // 5. БЕСШОВНЫЙ ПРОЛЕТ В ЦЕНТР
+    // ==============================================================
     let flightActive = false;
     let flightProgress = 0;
     const startCamPos = new THREE.Vector3(0, 0, 36);

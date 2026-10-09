@@ -34,7 +34,6 @@
       cursor: grabbing;
     }
 
-    /* Подсказка старта tlanex */
     #start-hint {
       position: fixed;
       bottom: 35px;
@@ -63,7 +62,6 @@
       50% { opacity: 1; transform: translateX(-50%) scale(1.02); }
     }
 
-    /* Модальное окно просмотра воспоминаний */
     #photo-card-container {
       position: fixed;
       top: 0;
@@ -167,7 +165,6 @@
 
   <div id="start-hint">ТОРКНІТЬСЯ ЕКРАНА, ЩОБ РОЗПОЧАТИ ПОДОРОЖ</div>
 
-  <!-- Модальное окно фото -->
   <div id="photo-card-container">
     <div class="memory-card">
       <img id="card-img" src="" alt="Спогад">
@@ -219,15 +216,15 @@
     const nextBtn = document.getElementById('next-btn');
     const closeBtn = document.getElementById('close-btn');
 
-    // Процедурная текстура неонового свечения точки (никаких пиксельных квадратов)
+    // Мягкая круглая неоновая текстура точки
     function createGlowDotTexture() {
       const c = document.createElement('canvas');
       c.width = 64; c.height = 64;
       const ctx = c.getContext('2d');
       const grad = ctx.createRadialGradient(32, 32, 0, 32, 32, 32);
       grad.addColorStop(0, 'rgba(255, 255, 255, 1)');
-      grad.addColorStop(0.28, 'rgba(255, 65, 115, 0.85)');
-      grad.addColorStop(0.68, 'rgba(255, 15, 75, 0.2)');
+      grad.addColorStop(0.25, 'rgba(255, 80, 130, 0.9)');
+      grad.addColorStop(0.65, 'rgba(255, 20, 80, 0.2)');
       grad.addColorStop(1, 'rgba(0, 0, 0, 0)');
       ctx.fillStyle = grad;
       ctx.fillRect(0, 0, 64, 64);
@@ -235,7 +232,7 @@
     }
     const glowDotTex = createGlowDotTexture();
 
-    // 1. Сцена и Камера
+    // 1. Сцена и камера
     const scene = new THREE.Scene();
     scene.fog = new THREE.FogExp2(0x010003, 0.007);
 
@@ -271,7 +268,31 @@
     scene.add(bgStars);
 
     // ==============================================================
-    // 2. ВОРОНКА СЛОВ TLANEX
+    // 2. ПАДАЮЩИЕ ЗВЕЗДЫ (КОМЕТЫ)
+    // ==============================================================
+    const meteors = [];
+    for (let i = 0; i < 4; i++) {
+      const lineGeo = new THREE.BufferGeometry();
+      lineGeo.setFromPoints([new THREE.Vector3(0, 0, 0), new THREE.Vector3(-8, -4, -5)]);
+      const lineMat = new THREE.LineBasicMaterial({
+        color: 0xff77aa,
+        transparent: true,
+        opacity: 0,
+        blending: THREE.AdditiveBlending
+      });
+      const meteor = new THREE.Line(lineGeo, lineMat);
+      scene.add(meteor);
+
+      meteors.push({
+        mesh: meteor,
+        active: false,
+        timer: Math.random() * 2.5,
+        speed: 2.2 + Math.random() * 0.8
+      });
+    }
+
+    // ==============================================================
+    // 3. ВОРОНКА СЛОВ TLANEX
     // ==============================================================
     function createLoveWordTex(text) {
       const c = document.createElement('canvas');
@@ -311,30 +332,15 @@
     }
 
     // ==============================================================
-    // 3. МИР ГАЛАКТИКИ И СЕРДЦА
+    // 4. МИР СЕРДЦА И ГАЛАКТИКИ (БЕЗ ЧЕРНОЙ ДЫРЫ)
     // ==============================================================
     const galaxyWorld = new THREE.Group();
     galaxyWorld.position.set(0, 0, 0);
     galaxyWorld.scale.set(0.001, 0.001, 0.001);
     scene.add(galaxyWorld);
 
-    // Черная дыра в центре
-    const blackHole = new THREE.Mesh(
-      new THREE.SphereGeometry(3.4, 32, 32),
-      new THREE.MeshBasicMaterial({ color: 0x000000 })
-    );
-    galaxyWorld.add(blackHole);
-
-    // Фотонное кольцо света
-    const photonRing = new THREE.Mesh(
-      new THREE.RingGeometry(3.4, 4.2, 48),
-      new THREE.MeshBasicMaterial({ color: 0xff1450, side: THREE.DoubleSide, transparent: true, opacity: 0.9, blending: THREE.AdditiveBlending })
-    );
-    photonRing.rotation.x = Math.PI / 2;
-    galaxyWorld.add(photonRing);
-
-    // Аккреционный диск галактики
-    const galaxyCount = 42000;
+    // Спиральный диск галактики
+    const galaxyCount = 45000;
     const galaxyGeo = new THREE.BufferGeometry();
     const positions = new Float32Array(galaxyCount * 3);
     const colors = new Float32Array(galaxyCount * 3);
@@ -343,7 +349,7 @@
 
     for (let i = 0; i < galaxyCount; i++) {
       const i3 = i * 3;
-      const radius = 3.8 + Math.pow(Math.random(), 1.4) * 32;
+      const radius = 1.5 + Math.pow(Math.random(), 1.3) * 35;
       const spin = radius * 1.7;
       const branchAngle = ((i % 3) * 2 * Math.PI) / 3;
 
@@ -355,7 +361,7 @@
       positions[i3 + 1] = ry - 4.5;
       positions[i3 + 2] = Math.sin(branchAngle + spin) * radius + rz;
 
-      const normR = (radius - 3.8) / 32;
+      const normR = radius / 36.5;
       const mixed = colorInside.clone().lerp(colorOutside, normR);
       colors[i3] = mixed.r; colors[i3 + 1] = mixed.g; colors[i3 + 2] = mixed.b;
     }
@@ -372,21 +378,42 @@
     }));
     galaxyWorld.add(galaxy);
 
-    // 4. Плотное 3D-сердце (16 000 частиц)
+    // Тонкие неоновые кольца вокруг центра
+    function createCenterRing(r, tiltX, col) {
+      const pts = [];
+      for (let i = 0; i <= 120; i++) {
+        const a = (i / 120) * Math.PI * 2;
+        pts.push(new THREE.Vector3(Math.cos(a) * r, 0, Math.sin(a) * r));
+      }
+      const ring = new THREE.Line(
+        new THREE.BufferGeometry().setFromPoints(pts),
+        new THREE.LineBasicMaterial({ color: col, transparent: true, opacity: 0.55, blending: THREE.AdditiveBlending })
+      );
+      ring.rotation.x = tiltX;
+      ring.position.y = 6.2;
+      return ring;
+    }
+    const ring1 = createCenterRing(18, 0.35, 0xff2a70);
+    const ring2 = createCenterRing(21.5, -0.25, 0xff75a0);
+    galaxyWorld.add(ring1);
+    galaxyWorld.add(ring2);
+
+    // 5. Пылающее плотное 3D-сердце (18 000 частиц, залитый центр)
     const heartCenterGroup = new THREE.Group();
     galaxyWorld.add(heartCenterGroup);
 
-    const heartLight = new THREE.PointLight(0xff2a6d, 3.8, 55);
+    const heartLight = new THREE.PointLight(0xff2a6d, 4.2, 60);
     heartLight.position.set(0, 6.5, 0);
     heartCenterGroup.add(heartLight);
 
-    const coreGeo = new THREE.SphereGeometry(3.2, 32, 32);
-    const coreMat = new THREE.MeshBasicMaterial({ color: 0xff1450, transparent: true, opacity: 0.4, blending: THREE.AdditiveBlending });
+    // Внутреннее сияющее теплое ядро
+    const coreGeo = new THREE.SphereGeometry(3.6, 32, 32);
+    const coreMat = new THREE.MeshBasicMaterial({ color: 0xff1450, transparent: true, opacity: 0.45, blending: THREE.AdditiveBlending });
     const innerCore = new THREE.Mesh(coreGeo, coreMat);
     innerCore.position.set(0, 6.5, 0);
     heartCenterGroup.add(innerCore);
 
-    const heartCount = 16000;
+    const heartCount = 18000;
     const heartGeo = new THREE.BufferGeometry();
     const heartPos = new Float32Array(heartCount * 3);
     const heartColors = new Float32Array(heartCount * 3);
@@ -399,16 +426,16 @@
       const t = Math.PI * 2 * Math.random();
       const xBase = 16 * Math.pow(Math.sin(t), 3);
       const yBase = 13 * Math.cos(t) - 5 * Math.cos(2 * t) - 2 * Math.cos(3 * t) - Math.cos(4 * t);
-      const fill = Math.pow(Math.random(), 0.6);
-      const zDepth = (Math.random() - 0.5) * 8.5 * fill;
+      const fill = Math.pow(Math.random(), 0.55);
+      const zDepth = (Math.random() - 0.5) * 9.0 * fill;
 
-      const scale = 0.68 * fill;
+      const scale = 0.70 * fill;
       heartPos[i3] = xBase * scale;
       heartPos[i3 + 1] = yBase * scale + 6.5;
       heartPos[i3 + 2] = zDepth;
 
       let c = colEdge.clone();
-      if (fill < 0.4) c.lerp(colCore, 1 - fill / 0.4);
+      if (fill < 0.45) c.lerp(colCore, 1 - fill / 0.45);
       else c.lerp(colInside, 0.5);
 
       heartColors[i3] = c.r; heartColors[i3 + 1] = c.g; heartColors[i3 + 2] = c.b;
@@ -427,8 +454,8 @@
     }));
     heartCenterGroup.add(heart);
 
-    // Парящие искры от сердца
-    const embersCount = 450;
+    // Парящие искры, непрерывно поднимающиеся из сердца вверх
+    const embersCount = 550;
     const embersGeo = new THREE.BufferGeometry();
     const embersPos = new Float32Array(embersCount * 3);
     const embersVelocity = [];
@@ -441,7 +468,7 @@
     embersGeo.setAttribute('position', new THREE.BufferAttribute(embersPos, 3));
     const embers = new THREE.Points(embersGeo, new THREE.PointsMaterial({
       color: 0xff70a0,
-      size: 0.65,
+      size: 0.7,
       map: glowDotTex,
       blending: THREE.AdditiveBlending,
       transparent: true,
@@ -467,7 +494,7 @@
       const s = createOrbitText(w);
       s.scale.set(7.5, 1.85, 1);
       const angle = (idx / words.length) * Math.PI * 2;
-      s.position.set(Math.cos(angle) * 22, -2, Math.sin(angle) * 22);
+      s.position.set(Math.cos(angle) * 23, -2, Math.sin(angle) * 23);
       labelsGroup.add(s);
     });
 
@@ -553,9 +580,7 @@
       if (e.target === cardContainer) cardContainer.classList.remove('active');
     });
 
-    // ==============================================================
-    // 5. БЕСШОВНЫЙ ПРОЛЕТ В ЦЕНТР
-    // ==============================================================
+    // 6. Бесшовный пролет в центр
     let flightActive = false;
     let flightProgress = 0;
     const startCamPos = new THREE.Vector3(0, 0, 36);
@@ -574,6 +599,31 @@
     function animate() {
       requestAnimationFrame(animate);
       const t = clock.getElapsedTime();
+
+      // Падающие кометы
+      meteors.forEach(m => {
+        if (!m.active) {
+          m.timer -= 0.016;
+          if (m.timer <= 0) {
+            m.active = true;
+            m.mesh.position.set(
+              (Math.random() - 0.5) * 90 + 20,
+              25 + Math.random() * 20,
+              -30 + (Math.random() - 0.5) * 40
+            );
+            m.mesh.material.opacity = 0.85;
+          }
+        } else {
+          m.mesh.position.x -= m.speed;
+          m.mesh.position.y -= m.speed * 0.5;
+          m.mesh.position.z -= m.speed * 0.6;
+          m.mesh.material.opacity -= 0.012;
+          if (m.mesh.material.opacity <= 0) {
+            m.active = false;
+            m.timer = 1.2 + Math.random() * 3.5;
+          }
+        }
+      });
 
       // Спираль слов до старта
       if (!flightActive && flightProgress === 0) {
@@ -611,8 +661,10 @@
       // Жизнь мира
       if (flightProgress >= 1) {
         galaxy.rotation.y += 0.002;
-        photonRing.rotation.z += 0.01;
         labelsGroup.rotation.y = -t * 0.08;
+
+        ring1.rotation.y = t * 0.05;
+        ring2.rotation.y = -t * 0.04;
 
         miniBadges.forEach((b, i) => {
           const curAngle = b.userData.baseAngle + t * 0.1;

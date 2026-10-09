@@ -34,20 +34,18 @@
       cursor: grabbing;
     }
 
-    /* ==============================================================
-       ПЛЕЕР В СТИЛЕ IOS (DYNAMIC ISLAND / APPLE MUSIC WIDGET)
-       ============================================================== */
+    /* iOS Виджет Плеера */
     #ios-player {
       position: fixed;
       top: 20px;
       left: 50%;
       transform: translateX(-50%) translateY(-100px);
       z-index: 50;
-      background: rgba(20, 20, 25, 0.72);
+      background: rgba(20, 20, 25, 0.75);
       border: 1px solid rgba(255, 255, 255, 0.18);
       backdrop-filter: blur(28px) saturate(190%);
       -webkit-backdrop-filter: blur(28px) saturate(190%);
-      box-shadow: 0 16px 40px rgba(0, 0, 0, 0.55), 0 0 25px rgba(255, 77, 109, 0.25);
+      box-shadow: 0 16px 40px rgba(0, 0, 0, 0.6), 0 0 25px rgba(255, 77, 109, 0.3);
       border-radius: 36px;
       padding: 10px 18px;
       display: flex;
@@ -256,7 +254,6 @@
 </head>
 <body>
 
-  <!-- Аудиоплеер -->
   <audio id="bg-music" loop preload="auto"></audio>
 
   <!-- Виджет плеера iOS -->
@@ -275,7 +272,7 @@
 
   <div id="start-hint">ТОРКНІТЬСЯ ЕКРАНА, ЩОБ РОЗПОЧАТИ ПОДОРОЖ</div>
 
-  <!-- Модалка просмотра -->
+  <!-- Модалка фото -->
   <div id="photo-card-container">
     <div class="memory-card">
       <img id="card-img" src="" alt="Спогад">
@@ -291,11 +288,7 @@
   <canvas id="webgl-canvas"></canvas>
 
   <script>
-    // ==============================================================
-    // КОНФИГУРАЦИЯ СЦЕН И МУЗЫКИ
-    // Можешь назвать свои аудиофайлы track1.mp3, track2.mp3, track3.mp3
-    // Либо оставить music.mp3 для первого
-    // ==============================================================
+    // 3 КАРДИНАЛЬНО РАЗНЫХ МИРА
     const biomes = [
       {
         name: "Космос Кохання",
@@ -303,35 +296,26 @@
         icon: "🌌",
         audioSrc: "music.mp3",
         bgFog: 0x000002,
-        coreColor: 0xff1450,
         lightColor: 0xff2a6d,
-        ringColor: 0xff2a70,
-        planeColor: 0x220215,
-        wordColor: "#ff4d88"
+        coreColor: 0xff1450
       },
       {
-        name: "Сакура та Квіти",
-        subtitle: "Blossom Valley • Світ 2/3",
+        name: "Поляна Сакури",
+        subtitle: "Blossom Garden • Світ 2/3",
         icon: "🌸",
-        audioSrc: "track2.mp3", // или music.mp3
-        bgFog: 0x0a030c,
-        coreColor: 0xff85a2,
-        lightColor: 0xff99bb,
-        ringColor: 0xffb3c6,
-        planeColor: 0x0f291e,
-        wordColor: "#ff70a6"
+        audioSrc: "track2.mp3", // если нет, будет music.mp3
+        bgFog: 0x08020a,
+        lightColor: 0xff85a2,
+        coreColor: 0xff5588
       },
       {
-        name: "Захід на Морі",
+        name: "Захід на Океані",
         subtitle: "Sunset Ocean • Світ 3/3",
         icon: "🌊",
-        audioSrc: "track3.mp3", // или music.mp3
-        bgFog: 0x040817,
-        coreColor: 0xff7700,
-        lightColor: 0xffaa00,
-        ringColor: 0x00d4ff,
-        planeColor: 0x031d38,
-        wordColor: "#ff9e00"
+        audioSrc: "track3.mp3",
+        bgFog: 0x030814,
+        lightColor: 0xff9900,
+        coreColor: 0xff5500
       }
     ];
 
@@ -400,39 +384,23 @@
     controls.target.set(0, 0, 0);
     controls.enabled = false;
 
-    // 2. Фоновые звезды
+    // Фоновые звезды
     const bgStarsGeo = new THREE.BufferGeometry();
     const bgPos = new Float32Array(3000 * 3);
-    for (let i = 0; i < 3000 * 3; i++) {
-      bgPos[i] = (Math.random() - 0.5) * 260;
-    }
+    for (let i = 0; i < 3000 * 3; i++) bgPos[i] = (Math.random() - 0.5) * 260;
     bgStarsGeo.setAttribute('position', new THREE.BufferAttribute(bgPos, 3));
     const bgStarsMat = new THREE.PointsMaterial({ color: 0xffaacc, size: 0.35, transparent: true, opacity: 0.75 });
     const bgStars = new THREE.Points(bgStarsGeo, bgStarsMat);
     scene.add(bgStars);
 
-    // Падающие кометы
-    const meteors = [];
-    for (let i = 0; i < 4; i++) {
-      const lineGeo = new THREE.BufferGeometry();
-      lineGeo.setFromPoints([new THREE.Vector3(0, 0, 0), new THREE.Vector3(-6, -3, -4)]);
-      const lineMat = new THREE.LineBasicMaterial({ color: 0xff6699, transparent: true, opacity: 0 });
-      const meteor = new THREE.Line(lineGeo, lineMat);
-      scene.add(meteor);
-      meteors.push({ mesh: meteor, active: false, timer: Math.random() * 3, speed: 1.8 });
-    }
-
-    // 3. СПИРАЛЬ СЛОВ НА СТАРТЕ
-    function createLoveWordTex(text, col) {
+    // 2. СПИРАЛЬ СЛОВ НА СТАРТЕ
+    function createLoveWordTex(text) {
       const c = document.createElement('canvas');
       c.width = 320; c.height = 80;
       const ctx = c.getContext('2d');
       ctx.font = "bold 34px -apple-system, BlinkMacSystemFont, sans-serif";
-      ctx.textAlign = "center";
-      ctx.textBaseline = "middle";
-      ctx.fillStyle = col;
-      ctx.shadowColor = col;
-      ctx.shadowBlur = 12;
+      ctx.textAlign = "center"; ctx.textBaseline = "middle";
+      ctx.fillStyle = "#ff4d88"; ctx.shadowColor = "#ff0055"; ctx.shadowBlur = 12;
       ctx.fillText(text, 160, 40);
       return new THREE.CanvasTexture(c);
     }
@@ -440,136 +408,33 @@
     const wordList = ["Te amo", "I love you", "Кохаю тебе", "Te amo", "Ti amo", "Я тебе кохаю", "Je t'aime"];
     const spiralGroup = new THREE.Group();
     scene.add(spiralGroup);
-
     const spiralWords = [];
+
     for (let i = 0; i < 150; i++) {
-      const tex = createLoveWordTex(wordList[i % wordList.length], "#ff4d88");
+      const tex = createLoveWordTex(wordList[i % wordList.length]);
       const mat = new THREE.SpriteMaterial({ map: tex, transparent: true, opacity: 0.98, blending: THREE.AdditiveBlending });
       const sprite = new THREE.Sprite(mat);
-
       const t = i / 150;
       const angle = t * Math.PI * 14; 
       const radius = 1.2 + Math.pow(t, 1.1) * 24.0;
-
       sprite.position.x = Math.cos(angle) * radius;
       sprite.position.y = Math.sin(angle) * radius;
       sprite.position.z = 0;
-
       const scale = 1.8 + t * 4.6;
       sprite.scale.set(scale, scale * 0.25, 1);
       sprite.userData = { baseX: sprite.position.x, baseY: sprite.position.y };
-
       spiralWords.push(sprite);
       spiralGroup.add(sprite);
     }
 
     // ==============================================================
-    // 4. МИР СЕРДЦА И ГАЛАКТИКИ
+    // 3. СЕРДЦЕ ВСЕГДА В ЦЕНТРЕ (ЕДИНОЕ ДЛЯ ВСЕХ МИРОВ)
     // ==============================================================
-    const galaxyWorld = new THREE.Group();
-    galaxyWorld.position.set(0, 0, 0);
-    galaxyWorld.scale.set(0.001, 0.001, 0.001);
-    scene.add(galaxyWorld);
-
-    // ==============================================================
-    // ЗАПОЛНЕНИЕ НИЗА: СВЕТЯЩАЯСЯ ВОЛНОВАЯ РЕШЕТКА ПОД ФОТО
-    // ==============================================================
-    const gridHelper = new THREE.GridHelper(52, 28, 0xff2a70, 0x550a25);
-    gridHelper.position.y = -6.5;
-    gridHelper.material.transparent = true;
-    gridHelper.material.opacity = 0.45;
-    galaxyWorld.add(gridHelper);
-
-    // Дополнительное кольцо плотного звездного тумана внизу
-    const mistGeo = new THREE.BufferGeometry();
-    const mistPos = new Float32Array(5000 * 3);
-    for (let i = 0; i < 5000; i++) {
-      const rad = 14 + Math.random() * 22;
-      const ang = Math.random() * Math.PI * 2;
-      mistPos[i * 3] = Math.cos(ang) * rad;
-      mistPos[i * 3 + 1] = -5.5 + (Math.random() - 0.5) * 3;
-      mistPos[i * 3 + 2] = Math.sin(ang) * rad;
-    }
-    mistGeo.setAttribute('position', new THREE.BufferAttribute(mistPos, 3));
-    const mistMat = new THREE.PointsMaterial({
-      color: 0xff3377,
-      size: 0.28,
-      transparent: true,
-      opacity: 0.65,
-      blending: THREE.AdditiveBlending
-    });
-    const mistField = new THREE.Points(mistGeo, mistMat);
-    galaxyWorld.add(mistField);
-
-    // Спиральная Галактика
-    const galaxyCount = 38000;
-    const galaxyGeo = new THREE.BufferGeometry();
-    const positions = new Float32Array(galaxyCount * 3);
-    const colors = new Float32Array(galaxyCount * 3);
-    const colorInside = new THREE.Color('#ff2050');
-    const colorOutside = new THREE.Color('#2b0014');
-
-    for (let i = 0; i < galaxyCount; i++) {
-      const i3 = i * 3;
-      const radius = Math.random() * 34;
-      const spin = radius * 1.6;
-      const branchAngle = ((i % 3) * 2 * Math.PI) / 3;
-
-      const rx = Math.pow(Math.random(), 3) * (Math.random() < 0.5 ? 1 : -1) * 0.3 * radius;
-      const ry = Math.pow(Math.random(), 3) * (Math.random() < 0.5 ? 1 : -1) * 0.12 * radius;
-      const rz = Math.pow(Math.random(), 3) * (Math.random() < 0.5 ? 1 : -1) * 0.3 * radius;
-
-      positions[i3] = Math.cos(branchAngle + spin) * radius + rx;
-      positions[i3 + 1] = ry - 4.5;
-      positions[i3 + 2] = Math.sin(branchAngle + spin) * radius + rz;
-
-      const mixed = colorInside.clone().lerp(colorOutside, radius / 34);
-      colors[i3] = mixed.r;
-      colors[i3 + 1] = mixed.g;
-      colors[i3 + 2] = mixed.b;
-    }
-    galaxyGeo.setAttribute('position', new THREE.BufferAttribute(positions, 3));
-    galaxyGeo.setAttribute('color', new THREE.BufferAttribute(colors, 3));
-
-    const galaxyMat = new THREE.PointsMaterial({
-      size: 0.18,
-      vertexColors: true,
-      blending: THREE.AdditiveBlending,
-      depthWrite: false,
-      transparent: true
-    });
-    const galaxy = new THREE.Points(galaxyGeo, galaxyMat);
-    galaxyWorld.add(galaxy);
-
-    // Кольца Сатурна
-    function createOrbitRing(radiusX, radiusZ, tiltX, tiltZ, colorHex) {
-      const pts = [];
-      for (let i = 0; i <= 120; i++) {
-        const th = (i / 120) * Math.PI * 2;
-        pts.push(new THREE.Vector3(Math.cos(th) * radiusX, 0, Math.sin(th) * radiusZ));
-      }
-      const ring = new THREE.Line(
-        new THREE.BufferGeometry().setFromPoints(pts),
-        new THREE.LineBasicMaterial({ color: colorHex, transparent: true, opacity: 0.45, blending: THREE.AdditiveBlending })
-      );
-      ring.rotation.x = tiltX;
-      ring.rotation.z = tiltZ;
-      return ring;
-    }
-
-    const ring1 = createOrbitRing(16, 16, 0.35, 0.25, 0xff2a70);
-    ring1.position.y = 5.5;
-    galaxyWorld.add(ring1);
-
-    const ring2 = createOrbitRing(19.5, 19.5, -0.3, -0.2, 0xff70a6);
-    ring2.position.y = 6.2;
-    galaxyWorld.add(ring2);
-
-    // 5. ПЫЛАЮЩИЙ ЦЕНТР СЕРДЦА
     const heartCenterGroup = new THREE.Group();
-    galaxyWorld.add(heartCenterGroup);
+    scene.add(heartCenterGroup);
+    heartCenterGroup.scale.set(0.001, 0.001, 0.001);
 
-    const heartLight = new THREE.PointLight(0xff2a6d, 3, 45);
+    const heartLight = new THREE.PointLight(0xff2a6d, 3.5, 50);
     heartLight.position.set(0, 6.5, 0);
     heartCenterGroup.add(heartLight);
 
@@ -579,11 +444,11 @@
     innerCore.position.set(0, 6.5, 0);
     heartCenterGroup.add(innerCore);
 
+    // Плотное сердце (14 000 частиц)
     const heartCount = 14000;
     const heartGeo = new THREE.BufferGeometry();
     const heartPos = new Float32Array(heartCount * 3);
     const heartColors = new Float32Array(heartCount * 3);
-
     const colEdge = new THREE.Color('#ff0d55');
     const colInside = new THREE.Color('#ff85a2');
     const colCore = new THREE.Color('#ffffff');
@@ -605,73 +470,181 @@
       if (fill < 0.4) c.lerp(colCore, 1 - fill / 0.4);
       else c.lerp(colInside, 0.5);
 
-      heartColors[i3] = c.r;
-      heartColors[i3 + 1] = c.g;
-      heartColors[i3 + 2] = c.b;
+      heartColors[i3] = c.r; heartColors[i3 + 1] = c.g; heartColors[i3 + 2] = c.b;
     }
-
     heartGeo.setAttribute('position', new THREE.BufferAttribute(heartPos, 3));
     heartGeo.setAttribute('color', new THREE.BufferAttribute(heartColors, 3));
-
-    const heartMat = new THREE.PointsMaterial({
-      size: 0.32,
-      vertexColors: true,
-      blending: THREE.AdditiveBlending,
-      transparent: true,
-      opacity: 0.95,
-      depthWrite: false
-    });
+    const heartMat = new THREE.PointsMaterial({ size: 0.32, vertexColors: true, blending: THREE.AdditiveBlending, transparent: true, opacity: 0.95, depthWrite: false });
     const heart = new THREE.Points(heartGeo, heartMat);
     heartCenterGroup.add(heart);
 
-    // Парящие искры
+    // Парящие искры от сердца
     const embersCount = 450;
     const embersGeo = new THREE.BufferGeometry();
     const embersPos = new Float32Array(embersCount * 3);
     const embersVelocity = [];
-
     for (let i = 0; i < embersCount; i++) {
       embersPos[i * 3] = (Math.random() - 0.5) * 16;
       embersPos[i * 3 + 1] = 4 + Math.random() * 12;
       embersPos[i * 3 + 2] = (Math.random() - 0.5) * 12;
       embersVelocity.push({ y: 0.03 + Math.random() * 0.04, x: (Math.random() - 0.5) * 0.015, z: (Math.random() - 0.5) * 0.015 });
     }
-
     embersGeo.setAttribute('position', new THREE.BufferAttribute(embersPos, 3));
     const embersMat = new THREE.PointsMaterial({ color: 0xff70a0, size: 0.45, blending: THREE.AdditiveBlending, transparent: true, opacity: 0.8 });
     const embers = new THREE.Points(embersGeo, embersMat);
     heartCenterGroup.add(embers);
 
-    // Текстовые орбиты
-    function createOrbitText(text) {
-      const c = document.createElement('canvas');
-      const ctx = c.getContext('2d');
-      c.width = 512; c.height = 128;
-      ctx.fillStyle = "rgba(255, 45, 95, 0.95)";
-      ctx.shadowColor = "#ff0055";
-      ctx.shadowBlur = 18;
-      ctx.font = "Bold 34px sans-serif";
-      ctx.textAlign = "center";
-      ctx.fillText(text, 256, 75);
+    // ==============================================================
+    // 4. ТРИ КАРДИНАЛЬНО РАЗНЫХ МИРА
+    // ==============================================================
 
-      const tex = new THREE.CanvasTexture(c);
-      const sprite = new THREE.Sprite(new THREE.SpriteMaterial({ map: tex, transparent: true }));
-      sprite.scale.set(7.5, 1.85, 1);
-      return sprite;
+    // --- МИР 1: КОСМОС (Галактика + Кольца Сатурна + Неоновая Сетка) ---
+    const spaceGroup = new THREE.Group();
+    scene.add(spaceGroup);
+    spaceGroup.scale.set(0.001, 0.001, 0.001);
+
+    const galaxyCount = 38000;
+    const galaxyGeo = new THREE.BufferGeometry();
+    const positions = new Float32Array(galaxyCount * 3);
+    const gColors = new Float32Array(galaxyCount * 3);
+    const colorInside = new THREE.Color('#ff2050');
+    const colorOutside = new THREE.Color('#2b0014');
+
+    for (let i = 0; i < galaxyCount; i++) {
+      const i3 = i * 3;
+      const radius = Math.random() * 34;
+      const spin = radius * 1.6;
+      const branchAngle = ((i % 3) * 2 * Math.PI) / 3;
+      const rx = Math.pow(Math.random(), 3) * (Math.random() < 0.5 ? 1 : -1) * 0.3 * radius;
+      const ry = Math.pow(Math.random(), 3) * (Math.random() < 0.5 ? 1 : -1) * 0.12 * radius;
+      const rz = Math.pow(Math.random(), 3) * (Math.random() < 0.5 ? 1 : -1) * 0.3 * radius;
+
+      positions[i3] = Math.cos(branchAngle + spin) * radius + rx;
+      positions[i3 + 1] = ry - 4.5;
+      positions[i3 + 2] = Math.sin(branchAngle + spin) * radius + rz;
+
+      const mixed = colorInside.clone().lerp(colorOutside, radius / 34);
+      gColors[i3] = mixed.r; gColors[i3 + 1] = mixed.g; gColors[i3 + 2] = mixed.b;
     }
+    galaxyGeo.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+    galaxyGeo.setAttribute('color', new THREE.BufferAttribute(gColors, 3));
+    const galaxy = new THREE.Points(galaxyGeo, new THREE.PointsMaterial({ size: 0.18, vertexColors: true, blending: THREE.AdditiveBlending, depthWrite: false, transparent: true }));
+    spaceGroup.add(galaxy);
 
-    const words = ["КОХАЮ ТЕБЕ", "НАЗАВЖДИ ∞", "МОЄ СЕРДЕНЬКО", "ВІЧНЕ КОХАННЯ"];
-    const labelsGroup = new THREE.Group();
-    galaxyWorld.add(labelsGroup);
+    // Кольца Сатурна
+    function makeRing(r, tiltX, col) {
+      const pts = [];
+      for (let i = 0; i <= 100; i++) {
+        const a = (i / 100) * Math.PI * 2;
+        pts.push(new THREE.Vector3(Math.cos(a) * r, 0, Math.sin(a) * r));
+      }
+      const ring = new THREE.Line(new THREE.BufferGeometry().setFromPoints(pts), new THREE.LineBasicMaterial({ color: col, transparent: true, opacity: 0.5 }));
+      ring.rotation.x = tiltX;
+      ring.position.y = 5.8;
+      return ring;
+    }
+    const ringSpace = makeRing(17, 0.35, 0xff2a70);
+    spaceGroup.add(ringSpace);
 
-    words.forEach((w, idx) => {
-      const s = createOrbitText(w);
-      const angle = (idx / words.length) * Math.PI * 2;
-      s.position.set(Math.cos(angle) * 22, -2, Math.sin(angle) * 22);
-      labelsGroup.add(s);
+    const spaceGrid = new THREE.GridHelper(52, 28, 0xff2a70, 0x550a25);
+    spaceGrid.position.y = -6.5;
+    spaceGrid.material.transparent = true; spaceGrid.material.opacity = 0.45;
+    spaceGroup.add(spaceGrid);
+
+    // --- МИР 2: ПОЛЯНА САКУРЫ (Зеленая трава с цветами + Вихрь лепестков) ---
+    const sakuraGroup = new THREE.Group();
+    scene.add(sakuraGroup);
+    sakuraGroup.visible = false;
+
+    // Поляна травы и цветов
+    const grassCount = 18000;
+    const grassGeo = new THREE.BufferGeometry();
+    const grassPos = new Float32Array(grassCount * 3);
+    const grassCol = new Float32Array(grassCount * 3);
+    const cGrass1 = new THREE.Color('#0f5132');
+    const cGrass2 = new THREE.Color('#20c997');
+    const cFlower = new THREE.Color('#ff758c');
+
+    for (let i = 0; i < grassCount; i++) {
+      const rad = 2 + Math.random() * 38;
+      const ang = Math.random() * Math.PI * 2;
+      grassPos[i * 3] = Math.cos(ang) * rad;
+      grassPos[i * 3 + 1] = -5.8 + (Math.random() - 0.5) * 0.8;
+      grassPos[i * 3 + 2] = Math.sin(ang) * rad;
+
+      // 85% трава, 15% яркие цветки
+      let c = (Math.random() < 0.15) ? cFlower : cGrass1.clone().lerp(cGrass2, Math.random());
+      grassCol[i * 3] = c.r; grassCol[i * 3 + 1] = c.g; grassCol[i * 3 + 2] = c.b;
+    }
+    grassGeo.setAttribute('position', new THREE.BufferAttribute(grassPos, 3));
+    grassGeo.setAttribute('color', new THREE.BufferAttribute(grassCol, 3));
+    const grassField = new THREE.Points(grassGeo, new THREE.PointsMaterial({ size: 0.35, vertexColors: true, transparent: true, opacity: 0.85 }));
+    sakuraGroup.add(grassField);
+
+    // 2500 летающих лепестков сакуры
+    const petalsCount = 2500;
+    const petalsGeo = new THREE.BufferGeometry();
+    const petalsPos = new Float32Array(petalsCount * 3);
+    const petalsVel = [];
+
+    for (let i = 0; i < petalsCount; i++) {
+      petalsPos[i * 3] = (Math.random() - 0.5) * 55;
+      petalsPos[i * 3 + 1] = -5 + Math.random() * 26;
+      petalsPos[i * 3 + 2] = (Math.random() - 0.5) * 55;
+      petalsVel.push({
+        x: (Math.random() - 0.5) * 0.08,
+        y: -0.02 - Math.random() * 0.03,
+        z: (Math.random() - 0.5) * 0.08,
+        rotSpeed: 0.02 + Math.random() * 0.04
+      });
+    }
+    petalsGeo.setAttribute('position', new THREE.BufferAttribute(petalsPos, 3));
+    const petalsMat = new THREE.PointsMaterial({ color: 0xffa8c5, size: 0.55, transparent: true, opacity: 0.9, blending: THREE.AdditiveBlending });
+    const petalsField = new THREE.Points(petalsGeo, petalsMat);
+    sakuraGroup.add(petalsField);
+
+    // --- МИР 3: ЗАХОД СОНЦА НА ОКЕАНЕ (Морская поверхность с 3D-волнами) ---
+    const oceanGroup = new THREE.Group();
+    scene.add(oceanGroup);
+    oceanGroup.visible = false;
+
+    // Сетка волнующегося океана (60x60 сегментов)
+    const oceanGeo = new THREE.PlaneGeometry(80, 80, 65, 65);
+    oceanGeo.rotateX(-Math.PI / 2);
+    const oceanMat = new THREE.MeshBasicMaterial({
+      color: 0x023e8a,
+      wireframe: true,
+      transparent: true,
+      opacity: 0.45
     });
+    const oceanMesh = new THREE.Mesh(oceanGeo, oceanMat);
+    oceanMesh.position.y = -6.2;
+    oceanGroup.add(oceanMesh);
 
-    // 6. МЕДАЛЬОНЫ ФОТО И ИХ ШЛЕЙФЫ
+    // Золотые солнечные блики на воде
+    const sparksCount = 2000;
+    const sparksGeo = new THREE.BufferGeometry();
+    const sparksPos = new Float32Array(sparksCount * 3);
+    for (let i = 0; i < sparksCount; i++) {
+      sparksPos[i * 3] = (Math.random() - 0.5) * 60;
+      sparksPos[i * 3 + 1] = -6.0 + Math.random() * 0.4;
+      sparksPos[i * 3 + 2] = (Math.random() - 0.5) * 60;
+    }
+    sparksGeo.setAttribute('position', new THREE.BufferAttribute(sparksPos, 3));
+    const sparksMat = new THREE.PointsMaterial({ color: 0xffb703, size: 0.35, blending: THREE.AdditiveBlending, transparent: true, opacity: 0.85 });
+    const sparksField = new THREE.Points(sparksGeo, sparksMat);
+    oceanGroup.add(sparksField);
+
+    // Огромное закатное солнце на горизонте
+    const sunGeo = new THREE.CircleGeometry(18, 48);
+    const sunMat = new THREE.MeshBasicMaterial({ color: 0xff5500, transparent: true, opacity: 0.55 });
+    const sunsetSun = new THREE.Mesh(sunGeo, sunMat);
+    sunsetSun.position.set(0, 4, -45);
+    oceanGroup.add(sunsetSun);
+
+    // ==============================================================
+    // 5. ФОТО-МЕДАЛЬОНЫ ВОКРУГ СЕРДЦА
+    // ==============================================================
     function createMiniBadge(imgUrl, callback) {
       const img = new Image();
       img.crossOrigin = "anonymous";
@@ -680,99 +653,79 @@
         const c = document.createElement('canvas');
         c.width = 160; c.height = 160;
         const ctx = c.getContext('2d');
-
-        ctx.beginPath();
-        ctx.arc(80, 80, 70, 0, Math.PI * 2);
-        ctx.fillStyle = '#ff2060';
-        ctx.shadowColor = '#ff2060';
-        ctx.shadowBlur = 15;
-        ctx.fill();
-
-        ctx.save();
-        ctx.beginPath();
-        ctx.arc(80, 80, 64, 0, Math.PI * 2);
-        ctx.clip();
-        ctx.drawImage(img, 0, 0, 160, 160);
-        ctx.restore();
-
-        ctx.beginPath();
-        ctx.arc(80, 80, 64, 0, Math.PI * 2);
-        ctx.lineWidth = 6;
-        ctx.strokeStyle = '#ffffff';
-        ctx.stroke();
-
-        ctx.font = '24px sans-serif';
-        ctx.fillText('💖', 120, 140);
+        ctx.beginPath(); ctx.arc(80, 80, 70, 0, Math.PI * 2);
+        ctx.fillStyle = '#ff2060'; ctx.shadowColor = '#ff2060'; ctx.shadowBlur = 15; ctx.fill();
+        ctx.save(); ctx.beginPath(); ctx.arc(80, 80, 64, 0, Math.PI * 2); ctx.clip();
+        ctx.drawImage(img, 0, 0, 160, 160); ctx.restore();
+        ctx.beginPath(); ctx.arc(80, 80, 64, 0, Math.PI * 2); ctx.lineWidth = 6; ctx.strokeStyle = '#ffffff'; ctx.stroke();
+        ctx.font = '24px sans-serif'; ctx.fillText('💖', 120, 140);
         callback(new THREE.CanvasTexture(c));
       };
     }
 
     const miniBadges = [];
     const badgesGroup = new THREE.Group();
-    galaxyWorld.add(badgesGroup);
-
-    const trailsGroup = new THREE.Group();
-    galaxyWorld.add(trailsGroup);
-    const trailsList = [];
+    scene.add(badgesGroup);
+    badgesGroup.scale.set(0.001, 0.001, 0.001);
 
     memories.forEach((mem, index) => {
       createMiniBadge(mem.image, (texture) => {
         const sprite = new THREE.Sprite(new THREE.SpriteMaterial({ map: texture, transparent: true }));
         sprite.scale.set(2.8, 2.8, 1);
-
         const angle = (index / memories.length) * Math.PI * 2;
         const radius = 15.5;
         sprite.position.set(Math.cos(angle) * radius, -2.5, Math.sin(angle) * radius);
         sprite.userData = { index: index, baseAngle: angle, radius: radius };
         miniBadges.push(sprite);
         badgesGroup.add(sprite);
-
-        const trailParticles = [];
-        for (let j = 0; j < 5; j++) {
-          const tSprite = new THREE.Sprite(new THREE.SpriteMaterial({ map: texture, transparent: true, opacity: 0.35 / (j + 1), blending: THREE.AdditiveBlending }));
-          tSprite.scale.set(1.4 - j * 0.18, 1.4 - j * 0.18, 1);
-          trailsGroup.add(tSprite);
-          trailParticles.push(tSprite);
-        }
-        trailsList.push({ badge: sprite, particles: trailParticles, history: [] });
       });
     });
 
-    // 7. СИСТЕМА ДИНАМИЧЕСКОЙ СМЕНЫ СЦЕН (БИОМОВ)
-    function applyBiome(index) {
+    // ==============================================================
+    // 6. ПЕРЕКЛЮЧЕНИЕ СЦЕН И МУЗЫКИ (КАРДИНАЛЬНАЯ СМЕНА)
+    // ==============================================================
+    function switchBiome(index) {
       currentBiomeIndex = index;
       const b = biomes[index];
 
-      // Обновление UI плеера
+      // UI плеера
       biomeIcon.textContent = b.icon;
       trackTitle.textContent = b.name;
       trackSubtitle.textContent = b.subtitle;
 
-      // Переключение музыки
+      // Смена аудио
       bgMusic.src = b.audioSrc;
-      bgMusic.play().catch(e => console.log("Audio switch:", e));
+      bgMusic.play().catch(e => {
+        // Если файла нет, возвращаем дефолтный
+        bgMusic.src = "music.mp3";
+        bgMusic.play().catch(() => {});
+      });
       btnPlay.textContent = "⏸";
 
-      // Смена цветовой гаммы в 3D
+      // Смена фона и тумана
       scene.fog.color.setHex(b.bgFog);
       document.body.style.backgroundColor = '#' + b.bgFog.toString(16).padStart(6, '0');
+
+      // Цвет подсветки сердца
       innerCore.material.color.setHex(b.coreColor);
       heartLight.color.setHex(b.lightColor);
-      ring1.material.color.setHex(b.ringColor);
-      mistMat.color.setHex(b.lightColor);
-      gridHelper.material.color.setHex(b.ringColor);
+
+      // Кардинальное скрытие/показ миров
+      spaceGroup.visible = (index === 0);
+      sakuraGroup.visible = (index === 1);
+      oceanGroup.visible = (index === 2);
     }
 
     btnNext.addEventListener('click', (e) => {
       e.stopPropagation();
       currentBiomeIndex = (currentBiomeIndex + 1) % biomes.length;
-      applyBiome(currentBiomeIndex);
+      switchBiome(currentBiomeIndex);
     });
 
     btnPrev.addEventListener('click', (e) => {
       e.stopPropagation();
       currentBiomeIndex = (currentBiomeIndex - 1 + biomes.length) % biomes.length;
-      applyBiome(currentBiomeIndex);
+      switchBiome(currentBiomeIndex);
     });
 
     btnPlay.addEventListener('click', (e) => {
@@ -786,7 +739,7 @@
       }
     });
 
-    // Клики по фото и управление модалкой
+    // Клик по фото
     const raycaster = new THREE.Raycaster();
     const mouse = new THREE.Vector2();
     let pStartX = 0, pStartY = 0;
@@ -800,7 +753,6 @@
         startHyperspaceFlight();
         return;
       }
-
       if (cardContainer.classList.contains('active')) return;
       if (Math.hypot(e.clientX - pStartX, e.clientY - pStartY) > 6) return;
 
@@ -838,7 +790,9 @@
       if (e.target === cardContainer) cardContainer.classList.remove('active');
     });
 
-    // 8. ПЛАВНЫЙ ПРОЛЕТ СКВОЗЬ СПИРАЛЬ
+    // ==============================================================
+    // 7. СТАРТ И ПРОЛЕТ СКВОЗЬ СПИРАЛЬ
+    // ==============================================================
     let flightActive = false;
     let flightProgress = 0;
     const startCamPos = new THREE.Vector3(0, 0, 36);
@@ -849,10 +803,8 @@
       startHint.style.opacity = '0';
       setTimeout(() => startHint.remove(), 400);
 
-      // Показываем плеер iOS
       iosPlayer.classList.add('visible');
-
-      applyBiome(0); // Запускаем первую сцену и музыку
+      switchBiome(0); // Стартуем в космосе
     }
 
     const clock = new THREE.Clock();
@@ -861,33 +813,12 @@
       requestAnimationFrame(animate);
       const t = clock.getElapsedTime();
 
-      // Кометы
-      meteors.forEach(m => {
-        if (!m.active) {
-          m.timer -= 0.016;
-          if (m.timer <= 0) {
-            m.active = true;
-            m.mesh.position.set((Math.random() - 0.5) * 80 + 20, 25 + Math.random() * 20, -30 + (Math.random() - 0.5) * 40);
-            m.mesh.material.opacity = 0.8;
-          }
-        } else {
-          m.mesh.position.x -= m.speed;
-          m.mesh.position.y -= m.speed * 0.5;
-          m.mesh.position.z -= m.speed * 0.6;
-          m.mesh.material.opacity -= 0.012;
-          if (m.mesh.material.opacity <= 0) {
-            m.active = false;
-            m.timer = 1.5 + Math.random() * 4;
-          }
-        }
-      });
-
       // Спираль слов до старта
       if (!flightActive && flightProgress === 0) {
         spiralGroup.rotation.z = -t * 0.16;
       }
 
-      // Полет сквозь спираль
+      // Полет
       if (flightActive) {
         flightProgress += 0.012;
         const p = Math.min(flightProgress, 1);
@@ -905,8 +836,10 @@
           s.material.opacity = Math.max(0, 0.98 - ease * 1.3);
         });
 
-        galaxyWorld.scale.set(ease, ease, ease);
-        galaxy.rotation.y += (1 - p) * 0.08;
+        // Сердце и миры раскрываются
+        heartCenterGroup.scale.set(ease, ease, ease);
+        spaceGroup.scale.set(ease, ease, ease);
+        badgesGroup.scale.set(ease, ease, ease);
 
         if (p >= 1) {
           flightActive = false;
@@ -915,16 +848,29 @@
         }
       }
 
-      // Жизнь мира
+      // Жизнь активного мира
       if (flightProgress >= 1) {
-        galaxy.rotation.y += 0.002;
-        labelsGroup.rotation.y = -t * 0.08;
-        gridHelper.rotation.y = t * 0.015;
-        mistField.rotation.y = -t * 0.02;
+        // Сердце бьется ВСЕГДА в центре во всех мирах
+        const beat = 1 + Math.sin(t * 3.4) * 0.07;
+        heart.scale.set(beat, beat, beat);
+        innerCore.scale.set(beat * 1.1, beat * 1.1, beat * 1.1);
+        heartLight.intensity = 2.5 + Math.sin(t * 3.4) * 1.5;
 
-        ring1.rotation.y = t * 0.05;
-        ring2.rotation.y = -t * 0.04;
+        // Парящие искры от сердца
+        const posAttr = embersGeo.attributes.position;
+        for (let i = 0; i < embersCount; i++) {
+          posAttr.array[i * 3 + 1] += embersVelocity[i].y;
+          posAttr.array[i * 3] += embersVelocity[i].x;
+          posAttr.array[i * 3 + 2] += embersVelocity[i].z;
+          if (posAttr.array[i * 3 + 1] > 18) {
+            posAttr.array[i * 3 + 1] = 3.5;
+            posAttr.array[i * 3] = (Math.random() - 0.5) * 10;
+            posAttr.array[i * 3 + 2] = (Math.random() - 0.5) * 8;
+          }
+        }
+        embersGeo.needsUpdate = true;
 
+        // Вращение фото-медальонов вокруг сердца
         miniBadges.forEach((b, i) => {
           const curAngle = b.userData.baseAngle + t * 0.1;
           b.position.x = Math.cos(curAngle) * b.userData.radius;
@@ -932,34 +878,43 @@
           b.position.y = -2.5 + Math.sin(t * 2 + i) * 0.4;
         });
 
-        trailsList.forEach(trail => {
-          trail.history.unshift(trail.badge.position.clone());
-          if (trail.history.length > 25) trail.history.pop();
-          trail.particles.forEach((p, idx) => {
-            const hIdx = (idx + 1) * 3;
-            if (trail.history[hIdx]) p.position.copy(trail.history[hIdx]);
-          });
-        });
-
-        const beat = 1 + Math.sin(t * 3.4) * 0.07;
-        heart.scale.set(beat, beat, beat);
-        innerCore.scale.set(beat * 1.1, beat * 1.1, beat * 1.1);
-        heartLight.intensity = 2.5 + Math.sin(t * 3.4) * 1.5;
-
-        // Полет искр
-        const posAttr = embersGeo.attributes.position;
-        for (let i = 0; i < embersCount; i++) {
-          posAttr.array[i * 3 + 1] += embersVelocity[i].y;
-          posAttr.array[i * 3] += embersVelocity[i].x;
-          posAttr.array[i * 3 + 2] += embersVelocity[i].z;
-
-          if (posAttr.array[i * 3 + 1] > 18) {
-            posAttr.array[i * 3 + 1] = 3.5;
-            posAttr.array[i * 3] = (Math.random() - 0.5) * 10;
-            posAttr.array[i * 3 + 2] = (Math.random() - 0.5) * 8;
-          }
+        // Анимация 1: Космос
+        if (spaceGroup.visible) {
+          galaxy.rotation.y += 0.002;
+          spaceGrid.rotation.y = t * 0.015;
+          ringSpace.rotation.y = t * 0.04;
         }
-        posAttr.needsUpdate = true;
+
+        // Анимация 2: Поляна Сакуры (вихрь лепестков)
+        if (sakuraGroup.visible) {
+          const pPos = petalsGeo.attributes.position;
+          for (let i = 0; i < petalsCount; i++) {
+            pPos.array[i * 3] += petalsVel[i].x + Math.sin(t + i) * 0.02;
+            pPos.array[i * 3 + 1] += petalsVel[i].y;
+            pPos.array[i * 3 + 2] += petalsVel[i].z + Math.cos(t + i) * 0.02;
+
+            if (pPos.array[i * 3 + 1] < -6) {
+              pPos.array[i * 3 + 1] = 20;
+              pPos.array[i * 3] = (Math.random() - 0.5) * 55;
+              pPos.array[i * 3 + 2] = (Math.random() - 0.5) * 55;
+            }
+          }
+          petalsGeo.needsUpdate = true;
+          grassField.rotation.y = t * 0.005;
+        }
+
+        // Анимация 3: Закат на Океане (3D-волны)
+        if (oceanGroup.visible) {
+          const pos = oceanGeo.attributes.position;
+          for (let i = 0; i < pos.count; i++) {
+            const u = pos.getX(i);
+            const v = pos.getZ(i);
+            const wave = Math.sin(u * 0.25 + t * 2.2) * 0.65 + Math.cos(v * 0.25 + t * 1.8) * 0.65;
+            pos.setY(i, wave);
+          }
+          pos.needsUpdate = true;
+          sparksField.rotation.y = -t * 0.01;
+        }
 
         controls.update();
       }

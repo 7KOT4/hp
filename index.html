@@ -14,9 +14,9 @@
     }
 
     body {
-      background-color: #000002;
+      background-color: #010003;
       overflow: hidden;
-      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Segoe UI", Roboto, sans-serif;
+      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", Roboto, sans-serif;
       color: #fff;
     }
 
@@ -34,26 +34,26 @@
       cursor: grabbing;
     }
 
-    /* iOS Виджет Плеера */
+    /* iOS Glass Dynamic Island Player */
     #ios-player {
       position: fixed;
-      top: 20px;
+      top: 18px;
       left: 50%;
-      transform: translateX(-50%) translateY(-100px);
+      transform: translateX(-50%) translateY(-120px);
       z-index: 50;
-      background: rgba(20, 20, 25, 0.75);
-      border: 1px solid rgba(255, 255, 255, 0.18);
-      backdrop-filter: blur(28px) saturate(190%);
-      -webkit-backdrop-filter: blur(28px) saturate(190%);
-      box-shadow: 0 16px 40px rgba(0, 0, 0, 0.6), 0 0 25px rgba(255, 77, 109, 0.3);
-      border-radius: 36px;
-      padding: 10px 18px;
+      background: rgba(14, 14, 18, 0.65);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      backdrop-filter: blur(35px) saturate(200%);
+      -webkit-backdrop-filter: blur(35px) saturate(200%);
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.7), 0 0 30px rgba(255, 42, 95, 0.2);
+      border-radius: 40px;
+      padding: 9px 18px;
       display: flex;
       align-items: center;
       gap: 14px;
-      width: 330px;
-      max-width: 90vw;
-      transition: transform 0.6s cubic-bezier(0.19, 1, 0.22, 1), opacity 0.6s ease;
+      width: 335px;
+      max-width: 92vw;
+      transition: transform 0.7s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.7s ease;
       opacity: 0;
     }
 
@@ -65,14 +65,15 @@
     .player-cover {
       width: 44px;
       height: 44px;
-      border-radius: 12px;
+      border-radius: 14px;
       background: linear-gradient(135deg, #ff2a5f, #ff758c);
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 20px;
-      box-shadow: 0 4px 15px rgba(255, 42, 95, 0.45);
+      font-size: 22px;
+      box-shadow: 0 4px 18px rgba(255, 42, 95, 0.5);
       flex-shrink: 0;
+      transition: transform 0.3s ease;
     }
 
     .player-info {
@@ -87,18 +88,20 @@
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
+      letter-spacing: 0.2px;
     }
 
     .player-subtitle {
-      font-size: 0.76rem;
-      color: rgba(255, 255, 255, 0.6);
-      margin-top: 1px;
+      font-size: 0.74rem;
+      color: rgba(255, 255, 255, 0.55);
+      margin-top: 2px;
+      font-weight: 400;
     }
 
     .player-controls {
       display: flex;
       align-items: center;
-      gap: 10px;
+      gap: 8px;
     }
 
     .ctrl-btn {
@@ -117,12 +120,12 @@
     }
 
     .ctrl-btn:active {
-      transform: scale(0.85);
+      transform: scale(0.82);
     }
 
     .ctrl-btn.play {
-      background: rgba(255, 255, 255, 0.16);
-      font-size: 1rem;
+      background: rgba(255, 255, 255, 0.14);
+      font-size: 0.95rem;
     }
 
     /* Подсказка старта */
@@ -132,29 +135,29 @@
       left: 50%;
       transform: translateX(-50%);
       z-index: 30;
-      font-size: 0.85rem;
-      letter-spacing: 2px;
+      font-size: 0.82rem;
+      letter-spacing: 2.2px;
       text-transform: uppercase;
       font-weight: 500;
-      color: rgba(255, 175, 210, 0.9);
-      background: rgba(20, 2, 10, 0.6);
-      backdrop-filter: blur(8px);
-      -webkit-backdrop-filter: blur(8px);
+      color: rgba(255, 185, 215, 0.9);
+      background: rgba(18, 2, 10, 0.55);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
       padding: 11px 26px;
       border-radius: 30px;
-      border: 1px solid rgba(255, 77, 109, 0.4);
-      box-shadow: 0 0 25px rgba(255, 42, 95, 0.35);
+      border: 1px solid rgba(255, 77, 109, 0.35);
+      box-shadow: 0 0 30px rgba(255, 42, 95, 0.3);
       pointer-events: none;
       animation: pulseHint 2.4s infinite ease-in-out;
-      transition: opacity 0.4s ease;
+      transition: opacity 0.5s ease;
     }
 
     @keyframes pulseHint {
-      0%, 100% { opacity: 0.55; transform: translateX(-50%) scale(0.98); }
+      0%, 100% { opacity: 0.5; transform: translateX(-50%) scale(0.97); }
       50% { opacity: 1; transform: translateX(-50%) scale(1.02); }
     }
 
-    /* Модальное окно просмотра воспоминания */
+    /* Модальное окно просмотра воспоминаний */
     #photo-card-container {
       position: fixed;
       top: 0;
@@ -168,9 +171,9 @@
       pointer-events: none;
       opacity: 0;
       transition: opacity 0.4s ease;
-      background: radial-gradient(circle at center, rgba(35, 3, 16, 0.6) 0%, rgba(0, 0, 0, 0.85) 100%);
-      backdrop-filter: blur(8px);
-      -webkit-backdrop-filter: blur(8px);
+      background: radial-gradient(circle at center, rgba(30, 2, 14, 0.65) 0%, rgba(0, 0, 0, 0.88) 100%);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
     }
 
     #photo-card-container.active {
@@ -179,16 +182,16 @@
     }
 
     .memory-card {
-      background: rgba(18, 2, 8, 0.94);
-      border: 1px solid rgba(255, 64, 129, 0.45);
-      box-shadow: 0 0 50px rgba(255, 30, 90, 0.4);
-      border-radius: 26px;
+      background: rgba(16, 2, 8, 0.92);
+      border: 1px solid rgba(255, 64, 129, 0.5);
+      box-shadow: 0 0 60px rgba(255, 30, 90, 0.45);
+      border-radius: 28px;
       padding: 22px 20px;
-      max-width: 320px;
+      max-width: 325px;
       width: 86%;
       text-align: center;
       transform: scale(0.7) translateY(40px);
-      transition: transform 0.4s cubic-bezier(0.19, 1, 0.22, 1);
+      transition: transform 0.45s cubic-bezier(0.16, 1, 0.3, 1);
     }
 
     #photo-card-container.active .memory-card {
@@ -200,9 +203,9 @@
       height: 200px;
       object-fit: cover;
       border-radius: 18px;
-      border: 1px solid rgba(255, 255, 255, 0.15);
+      border: 1px solid rgba(255, 255, 255, 0.18);
       margin-bottom: 14px;
-      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.5);
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.6);
     }
 
     .memory-card h2 {
@@ -210,12 +213,12 @@
       font-weight: 700;
       margin-bottom: 8px;
       color: #ff4d6d;
-      text-shadow: 0 0 10px rgba(255, 77, 109, 0.5);
+      text-shadow: 0 0 12px rgba(255, 77, 109, 0.5);
     }
 
     .memory-card p {
       font-size: 0.92rem;
-      color: #e0d0d8;
+      color: #e5d4dd;
       line-height: 1.45;
       margin-bottom: 18px;
       padding: 0 4px;
@@ -232,7 +235,7 @@
       border: 1px solid rgba(255, 77, 109, 0.35);
       color: #fff;
       font-size: 0.88rem;
-      padding: 8px 18px;
+      padding: 9px 20px;
       border-radius: 20px;
       cursor: pointer;
       transition: 0.2s all;
@@ -241,7 +244,7 @@
     .btn-action.next {
       background: linear-gradient(135deg, #ff2a5f, #ff758c);
       border: none;
-      box-shadow: 0 0 15px rgba(255, 42, 95, 0.5);
+      box-shadow: 0 0 18px rgba(255, 42, 95, 0.55);
     }
 
     .btn-action:hover {
@@ -256,7 +259,7 @@
 
   <audio id="bg-music" loop preload="auto"></audio>
 
-  <!-- Виджет плеера iOS -->
+  <!-- iOS Плеер -->
   <div id="ios-player">
     <div class="player-cover" id="biome-icon">🌌</div>
     <div class="player-info">
@@ -272,7 +275,7 @@
 
   <div id="start-hint">ТОРКНІТЬСЯ ЕКРАНА, ЩОБ РОЗПОЧАТИ ПОДОРОЖ</div>
 
-  <!-- Модалка фото -->
+  <!-- Модалка воспоминаний -->
   <div id="photo-card-container">
     <div class="memory-card">
       <img id="card-img" src="" alt="Спогад">
@@ -288,34 +291,36 @@
   <canvas id="webgl-canvas"></canvas>
 
   <script>
-    // 3 КАРДИНАЛЬНО РАЗНЫХ МИРА
+    // ==============================================================
+    // 3 КАРДИНАЛЬНО РАЗНЫХ КИНЕМАТОГРАФИЧНЫХ МИРА
+    // ==============================================================
     const biomes = [
       {
         name: "Космос Кохання",
         subtitle: "Galaxy Love • Світ 1/3",
         icon: "🌌",
         audioSrc: "music.mp3",
-        bgFog: 0x000002,
-        lightColor: 0xff2a6d,
-        coreColor: 0xff1450
+        bgFog: 0x010003,
+        coreColor: 0xff1450,
+        lightColor: 0xff2a6d
       },
       {
         name: "Поляна Сакури",
         subtitle: "Blossom Garden • Світ 2/3",
         icon: "🌸",
-        audioSrc: "track2.mp3", // если нет, будет music.mp3
-        bgFog: 0x08020a,
-        lightColor: 0xff85a2,
-        coreColor: 0xff5588
+        audioSrc: "track2.mp3",
+        bgFog: 0x08010b,
+        coreColor: 0xff70a6,
+        lightColor: 0xff94b8
       },
       {
         name: "Захід на Океані",
         subtitle: "Sunset Ocean • Світ 3/3",
         icon: "🌊",
         audioSrc: "track3.mp3",
-        bgFog: 0x030814,
-        lightColor: 0xff9900,
-        coreColor: 0xff5500
+        bgFog: 0x030713,
+        coreColor: 0xff5500,
+        lightColor: 0xff8c00
       }
     ];
 
@@ -365,14 +370,32 @@
     const nextBtn = document.getElementById('next-btn');
     const closeBtn = document.getElementById('close-btn');
 
+    // ==============================================================
+    // ГЕНЕРАТОР МЯГКИХ НЕОНОВЫХ ЧАСТИЦ (НИКАКИХ КВАДРАТОВ И ПИКСЕЛЕЙ)
+    // ==============================================================
+    function createGlowTexture() {
+      const c = document.createElement('canvas');
+      c.width = 64; c.height = 64;
+      const ctx = c.getContext('2d');
+      const grad = ctx.createRadialGradient(32, 32, 0, 32, 32, 32);
+      grad.addColorStop(0, 'rgba(255, 255, 255, 1)');
+      grad.addColorStop(0.25, 'rgba(255, 120, 180, 0.85)');
+      grad.addColorStop(0.6, 'rgba(255, 30, 90, 0.25)');
+      grad.addColorStop(1, 'rgba(0, 0, 0, 0)');
+      ctx.fillStyle = grad;
+      ctx.fillRect(0, 0, 64, 64);
+      return new THREE.CanvasTexture(c);
+    }
+    const glowParticleTex = createGlowTexture();
+
     // 1. Сцена и Камера
     const scene = new THREE.Scene();
-    scene.fog = new THREE.FogExp2(0x000002, 0.007);
+    scene.fog = new THREE.FogExp2(0x010003, 0.0075);
 
     const camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 1000);
     camera.position.set(0, 0, 36);
 
-    const renderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: true, alpha: true });
+    const renderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: true, alpha: true, powerPreference: "high-performance" });
     renderer.setSize(window.innerWidth, window.innerHeight);
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 
@@ -384,24 +407,35 @@
     controls.target.set(0, 0, 0);
     controls.enabled = false;
 
-    // Фоновые звезды
+    // Фоновые мягкие звезды
     const bgStarsGeo = new THREE.BufferGeometry();
-    const bgPos = new Float32Array(3000 * 3);
-    for (let i = 0; i < 3000 * 3; i++) bgPos[i] = (Math.random() - 0.5) * 260;
+    const bgPos = new Float32Array(2500 * 3);
+    for (let i = 0; i < 2500 * 3; i++) bgPos[i] = (Math.random() - 0.5) * 260;
     bgStarsGeo.setAttribute('position', new THREE.BufferAttribute(bgPos, 3));
-    const bgStarsMat = new THREE.PointsMaterial({ color: 0xffaacc, size: 0.35, transparent: true, opacity: 0.75 });
-    const bgStars = new THREE.Points(bgStarsGeo, bgStarsMat);
+    const bgStars = new THREE.Points(bgStarsGeo, new THREE.PointsMaterial({
+      color: 0xffb8d2,
+      size: 0.65,
+      map: glowParticleTex,
+      transparent: true,
+      opacity: 0.75,
+      blending: THREE.AdditiveBlending,
+      depthWrite: false
+    }));
     scene.add(bgStars);
 
-    // 2. СПИРАЛЬ СЛОВ НА СТАРТЕ
+    // ==============================================================
+    // 2. СПИРАЛЬ СЛОВ (TLANEX: ТОЧНАЯ МАТЕМАТИКА ВОРОНКИ)
+    // ==============================================================
     function createLoveWordTex(text) {
       const c = document.createElement('canvas');
-      c.width = 320; c.height = 80;
+      c.width = 340; c.height = 84;
       const ctx = c.getContext('2d');
-      ctx.font = "bold 34px -apple-system, BlinkMacSystemFont, sans-serif";
+      ctx.font = "bold 34px -apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif";
       ctx.textAlign = "center"; ctx.textBaseline = "middle";
-      ctx.fillStyle = "#ff4d88"; ctx.shadowColor = "#ff0055"; ctx.shadowBlur = 12;
-      ctx.fillText(text, 160, 40);
+      ctx.shadowColor = "#ff1a60";
+      ctx.shadowBlur = 14;
+      ctx.fillStyle = "#ff4d88";
+      ctx.fillText(text, 170, 42);
       return new THREE.CanvasTexture(c);
     }
 
@@ -428,23 +462,23 @@
     }
 
     // ==============================================================
-    // 3. СЕРДЦЕ ВСЕГДА В ЦЕНТРЕ (ЕДИНОЕ ДЛЯ ВСЕХ МИРОВ)
+    // 3. ПЫЛАЮЩЕЕ ОБЪЕМНОЕ СЕРДЦЕ (ВСЕГДА В ЦЕНТРЕ)
     // ==============================================================
     const heartCenterGroup = new THREE.Group();
     scene.add(heartCenterGroup);
     heartCenterGroup.scale.set(0.001, 0.001, 0.001);
 
-    const heartLight = new THREE.PointLight(0xff2a6d, 3.5, 50);
+    const heartLight = new THREE.PointLight(0xff2a6d, 3.8, 55);
     heartLight.position.set(0, 6.5, 0);
     heartCenterGroup.add(heartLight);
 
     const coreGeo = new THREE.SphereGeometry(3.2, 32, 32);
-    const coreMat = new THREE.MeshBasicMaterial({ color: 0xff1450, transparent: true, opacity: 0.35, blending: THREE.AdditiveBlending });
+    const coreMat = new THREE.MeshBasicMaterial({ color: 0xff1450, transparent: true, opacity: 0.4, blending: THREE.AdditiveBlending });
     const innerCore = new THREE.Mesh(coreGeo, coreMat);
     innerCore.position.set(0, 6.5, 0);
     heartCenterGroup.add(innerCore);
 
-    // Плотное сердце (14 000 частиц)
+    // 14 000 частиц с объёмом и градиентом
     const heartCount = 14000;
     const heartGeo = new THREE.BufferGeometry();
     const heartPos = new Float32Array(heartCount * 3);
@@ -474,11 +508,19 @@
     }
     heartGeo.setAttribute('position', new THREE.BufferAttribute(heartPos, 3));
     heartGeo.setAttribute('color', new THREE.BufferAttribute(heartColors, 3));
-    const heartMat = new THREE.PointsMaterial({ size: 0.32, vertexColors: true, blending: THREE.AdditiveBlending, transparent: true, opacity: 0.95, depthWrite: false });
+    const heartMat = new THREE.PointsMaterial({
+      size: 0.6,
+      map: glowParticleTex,
+      vertexColors: true,
+      blending: THREE.AdditiveBlending,
+      transparent: true,
+      opacity: 0.95,
+      depthWrite: false
+    });
     const heart = new THREE.Points(heartGeo, heartMat);
     heartCenterGroup.add(heart);
 
-    // Парящие искры от сердца
+    // Фонтан парящих искр
     const embersCount = 450;
     const embersGeo = new THREE.BufferGeometry();
     const embersPos = new Float32Array(embersCount * 3);
@@ -490,15 +532,22 @@
       embersVelocity.push({ y: 0.03 + Math.random() * 0.04, x: (Math.random() - 0.5) * 0.015, z: (Math.random() - 0.5) * 0.015 });
     }
     embersGeo.setAttribute('position', new THREE.BufferAttribute(embersPos, 3));
-    const embersMat = new THREE.PointsMaterial({ color: 0xff70a0, size: 0.45, blending: THREE.AdditiveBlending, transparent: true, opacity: 0.8 });
-    const embers = new THREE.Points(embersGeo, embersMat);
+    const embers = new THREE.Points(embersGeo, new THREE.PointsMaterial({
+      color: 0xff70a0,
+      size: 0.7,
+      map: glowParticleTex,
+      blending: THREE.AdditiveBlending,
+      transparent: true,
+      opacity: 0.85,
+      depthWrite: false
+    }));
     heartCenterGroup.add(embers);
 
     // ==============================================================
-    // 4. ТРИ КАРДИНАЛЬНО РАЗНЫХ МИРА
+    // 4. ТРИ КАРДИНАЛЬНО РАЗНЫХ МИРА (БЕЗ ДЕШЕВЫХ СЕТОК)
     // ==============================================================
 
-    // --- МИР 1: КОСМОС (Галактика + Кольца Сатурна + Неоновая Сетка) ---
+    // --- МИР 1: КОСМОС (Галактика + Звездный Туман внизу + Кольца) ---
     const spaceGroup = new THREE.Group();
     scene.add(spaceGroup);
     spaceGroup.scale.set(0.001, 0.001, 0.001);
@@ -528,17 +577,46 @@
     }
     galaxyGeo.setAttribute('position', new THREE.BufferAttribute(positions, 3));
     galaxyGeo.setAttribute('color', new THREE.BufferAttribute(gColors, 3));
-    const galaxy = new THREE.Points(galaxyGeo, new THREE.PointsMaterial({ size: 0.18, vertexColors: true, blending: THREE.AdditiveBlending, depthWrite: false, transparent: true }));
+    const galaxy = new THREE.Points(galaxyGeo, new THREE.PointsMaterial({
+      size: 0.45,
+      map: glowParticleTex,
+      vertexColors: true,
+      blending: THREE.AdditiveBlending,
+      depthWrite: false,
+      transparent: true
+    }));
     spaceGroup.add(galaxy);
 
-    // Кольца Сатурна
+    // Звездное озеро тумана внизу (вместо сетки!)
+    const mistGeo = new THREE.BufferGeometry();
+    const mistPos = new Float32Array(6000 * 3);
+    for (let i = 0; i < 6000; i++) {
+      const rad = 6 + Math.pow(Math.random(), 0.8) * 28;
+      const ang = Math.random() * Math.PI * 2;
+      mistPos[i * 3] = Math.cos(ang) * rad;
+      mistPos[i * 3 + 1] = -6.0 + (Math.random() - 0.5) * 1.8;
+      mistPos[i * 3 + 2] = Math.sin(ang) * rad;
+    }
+    mistGeo.setAttribute('position', new THREE.BufferAttribute(mistPos, 3));
+    const mistField = new THREE.Points(mistGeo, new THREE.PointsMaterial({
+      color: 0xff1450,
+      size: 0.75,
+      map: glowParticleTex,
+      transparent: true,
+      opacity: 0.4,
+      blending: THREE.AdditiveBlending,
+      depthWrite: false
+    }));
+    spaceGroup.add(mistField);
+
+    // Кольцо Сатурна
     function makeRing(r, tiltX, col) {
       const pts = [];
-      for (let i = 0; i <= 100; i++) {
-        const a = (i / 100) * Math.PI * 2;
+      for (let i = 0; i <= 120; i++) {
+        const a = (i / 120) * Math.PI * 2;
         pts.push(new THREE.Vector3(Math.cos(a) * r, 0, Math.sin(a) * r));
       }
-      const ring = new THREE.Line(new THREE.BufferGeometry().setFromPoints(pts), new THREE.LineBasicMaterial({ color: col, transparent: true, opacity: 0.5 }));
+      const ring = new THREE.Line(new THREE.BufferGeometry().setFromPoints(pts), new THREE.LineBasicMaterial({ color: col, transparent: true, opacity: 0.5, blending: THREE.AdditiveBlending }));
       ring.rotation.x = tiltX;
       ring.position.y = 5.8;
       return ring;
@@ -546,39 +624,40 @@
     const ringSpace = makeRing(17, 0.35, 0xff2a70);
     spaceGroup.add(ringSpace);
 
-    const spaceGrid = new THREE.GridHelper(52, 28, 0xff2a70, 0x550a25);
-    spaceGrid.position.y = -6.5;
-    spaceGrid.material.transparent = true; spaceGrid.material.opacity = 0.45;
-    spaceGroup.add(spaceGrid);
-
-    // --- МИР 2: ПОЛЯНА САКУРЫ (Зеленая трава с цветами + Вихрь лепестков) ---
+    // --- МИР 2: ПОЛЯНА САКУРЫ (Цветущий сад + Вихрь лепестков) ---
     const sakuraGroup = new THREE.Group();
     scene.add(sakuraGroup);
     sakuraGroup.visible = false;
 
-    // Поляна травы и цветов
+    // Плотный цветочный ковер внизу
     const grassCount = 18000;
     const grassGeo = new THREE.BufferGeometry();
     const grassPos = new Float32Array(grassCount * 3);
     const grassCol = new Float32Array(grassCount * 3);
-    const cGrass1 = new THREE.Color('#0f5132');
-    const cGrass2 = new THREE.Color('#20c997');
+    const cGrass1 = new THREE.Color('#0a3d24');
+    const cGrass2 = new THREE.Color('#198754');
     const cFlower = new THREE.Color('#ff758c');
 
     for (let i = 0; i < grassCount; i++) {
-      const rad = 2 + Math.random() * 38;
+      const rad = 2 + Math.pow(Math.random(), 0.7) * 36;
       const ang = Math.random() * Math.PI * 2;
       grassPos[i * 3] = Math.cos(ang) * rad;
-      grassPos[i * 3 + 1] = -5.8 + (Math.random() - 0.5) * 0.8;
+      grassPos[i * 3 + 1] = -5.8 + (Math.random() - 0.5) * 1.2;
       grassPos[i * 3 + 2] = Math.sin(ang) * rad;
 
-      // 85% трава, 15% яркие цветки
-      let c = (Math.random() < 0.15) ? cFlower : cGrass1.clone().lerp(cGrass2, Math.random());
+      let c = (Math.random() < 0.2) ? cFlower : cGrass1.clone().lerp(cGrass2, Math.random());
       grassCol[i * 3] = c.r; grassCol[i * 3 + 1] = c.g; grassCol[i * 3 + 2] = c.b;
     }
     grassGeo.setAttribute('position', new THREE.BufferAttribute(grassPos, 3));
     grassGeo.setAttribute('color', new THREE.BufferAttribute(grassCol, 3));
-    const grassField = new THREE.Points(grassGeo, new THREE.PointsMaterial({ size: 0.35, vertexColors: true, transparent: true, opacity: 0.85 }));
+    const grassField = new THREE.Points(grassGeo, new THREE.PointsMaterial({
+      size: 0.55,
+      map: glowParticleTex,
+      vertexColors: true,
+      transparent: true,
+      opacity: 0.85,
+      depthWrite: false
+    }));
     sakuraGroup.add(grassField);
 
     // 2500 летающих лепестков сакуры
@@ -586,60 +665,72 @@
     const petalsGeo = new THREE.BufferGeometry();
     const petalsPos = new Float32Array(petalsCount * 3);
     const petalsVel = [];
-
     for (let i = 0; i < petalsCount; i++) {
       petalsPos[i * 3] = (Math.random() - 0.5) * 55;
-      petalsPos[i * 3 + 1] = -5 + Math.random() * 26;
+      petalsPos[i * 3 + 1] = -5 + Math.random() * 28;
       petalsPos[i * 3 + 2] = (Math.random() - 0.5) * 55;
       petalsVel.push({
         x: (Math.random() - 0.5) * 0.08,
-        y: -0.02 - Math.random() * 0.03,
-        z: (Math.random() - 0.5) * 0.08,
-        rotSpeed: 0.02 + Math.random() * 0.04
+        y: -0.025 - Math.random() * 0.035,
+        z: (Math.random() - 0.5) * 0.08
       });
     }
     petalsGeo.setAttribute('position', new THREE.BufferAttribute(petalsPos, 3));
-    const petalsMat = new THREE.PointsMaterial({ color: 0xffa8c5, size: 0.55, transparent: true, opacity: 0.9, blending: THREE.AdditiveBlending });
-    const petalsField = new THREE.Points(petalsGeo, petalsMat);
+    const petalsField = new THREE.Points(petalsGeo, new THREE.PointsMaterial({
+      color: 0xffb3cb,
+      size: 0.85,
+      map: glowParticleTex,
+      transparent: true,
+      opacity: 0.9,
+      blending: THREE.AdditiveBlending,
+      depthWrite: false
+    }));
     sakuraGroup.add(petalsField);
 
-    // --- МИР 3: ЗАХОД СОНЦА НА ОКЕАНЕ (Морская поверхность с 3D-волнами) ---
+    // --- МИР 3: ЗАХОД НА ОКЕАНЕ (Мягкие волны + Золотое сияние) ---
     const oceanGroup = new THREE.Group();
     scene.add(oceanGroup);
     oceanGroup.visible = false;
 
-    // Сетка волнующегося океана (60x60 сегментов)
-    const oceanGeo = new THREE.PlaneGeometry(80, 80, 65, 65);
+    // Волнующаяся поверхность океана
+    const oceanGeo = new THREE.PlaneGeometry(85, 85, 70, 70);
     oceanGeo.rotateX(-Math.PI / 2);
     const oceanMat = new THREE.MeshBasicMaterial({
-      color: 0x023e8a,
+      color: 0x012a4a,
       wireframe: true,
       transparent: true,
-      opacity: 0.45
+      opacity: 0.35
     });
     const oceanMesh = new THREE.Mesh(oceanGeo, oceanMat);
     oceanMesh.position.y = -6.2;
     oceanGroup.add(oceanMesh);
 
-    // Золотые солнечные блики на воде
-    const sparksCount = 2000;
+    // Золотые солнечные блики на волнах
+    const sparksCount = 3000;
     const sparksGeo = new THREE.BufferGeometry();
     const sparksPos = new Float32Array(sparksCount * 3);
     for (let i = 0; i < sparksCount; i++) {
-      sparksPos[i * 3] = (Math.random() - 0.5) * 60;
-      sparksPos[i * 3 + 1] = -6.0 + Math.random() * 0.4;
-      sparksPos[i * 3 + 2] = (Math.random() - 0.5) * 60;
+      sparksPos[i * 3] = (Math.random() - 0.5) * 65;
+      sparksPos[i * 3 + 1] = -6.0 + Math.random() * 0.5;
+      sparksPos[i * 3 + 2] = (Math.random() - 0.5) * 65;
     }
     sparksGeo.setAttribute('position', new THREE.BufferAttribute(sparksPos, 3));
-    const sparksMat = new THREE.PointsMaterial({ color: 0xffb703, size: 0.35, blending: THREE.AdditiveBlending, transparent: true, opacity: 0.85 });
-    const sparksField = new THREE.Points(sparksGeo, sparksMat);
+    const sparksField = new THREE.Points(sparksGeo, new THREE.PointsMaterial({
+      color: 0xffb703,
+      size: 0.65,
+      map: glowParticleTex,
+      blending: THREE.AdditiveBlending,
+      transparent: true,
+      opacity: 0.85,
+      depthWrite: false
+    }));
     oceanGroup.add(sparksField);
 
-    // Огромное закатное солнце на горизонте
-    const sunGeo = new THREE.CircleGeometry(18, 48);
-    const sunMat = new THREE.MeshBasicMaterial({ color: 0xff5500, transparent: true, opacity: 0.55 });
+    // Заходящее солнце на горизонте
+    const sunGeo = new THREE.CircleGeometry(20, 48);
+    const sunMat = new THREE.MeshBasicMaterial({ color: 0xff5500, transparent: true, opacity: 0.45 });
     const sunsetSun = new THREE.Mesh(sunGeo, sunMat);
-    sunsetSun.position.set(0, 4, -45);
+    sunsetSun.position.set(0, 4.5, -50);
     oceanGroup.add(sunsetSun);
 
     // ==============================================================
@@ -651,14 +742,34 @@
       img.src = imgUrl;
       img.onload = () => {
         const c = document.createElement('canvas');
-        c.width = 160; c.height = 160;
+        c.width = 180; c.height = 180;
         const ctx = c.getContext('2d');
-        ctx.beginPath(); ctx.arc(80, 80, 70, 0, Math.PI * 2);
-        ctx.fillStyle = '#ff2060'; ctx.shadowColor = '#ff2060'; ctx.shadowBlur = 15; ctx.fill();
-        ctx.save(); ctx.beginPath(); ctx.arc(80, 80, 64, 0, Math.PI * 2); ctx.clip();
-        ctx.drawImage(img, 0, 0, 160, 160); ctx.restore();
-        ctx.beginPath(); ctx.arc(80, 80, 64, 0, Math.PI * 2); ctx.lineWidth = 6; ctx.strokeStyle = '#ffffff'; ctx.stroke();
-        ctx.font = '24px sans-serif'; ctx.fillText('💖', 120, 140);
+
+        // Неоновое свечение рамки
+        ctx.beginPath();
+        ctx.arc(90, 90, 78, 0, Math.PI * 2);
+        ctx.fillStyle = '#ff2060';
+        ctx.shadowColor = '#ff2060';
+        ctx.shadowBlur = 18;
+        ctx.fill();
+
+        // Круглая фотокарточка
+        ctx.save();
+        ctx.beginPath();
+        ctx.arc(90, 90, 70, 0, Math.PI * 2);
+        ctx.clip();
+        ctx.drawImage(img, 0, 0, 180, 180);
+        ctx.restore();
+
+        // Золотисто-белая рамка
+        ctx.beginPath();
+        ctx.arc(90, 90, 70, 0, Math.PI * 2);
+        ctx.lineWidth = 6;
+        ctx.strokeStyle = '#ffffff';
+        ctx.stroke();
+
+        ctx.font = '26px sans-serif';
+        ctx.fillText('💖', 135, 155);
         callback(new THREE.CanvasTexture(c));
       };
     }
@@ -682,35 +793,29 @@
     });
 
     // ==============================================================
-    // 6. ПЕРЕКЛЮЧЕНИЕ СЦЕН И МУЗЫКИ (КАРДИНАЛЬНАЯ СМЕНА)
+    // 6. ПЕРЕКЛЮЧЕНИЕ СЦЕН И МУЗЫКИ
     // ==============================================================
     function switchBiome(index) {
       currentBiomeIndex = index;
       const b = biomes[index];
 
-      // UI плеера
       biomeIcon.textContent = b.icon;
       trackTitle.textContent = b.name;
       trackSubtitle.textContent = b.subtitle;
 
-      // Смена аудио
       bgMusic.src = b.audioSrc;
-      bgMusic.play().catch(e => {
-        // Если файла нет, возвращаем дефолтный
+      bgMusic.play().catch(() => {
         bgMusic.src = "music.mp3";
         bgMusic.play().catch(() => {});
       });
       btnPlay.textContent = "⏸";
 
-      // Смена фона и тумана
       scene.fog.color.setHex(b.bgFog);
       document.body.style.backgroundColor = '#' + b.bgFog.toString(16).padStart(6, '0');
 
-      // Цвет подсветки сердца
       innerCore.material.color.setHex(b.coreColor);
       heartLight.color.setHex(b.lightColor);
 
-      // Кардинальное скрытие/показ миров
       spaceGroup.visible = (index === 0);
       sakuraGroup.visible = (index === 1);
       oceanGroup.visible = (index === 2);
@@ -791,7 +896,7 @@
     });
 
     // ==============================================================
-    // 7. СТАРТ И ПРОЛЕТ СКВОЗЬ СПИРАЛЬ
+    // 7. СТАРТ И БЕСШОВНЫЙ ПРОЛЕТ СКВОЗЬ СПИРАЛЬ
     // ==============================================================
     let flightActive = false;
     let flightProgress = 0;
@@ -804,7 +909,7 @@
       setTimeout(() => startHint.remove(), 400);
 
       iosPlayer.classList.add('visible');
-      switchBiome(0); // Стартуем в космосе
+      switchBiome(0);
     }
 
     const clock = new THREE.Clock();
@@ -836,7 +941,6 @@
           s.material.opacity = Math.max(0, 0.98 - ease * 1.3);
         });
 
-        // Сердце и миры раскрываются
         heartCenterGroup.scale.set(ease, ease, ease);
         spaceGroup.scale.set(ease, ease, ease);
         badgesGroup.scale.set(ease, ease, ease);
@@ -850,11 +954,11 @@
 
       // Жизнь активного мира
       if (flightProgress >= 1) {
-        // Сердце бьется ВСЕГДА в центре во всех мирах
+        // Сердце бьется в центре
         const beat = 1 + Math.sin(t * 3.4) * 0.07;
         heart.scale.set(beat, beat, beat);
         innerCore.scale.set(beat * 1.1, beat * 1.1, beat * 1.1);
-        heartLight.intensity = 2.5 + Math.sin(t * 3.4) * 1.5;
+        heartLight.intensity = 2.8 + Math.sin(t * 3.4) * 1.5;
 
         // Парящие искры от сердца
         const posAttr = embersGeo.attributes.position;
@@ -870,7 +974,7 @@
         }
         embersGeo.needsUpdate = true;
 
-        // Вращение фото-медальонов вокруг сердца
+        // Вращение фото-медальонов
         miniBadges.forEach((b, i) => {
           const curAngle = b.userData.baseAngle + t * 0.1;
           b.position.x = Math.cos(curAngle) * b.userData.radius;
@@ -881,7 +985,7 @@
         // Анимация 1: Космос
         if (spaceGroup.visible) {
           galaxy.rotation.y += 0.002;
-          spaceGrid.rotation.y = t * 0.015;
+          mistField.rotation.y = -t * 0.015;
           ringSpace.rotation.y = t * 0.04;
         }
 
@@ -894,13 +998,13 @@
             pPos.array[i * 3 + 2] += petalsVel[i].z + Math.cos(t + i) * 0.02;
 
             if (pPos.array[i * 3 + 1] < -6) {
-              pPos.array[i * 3 + 1] = 20;
+              pPos.array[i * 3 + 1] = 22;
               pPos.array[i * 3] = (Math.random() - 0.5) * 55;
               pPos.array[i * 3 + 2] = (Math.random() - 0.5) * 55;
             }
           }
           petalsGeo.needsUpdate = true;
-          grassField.rotation.y = t * 0.005;
+          grassField.rotation.y = t * 0.003;
         }
 
         // Анимация 3: Закат на Океане (3D-волны)
@@ -909,11 +1013,11 @@
           for (let i = 0; i < pos.count; i++) {
             const u = pos.getX(i);
             const v = pos.getZ(i);
-            const wave = Math.sin(u * 0.25 + t * 2.2) * 0.65 + Math.cos(v * 0.25 + t * 1.8) * 0.65;
+            const wave = Math.sin(u * 0.22 + t * 2.2) * 0.6 + Math.cos(v * 0.22 + t * 1.8) * 0.6;
             pos.setY(i, wave);
           }
           pos.needsUpdate = true;
-          sparksField.rotation.y = -t * 0.01;
+          sparksField.rotation.y = -t * 0.008;
         }
 
         controls.update();

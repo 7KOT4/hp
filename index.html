@@ -126,7 +126,6 @@
       padding: 0 4px;
     }
 
-    /* Таймер-статус перед видео */
     #surprise-timer-bar {
       font-size: 0.82rem;
       color: #ff2a5f;
@@ -165,7 +164,6 @@
       transform: scale(0.95);
     }
 
-    /* Финальное видео */
     #video-overlay {
       position: fixed;
       top: 0;
@@ -260,7 +258,6 @@
 
   <div id="start-hint">ТОРКНІТЬСЯ ЕКРАНА, ЩОБ ВІДКРИТИ ПРИВІТАННЯ ✨</div>
 
-  <!-- Полароидное окно -->
   <div id="photo-card-container">
     <div class="memory-card">
       <img id="card-img" src="" alt="Спогад">
@@ -274,10 +271,9 @@
     </div>
   </div>
 
-  <!-- Видео-оверлей -->
   <div id="video-overlay">
     <div class="video-wrapper">
-      <video id="bday-video" src="video.mp4" playsinline webkit-playsinline controls preload="auto"></video>
+      <video id="bday-video" src="67.mp4" playsinline webkit-playsinline controls preload="auto"></video>
       <button id="unmute-btn">УВІМКНУТИ ЗВУК 🔊</button>
     </div>
     <div class="video-hint">Особливе відео для тебе 💖</div>
@@ -288,7 +284,6 @@
   <canvas id="webgl-canvas"></canvas>
 
   <script>
-    // Массив фото — код автоматически поймет, какое фото последнее
     const memories = [
       {
         title: "З Днем Народження! 🎂✨",
@@ -357,7 +352,6 @@
     }
     const glowDotTex = createGlowDotTexture();
 
-    // 1. Сцена и камера
     const scene = new THREE.Scene();
     scene.fog = new THREE.FogExp2(0x020005, 0.007);
 
@@ -381,7 +375,6 @@
     controls.target.set(0, 0, 0);
     controls.enabled = false;
 
-    // Фоновые звезды
     const bgStarsGeo = new THREE.BufferGeometry();
     const bgPos = new Float32Array(2200 * 3);
     for (let i = 0; i < 2200 * 3; i++) bgPos[i] = (Math.random() - 0.5) * 260;
@@ -397,7 +390,6 @@
     }));
     scene.add(bgStars);
 
-    // Падающие кометы
     const meteors = [];
     for (let i = 0; i < 3; i++) {
       const lineGeo = new THREE.BufferGeometry();
@@ -408,7 +400,6 @@
       meteors.push({ mesh: meteor, active: false, timer: Math.random() * 2.5, speed: 2.2 });
     }
 
-    // 2. Спираль слов
     function createBdayWordTex(text) {
       const c = document.createElement('canvas');
       c.width = 380; c.height = 84;
@@ -443,13 +434,11 @@
       spiralGroup.add(sprite);
     }
 
-    // 3. Мир сердца и галактики
     const galaxyWorld = new THREE.Group();
     galaxyWorld.position.set(0, 0, 0);
     galaxyWorld.scale.set(0.001, 0.001, 0.001);
     scene.add(galaxyWorld);
 
-    // Спиральный диск
     const galaxyCount = isMobile ? 26000 : 38000;
     const galaxyGeo = new THREE.BufferGeometry();
     const positions = new Float32Array(galaxyCount * 3);
@@ -478,7 +467,6 @@
     }));
     galaxyWorld.add(galaxy);
 
-    // Звездное озеро
     const nebulaLakeCount = isMobile ? 5500 : 8500;
     const nebulaLakeGeo = new THREE.BufferGeometry();
     const nebulaLakePos = new Float32Array(nebulaLakeCount * 3);
@@ -504,7 +492,6 @@
     }));
     galaxyWorld.add(nebulaLake);
 
-    // 4. Сердце
     const heartCenterGroup = new THREE.Group();
     galaxyWorld.add(heartCenterGroup);
     const heartLight = new THREE.PointLight(0xff2a6d, 4.2, 60);
@@ -548,7 +535,6 @@
     }));
     heartCenterGroup.add(heart);
 
-    // 5. Гирлянда
     const garlandGroup = new THREE.Group();
     galaxyWorld.add(garlandGroup);
     const ropeRadius = isMobile ? 16.5 : 18.5;
@@ -576,7 +562,6 @@
     );
     garlandGroup.add(garlandGlow);
 
-    // 6. Полароиды
     function createPolaroidTexture(imgUrl, callback) {
       const img = new Image();
       img.src = imgUrl;
@@ -635,7 +620,6 @@
       });
     });
 
-    // Клики по полароидам
     const raycaster = new THREE.Raycaster();
     const mouse = new THREE.Vector2();
     let pStartX = 0, pStartY = 0;
@@ -668,10 +652,8 @@
       cardTitle.textContent = data.title;
       cardDesc.textContent = data.desc;
 
-      // Если это последнее фото в массиве
       if (index === memories.length - 1) {
         surpriseBar.style.display = 'block';
-        // Автозапуск видео через 5 секунд
         autoVideoTimer = setTimeout(() => {
           cardContainer.classList.remove('active');
           launchCelebrationVideo();
@@ -687,7 +669,6 @@
       e.stopPropagation();
       if (autoVideoTimer) clearTimeout(autoVideoTimer);
 
-      // Если нажали "Далі" на последнем фото — можно сразу запустить видео
       if (currentMemoryIndex === memories.length - 1) {
         cardContainer.classList.remove('active');
         launchCelebrationVideo();
@@ -704,29 +685,44 @@
       cardContainer.classList.remove('active');
     });
 
-    // 7. НАДЕЖНЫЙ ЗАПУСК ВИДЕО
     function launchCelebrationVideo() {
-      // Плавно убавляем фоновую музыку
       if (bgMusic && !bgMusic.paused) {
         let vInterval = setInterval(() => {
           if (bgMusic.volume > 0.1) bgMusic.volume -= 0.15;
           else { clearInterval(vInterval); bgMusic.pause(); }
-        }, 60);
+        }, 50);
       }
 
       videoOverlay.classList.add('active');
       bdayVideo.currentTime = 0;
+      bdayVideo.muted = true;
 
-      // Попытка прямого воспроизведения со звуком
-      const playPromise = bdayVideo.play();
-      if (playPromise !== undefined) {
-        playPromise.catch(error => {
-          console.warn("Autoplay blocked by browser policy. Starting muted with unmute button:", error);
-          // Если браузер заблокировал звук без жеста пользователя — включаем muted и показываем кнопку звука
-          bdayVideo.muted = true;
-          bdayVideo.play();
-          unmuteBtn.style.display = 'block';
-        });
+      const playVideo = () => {
+        const promise = bdayVideo.play();
+        if (promise !== undefined) {
+          promise.then(() => {
+            setTimeout(() => {
+              bdayVideo.muted = false;
+            }, 100);
+
+            if (bdayVideo.muted) {
+              unmuteBtn.style.display = 'block';
+            }
+          }).catch(err => {
+            console.warn("Autoplay error, retrying muted:", err);
+            bdayVideo.muted = true;
+            bdayVideo.play().then(() => {
+              unmuteBtn.style.display = 'block';
+            });
+          });
+        }
+      };
+
+      if (bdayVideo.readyState >= 2) {
+        playVideo();
+      } else {
+        bdayVideo.addEventListener('loadeddata', playVideo, { once: true });
+        bdayVideo.load();
       }
     }
 
@@ -736,13 +732,18 @@
       unmuteBtn.style.display = 'none';
     });
 
-    // Конец видео -> релоад
+    videoOverlay.addEventListener('click', () => {
+      if (bdayVideo.muted) {
+        bdayVideo.muted = false;
+        unmuteBtn.style.display = 'none';
+      }
+    });
+
     bdayVideo.addEventListener('ended', () => {
       fadeScreen.classList.add('visible');
       setTimeout(() => { window.location.reload(); }, 1600);
     });
 
-    // 8. Пролет в центр
     let flightActive = false;
     let flightProgress = 0;
     const startCamPos = new THREE.Vector3(0, 0, isMobile ? 42 : 36);
@@ -753,7 +754,6 @@
       startHint.style.opacity = '0';
       setTimeout(() => startHint.remove(), 400);
 
-      // Предзагрузка медиа при первом клике пользователя
       if (bgMusic) bgMusic.play().catch(() => {});
       if (bdayVideo) bdayVideo.load();
     }

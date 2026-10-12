@@ -183,9 +183,6 @@
   <canvas id="webgl-canvas"></canvas>
 
   <script>
-    // ==========================================
-    // ЛОКАЛЬНЫЕ ФОТО (1.jpg, 2.jpg, 3.jpg, 4.jpg)
-    // ==========================================
     const memories = [
       {
         title: "З Днем Народження! 🎂✨",
@@ -222,7 +219,6 @@
     const nextBtn = document.getElementById('next-btn');
     const closeBtn = document.getElementById('close-btn');
 
-    // Текстура мягкой сияющей точки
     function createGlowDotTexture() {
       const c = document.createElement('canvas');
       c.width = 64; c.height = 64;
@@ -238,7 +234,7 @@
     }
     const glowDotTex = createGlowDotTexture();
 
-    // 1. Сцена и камера с мобильной адаптацией
+    // 1. Сцена и камера
     const scene = new THREE.Scene();
     scene.fog = new THREE.FogExp2(0x020005, 0.007);
 
@@ -411,7 +407,7 @@
       const i3 = i * 3;
       const rad = 1.8 + Math.pow(Math.random(), 0.72) * 28.0;
       const ang = Math.random() * Math.PI * 2;
-      const depthY = -5.8 + Math.pow(rad / 28.0, 2) * 2.8 + (Math.random() - 0.5) * 1.5;
+      const depthY = -6.2 + Math.pow(rad / 28.0, 2) * 3.2 + (Math.random() - 0.5) * 1.5;
 
       nebulaLakePos[i3] = Math.cos(ang) * rad;
       nebulaLakePos[i3 + 1] = depthY;
@@ -486,8 +482,8 @@
       ring.position.y = 6.2;
       return ring;
     }
-    const ring1 = createCenterRing(18, 0.35, 0xff2a70);
-    const ring2 = createCenterRing(21.5, -0.25, 0xff75a0);
+    const ring1 = createCenterRing(19, 0.35, 0xff2a70);
+    const ring2 = createCenterRing(23, -0.25, 0xff75a0);
     galaxyWorld.add(ring1);
     galaxyWorld.add(ring2);
 
@@ -586,92 +582,87 @@
       const s = createOrbitText(w);
       s.scale.set(7.5, 1.85, 1);
       const angle = (idx / words.length) * Math.PI * 2;
-      s.position.set(Math.cos(angle) * 23, -2, Math.sin(angle) * 23);
+      s.position.set(Math.cos(angle) * 24.5, -2, Math.sin(angle) * 24.5);
       labelsGroup.add(s);
     });
 
     // ==============================================================
-    // 5. ПРАВИЛЬНЫЙ РАСЧЕТ ПРОПОРЦИЙ ФОТО (OBJECT-FIT: COVER ДЛЯ CANVAS)
+    // 5. УВЕЛИЧЕННЫЕ, СОЧНЫЕ ФОТО-МЕДАЛЬОНЫ БЕЗ РАСТЯЖЕНИЯ
     // ==============================================================
     function createPremiumBadge(imgUrl, callback) {
       const img = new Image();
       img.src = imgUrl;
       img.onload = () => {
         const c = document.createElement('canvas');
-        c.width = 256; c.height = 256;
+        c.width = 320; c.height = 320;
         const ctx = c.getContext('2d');
 
-        const centerX = 128;
-        const centerY = 128;
-        const outerRadius = 110;
-        const photoRadius = 96;
+        const centerX = 160;
+        const centerY = 160;
+        const outerGlowRadius = 142;
+        const photoRadius = 122;
 
-        // Внешнее мягкое неоновое сияние
+        // Яркий неоновый ореол
         ctx.beginPath();
-        ctx.arc(centerX, centerY, outerRadius, 0, Math.PI * 2);
+        ctx.arc(centerX, centerY, outerGlowRadius, 0, Math.PI * 2);
         ctx.fillStyle = '#ff2060';
         ctx.shadowColor = '#ff3377';
-        ctx.shadowBlur = 24;
+        ctx.shadowBlur = 30;
         ctx.fill();
 
-        // Круглая маска кадрирования
+        // Кадрирование без сплющивания (Object-Fit: Cover)
         ctx.save();
         ctx.beginPath();
         ctx.arc(centerX, centerY, photoRadius, 0, Math.PI * 2);
         ctx.clip();
 
-        // АЛГОРИТМ OBJECT-FIT COVER:
-        // Вычисляем масштаб, чтобы фото заполняло круг без искажения пропорций
         const imgAspect = img.width / img.height;
         let sWidth, sHeight, sx, sy;
 
         if (imgAspect > 1) {
-          // Горизонтальное фото: обрезаем бока, центрируем
           sHeight = img.height;
           sWidth = img.height;
           sx = (img.width - sWidth) / 2;
           sy = 0;
         } else {
-          // Вертикальное фото: обрезаем верх/низ, центрируем
           sWidth = img.width;
           sHeight = img.width;
           sx = 0;
           sy = (img.height - sHeight) / 2;
         }
 
-        // Отрисовка без деформации пропорций
         ctx.drawImage(img, sx, sy, sWidth, sHeight, centerX - photoRadius, centerY - photoRadius, photoRadius * 2, photoRadius * 2);
         ctx.restore();
 
-        // Стеклянная двойная неоновая рамка (белая + золото)
+        // Белая контурная окантовка
         ctx.beginPath();
         ctx.arc(centerX, centerY, photoRadius, 0, Math.PI * 2);
-        ctx.lineWidth = 7;
+        ctx.lineWidth = 8;
         ctx.strokeStyle = '#ffffff';
         ctx.stroke();
 
+        // Внешнее золотое кольцо
         ctx.beginPath();
-        ctx.arc(centerX, centerY, photoRadius + 6, 0, Math.PI * 2);
-        ctx.lineWidth = 3;
+        ctx.arc(centerX, centerY, photoRadius + 7, 0, Math.PI * 2);
+        ctx.lineWidth = 4;
         ctx.strokeStyle = '#ffd166';
         ctx.stroke();
 
-        // Сияющий акцент снизу
-        ctx.font = '32px sans-serif';
-        ctx.fillText('✨', 180, 218);
+        // Иконка-акцент
+        ctx.font = '38px sans-serif';
+        ctx.fillText('✨', 225, 275);
 
         callback(new THREE.CanvasTexture(c));
       };
 
-      // Фолбек, если фото не найдено
       img.onerror = () => {
         const c = document.createElement('canvas');
-        c.width = 256; c.height = 256;
+        c.width = 320; c.height = 320;
         const ctx = c.getContext('2d');
         ctx.fillStyle = '#ff2060';
-        ctx.beginPath(); ctx.arc(128, 128, 100, 0, Math.PI * 2); ctx.fill();
-        ctx.font = '70px sans-serif'; ctx.textAlign = 'center';
-        ctx.fillText('📸', 128, 150);
+        ctx.beginPath(); ctx.arc(160, 160, 125, 0, Math.PI * 2); ctx.fill();
+        ctx.font = '90px sans-serif'; ctx.textAlign = 'center';
+        ctx.fillText('📸', 160, 195);
         callback(new THREE.CanvasTexture(c));
       };
     }
@@ -683,19 +674,22 @@
     memories.forEach((mem, index) => {
       createPremiumBadge(mem.image, (texture) => {
         const sprite = new THREE.Sprite(new THREE.SpriteMaterial({ map: texture, transparent: true }));
-        const badgeScale = isMobile ? 3.5 : 3.0;
+        
+        // УВЕЛИЧЕННЫЙ МАСШТАБ (крупные, привлекающие внимание карточки)
+        const badgeScale = isMobile ? 5.6 : 5.0;
         sprite.scale.set(badgeScale, badgeScale, 1);
 
         const angle = (index / memories.length) * Math.PI * 2;
-        const radius = isMobile ? 15.2 : 16.8;
+        const radius = isMobile ? 16.2 : 17.8;
 
-        sprite.position.set(Math.cos(angle) * radius, -2.5, Math.sin(angle) * radius);
+        sprite.position.set(Math.cos(angle) * radius, -2.4, Math.sin(angle) * radius);
         
         sprite.userData = {
           index: index,
           baseAngle: angle,
           radius: radius,
-          floatSpeedY: 1.6 + index * 0.35,
+          baseScale: badgeScale,
+          floatSpeedY: 1.5 + index * 0.35,
           floatOffset: index * Math.PI * 0.5
         };
 
@@ -840,23 +834,23 @@
         ring1.rotation.y = t * 0.05;
         ring2.rotation.y = -t * 0.04;
 
-        // Плавный волнообразный полет фото-медальонов
+        // Плавный полет фото с эффектом приближения к зрителю
         miniBadges.forEach((b) => {
           const d = b.userData;
-          const curAngle = d.baseAngle + t * 0.1;
+          const curAngle = d.baseAngle + t * 0.09;
 
-          // Радиальное покачивание (Lissajous Wave)
-          const curRadius = d.radius + Math.sin(t * 1.8 + d.floatOffset) * 0.6;
+          const curRadius = d.radius + Math.sin(t * 1.6 + d.floatOffset) * 0.5;
           b.position.x = Math.cos(curAngle) * curRadius;
           b.position.z = Math.sin(curAngle) * curRadius;
 
-          // Мягкое вертикальное парение в невесомости
-          b.position.y = -2.4 + Math.sin(t * d.floatSpeedY + d.floatOffset) * 0.65;
+          b.position.y = -2.3 + Math.sin(t * d.floatSpeedY + d.floatOffset) * 0.65;
 
-          // Дыхание масштаба (легкая пульсация)
-          const baseScale = isMobile ? 3.5 : 3.0;
-          const scalePulse = baseScale * (1 + Math.sin(t * 2.4 + d.floatOffset) * 0.04);
-          b.scale.set(scalePulse, scalePulse, 1);
+          // ДИНАМИЧЕСКИЙ МАСШТАБ: фото плавно увеличивается, когда подлетает вперед
+          const proximityBonus = (b.position.z > 0) ? (b.position.z / d.radius) * 0.28 : 0;
+          const breathPulse = Math.sin(t * 2.2 + d.floatOffset) * 0.05;
+          const totalScale = d.baseScale * (1 + proximityBonus + breathPulse);
+
+          b.scale.set(totalScale, totalScale, 1);
         });
 
         // Движение светлячков со дна озера к фото

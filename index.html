@@ -88,11 +88,11 @@
     }
 
     .memory-card {
-      background: #fff;
+      background: #ffffff;
       color: #1a1a1a;
-      box-shadow: 0 10px 45px rgba(255, 42, 95, 0.5), 0 0 0 1px rgba(255, 255, 255, 0.4);
-      border-radius: 12px;
-      padding: 16px 16px 20px 16px;
+      box-shadow: 0 12px 50px rgba(255, 42, 95, 0.55), 0 0 0 1px rgba(255, 255, 255, 0.5);
+      border-radius: 14px;
+      padding: 16px 16px 22px 16px;
       max-width: 320px;
       width: 86%;
       text-align: center;
@@ -108,7 +108,7 @@
       width: 100%;
       height: 240px;
       object-fit: cover;
-      border-radius: 6px;
+      border-radius: 8px;
       border: 1px solid rgba(0, 0, 0, 0.08);
       margin-bottom: 14px;
     }
@@ -163,6 +163,7 @@
 </head>
 <body>
 
+  <!-- Аудио -->
   <audio id="bg-music" src="music.mp3" loop preload="auto"></audio>
 
   <div id="start-hint">ТОРКНІТЬСЯ ЕКРАНА, ЩОБ ВІДКРИТИ ПРИВІТАННЯ ✨</div>
@@ -184,7 +185,7 @@
 
   <script>
     // ==============================================================
-    // СПИСОК ФОТО (ДОБАВЛЯЙ СКОЛЬКО ХОЧЕШЬ: 1.jpg, 2.jpg, 3.jpg, 4.jpg, 5.jpg...)
+    // СПИСОК ФОТО (ДОБАВЛЯЙ СКОЛЬКО ХОЧЕШЬ: 1.jpg, 2.jpg, 3.jpg, 4.jpg...)
     // ==============================================================
     const memories = [
       {
@@ -361,7 +362,7 @@
     }
 
     // ==============================================================
-    // 3. МИР СЕРДЦА, ГАЛАКТИКИ И СВЕТЯЩЕГОСЯ НИЖНЕГО ОЗЕРА
+    // 3. МИР СЕРДЦА, ГАЛАКТИКИ И ЗВЕЗДНОГО ОЗЕРА
     // ==============================================================
     const galaxyWorld = new THREE.Group();
     galaxyWorld.position.set(0, 0, 0);
@@ -531,98 +532,127 @@
     heartCenterGroup.add(embers);
 
     // ==============================================================
-    // 5. СВЕТЯЩАЯСЯ НИТЬ ГИРЛЯНДЫ (ВЕРЁВКА) СО СВЕТОДИОДАМИ
+    // 5. КИНЕМАТОГРАФИЧНАЯ ОБЪЁМНАЯ НЕОНОВАЯ ГИРЛЯНДА
     // ==============================================================
     const garlandGroup = new THREE.Group();
     galaxyWorld.add(garlandGroup);
 
     const ropeRadius = isMobile ? 16.5 : 18.5;
-    const ropeSegments = 160;
-    const ropePoints = [];
+    const numPhotos = memories.length;
 
-    // Создаем красивую волнообразно провисающую нить
-    for (let i = 0; i <= ropeSegments; i++) {
-      const theta = (i / ropeSegments) * Math.PI * 2;
-      // Провисание волнами между фотографиями
-      const sag = Math.sin(theta * memories.length) * 0.55;
-      const x = Math.cos(theta) * ropeRadius;
-      const z = Math.sin(theta) * ropeRadius;
-      const y = -1.6 + sag;
-      ropePoints.push(new THREE.Vector3(x, y, z));
+    // Плавная кривая с реалистичным провисанием нити под весом карточек
+    class GarlandCurve extends THREE.Curve {
+      constructor(radius, count) {
+        super();
+        this.radius = radius;
+        this.count = count;
+      }
+      getPoint(t, optionalTarget = new THREE.Vector3()) {
+        const theta = t * Math.PI * 2;
+        // Качественный провис цепи (Catenary curve)
+        const wave = Math.sin(theta * this.count);
+        const sag = Math.pow(Math.abs(wave), 1.2) * (wave > 0 ? -0.7 : -0.7);
+
+        const x = Math.cos(theta) * this.radius;
+        const z = Math.sin(theta) * this.radius;
+        const y = -1.55 + Math.cos(theta * this.count) * 0.55;
+
+        return optionalTarget.set(x, y, z);
+      }
     }
 
-    const ropeGeo = new THREE.BufferGeometry().setFromPoints(ropePoints);
-    const ropeMat = new THREE.LineBasicMaterial({
-      color: 0xffd166,
-      transparent: true,
-      opacity: 0.65,
-      blending: THREE.AdditiveBlending
-    });
-    const garlandRope = new THREE.Line(ropeGeo, ropeMat);
-    garlandGroup.add(garlandRope);
+    const garlandPath = new GarlandCurve(ropeRadius, numPhotos);
 
-    // Маленькие огоньки-лампочки на нити
-    const bulbCount = 60;
+    // 1. Внутреннее светящееся ядро трубки
+    const tubeGeo = new THREE.TubeGeometry(garlandPath, 180, 0.08, 8, true);
+    const tubeMat = new THREE.MeshBasicMaterial({
+      color: 0xffe6a3,
+      transparent: true,
+      opacity: 0.95
+    });
+    const garlandTube = new THREE.Mesh(tubeGeo, tubeMat);
+    garlandGroup.add(garlandTube);
+
+    // 2. Внешнее мягкое неоновое гало-свечение вокруг нити
+    const tubeGlowGeo = new THREE.TubeGeometry(garlandPath, 180, 0.26, 8, true);
+    const tubeGlowMat = new THREE.MeshBasicMaterial({
+      color: 0xff3377,
+      transparent: true,
+      opacity: 0.35,
+      blending: THREE.AdditiveBlending,
+      side: THREE.BackSide
+    });
+    const garlandGlow = new THREE.Mesh(tubeGlowGeo, tubeGlowMat);
+    garlandGroup.add(garlandGlow);
+
+    // 3. Светящиеся жемчужины/светодиоды на нити
+    const bulbCount = 72;
     const bulbGeo = new THREE.BufferGeometry();
     const bulbPos = new Float32Array(bulbCount * 3);
     for (let i = 0; i < bulbCount; i++) {
-      const theta = (i / bulbCount) * Math.PI * 2;
-      const sag = Math.sin(theta * memories.length) * 0.55;
-      bulbPos[i * 3] = Math.cos(theta) * ropeRadius;
-      bulbPos[i * 3 + 1] = -1.6 + sag;
-      bulbPos[i * 3 + 2] = Math.sin(theta) * ropeRadius;
+      const pt = garlandPath.getPoint(i / bulbCount);
+      bulbPos[i * 3] = pt.x;
+      bulbPos[i * 3 + 1] = pt.y;
+      bulbPos[i * 3 + 2] = pt.z;
     }
     bulbGeo.setAttribute('position', new THREE.BufferAttribute(bulbPos, 3));
     const garlandBulbs = new THREE.Points(bulbGeo, new THREE.PointsMaterial({
-      color: 0xffe066,
-      size: 0.7,
+      color: 0xffdf80,
+      size: 0.95,
       map: glowDotTex,
       transparent: true,
-      opacity: 0.9,
-      blending: THREE.AdditiveBlending
+      opacity: 0.95,
+      blending: THREE.AdditiveBlending,
+      depthWrite: false
     }));
     garlandGroup.add(garlandBulbs);
 
     // ==============================================================
-    // 6. ПОЛАРОИДНЫЕ ФОТОГРАФИИ НА ПРИЩЕПКАХ (POLAROID GARLAND)
+    // 6. ПОЛАРОИДНЫЕ ФОТО С КРАСИВЫМИ ЗОЛОТЫМИ ПРИЩЕПКАМИ
     // ==============================================================
     function createPolaroidTexture(imgUrl, callback) {
       const img = new Image();
       img.src = imgUrl;
       img.onload = () => {
         const c = document.createElement('canvas');
-        c.width = 320;
-        c.height = 420;
+        c.width = 340;
+        c.height = 440;
         const ctx = c.getContext('2d');
 
-        // Тень и мягкое свечение карточки
-        ctx.shadowColor = 'rgba(255, 42, 95, 0.45)';
-        ctx.shadowBlur = 25;
+        // Глубокое мягкое свечение карточки
+        ctx.shadowColor = 'rgba(255, 42, 95, 0.4)';
+        ctx.shadowBlur = 28;
 
-        // Белая классическая полароидная рамка
+        // Белая полароидная бумага
         ctx.fillStyle = '#ffffff';
         ctx.beginPath();
-        ctx.roundRect(16, 30, 288, 370, [10]);
+        ctx.roundRect(18, 36, 304, 388, [12]);
         ctx.fill();
 
-        ctx.shadowBlur = 0; // Сброс тени
-
-        // Золотистая прищепка вверху
-        ctx.fillStyle = '#ffaa00';
-        ctx.shadowColor = '#ffd166';
-        ctx.shadowBlur = 10;
-        ctx.fillRect(146, 12, 28, 42);
-
-        // Металлическая пружинка на прищепке
-        ctx.fillStyle = '#ffffff';
-        ctx.fillRect(150, 26, 20, 6);
         ctx.shadowBlur = 0;
 
-        // Область для фото (Object-Fit: Cover)
-        const photoX = 30;
-        const photoY = 56;
-        const photoW = 260;
-        const photoH = 260;
+        // Реалистичная золотистая деревянная прищепка
+        ctx.fillStyle = '#ffd166';
+        ctx.shadowColor = 'rgba(255, 209, 102, 0.8)';
+        ctx.shadowBlur = 12;
+        ctx.beginPath();
+        ctx.roundRect(154, 8, 32, 54, [4]);
+        ctx.fill();
+
+        // Световой блик на прищепке
+        ctx.fillStyle = '#fff4cc';
+        ctx.fillRect(158, 12, 6, 46);
+
+        // Металлическая спираль/пружинка прищепки
+        ctx.fillStyle = '#ffffff';
+        ctx.shadowBlur = 0;
+        ctx.fillRect(152, 28, 36, 7);
+
+        // Окно фотографии (Object-Fit: Cover)
+        const photoX = 34;
+        const photoY = 66;
+        const photoW = 272;
+        const photoH = 272;
 
         ctx.save();
         ctx.beginPath();
@@ -647,28 +677,27 @@
         ctx.drawImage(img, sx, sy, sWidth, sHeight, photoX, photoY, photoW, photoH);
         ctx.restore();
 
-        // Небольшой рукописный праздничный элемент на белом поле снизу
-        ctx.font = '22px sans-serif';
+        // Аккуратная подпись на белом поле
+        ctx.font = '600 21px -apple-system, sans-serif';
         ctx.fillStyle = '#ff2a5f';
         ctx.textAlign = 'center';
-        ctx.fillText('Happy Birthday! ✨', 160, 370);
+        ctx.fillText('Happy Birthday! ✨', 170, 388);
 
         callback(new THREE.CanvasTexture(c));
       };
 
-      // Фолбек, если фото нет
       img.onerror = () => {
         const c = document.createElement('canvas');
-        c.width = 320;
-        c.height = 420;
+        c.width = 340;
+        c.height = 440;
         const ctx = c.getContext('2d');
         ctx.fillStyle = '#ffffff';
-        ctx.roundRect(16, 30, 288, 370, [10]);
+        ctx.roundRect(18, 36, 304, 388, [12]);
         ctx.fill();
         ctx.fillStyle = '#ff2a5f';
-        ctx.font = '70px sans-serif';
+        ctx.font = '80px sans-serif';
         ctx.textAlign = 'center';
-        ctx.fillText('📸', 160, 210);
+        ctx.fillText('📸', 170, 230);
         callback(new THREE.CanvasTexture(c));
       };
     }
@@ -681,24 +710,23 @@
       createPolaroidTexture(mem.image, (texture) => {
         const sprite = new THREE.Sprite(new THREE.SpriteMaterial({ map: texture, transparent: true }));
         
-        // Полароидный масштаб (пропорция 320x420)
-        const scaleW = isMobile ? 4.5 : 4.2;
-        const scaleH = scaleW * (420 / 320);
+        const scaleW = isMobile ? 4.6 : 4.4;
+        const scaleH = scaleW * (440 / 340);
         sprite.scale.set(scaleW, scaleH, 1);
 
-        const angle = (index / memories.length) * Math.PI * 2;
-        const radius = ropeRadius;
+        const tVal = index / memories.length;
+        const pt = garlandPath.getPoint(tVal);
 
-        sprite.position.set(Math.cos(angle) * radius, -3.2, Math.sin(angle) * radius);
+        // Карточка висит ровно под прищепкой на нити
+        sprite.position.set(pt.x, pt.y - 1.8, pt.z);
         
         sprite.userData = {
           index: index,
-          baseAngle: angle,
-          radius: radius,
+          tVal: tVal,
           scaleW: scaleW,
           scaleH: scaleH,
           swingSpeed: 1.4 + index * 0.2,
-          swingOffset: index * 1.2
+          swingOffset: index * 1.3
         };
 
         polaroidSprites.push(sprite);
@@ -706,7 +734,7 @@
       });
     });
 
-    // Клики и тапы по полароидам
+    // Клики и тапы
     const raycaster = new THREE.Raycaster();
     const mouse = new THREE.Vector2();
     let pStartX = 0, pStartY = 0;
@@ -775,7 +803,7 @@
       requestAnimationFrame(animate);
       const t = clock.getElapsedTime();
 
-      // Падающие кометы
+      // Кометы
       meteors.forEach(m => {
         if (!m.active) {
           m.timer -= 0.016;
@@ -837,27 +865,31 @@
       if (flightProgress >= 1) {
         galaxy.rotation.y += 0.002;
         nebulaLake.rotation.y = -t * 0.014;
-        garlandGroup.rotation.y = t * 0.07; // Вращение гирлянды
 
-        // Покачивание полароидных карточек на ветру / в невесомости
+        // Вращение гирлянды вокруг сцены
+        garlandGroup.rotation.y = t * 0.06;
+
+        // Естественное покачивание полароидов
         polaroidSprites.forEach((b) => {
           const d = b.userData;
-          const curAngle = d.baseAngle + t * 0.07;
+          const currentRotation = t * 0.06;
+          const totalT = (d.tVal + currentRotation / (Math.PI * 2)) % 1;
+          const pt = garlandPath.getPoint(totalT);
 
-          b.position.x = Math.cos(curAngle) * d.radius;
-          b.position.z = Math.sin(curAngle) * d.radius;
+          b.position.x = pt.x;
+          b.position.z = pt.z;
 
-          // Легкое естественное покачивание вверх-вниз на веревке
-          const swayY = Math.sin(t * d.swingSpeed + d.swingOffset) * 0.45;
-          b.position.y = -3.2 + swayY;
+          // Мягкое раскачивание на веревке
+          const swayY = Math.sin(t * d.swingSpeed + d.swingOffset) * 0.25;
+          b.position.y = pt.y - 1.8 + swayY;
 
-          // Динамический зум при приближении к зрителю
-          const proximity = (b.position.z > 0) ? (b.position.z / d.radius) * 0.35 : 0;
+          // Динамический масштаб при приближении к камере
+          const proximity = (b.position.z > 0) ? (b.position.z / ropeRadius) * 0.32 : 0;
           b.scale.set(d.scaleW * (1 + proximity), d.scaleH * (1 + proximity), 1);
         });
 
-        // Мерцание лампочек на гирлянде
-        garlandBulbs.material.opacity = 0.75 + Math.sin(t * 5.0) * 0.25;
+        // Мягкое мерцание светодиодных кристаллов
+        garlandBulbs.material.opacity = 0.8 + Math.sin(t * 4.2) * 0.2;
 
         // Пульсация сердца
         const beat = 1 + Math.sin(t * 3.4) * 0.07;
@@ -865,7 +897,7 @@
         innerCore.scale.set(beat * 1.1, beat * 1.1, beat * 1.1);
         heartLight.intensity = 2.8 + Math.sin(t * 3.4) * 1.5;
 
-        // Парящие искры из сердца
+        // Искры
         const posAttr = embersGeo.attributes.position;
         for (let i = 0; i < embersCount; i++) {
           posAttr.array[i * 3 + 1] += embersVelocity[i].y;

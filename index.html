@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Галактика Кохання ❤️</title>
+  <title>З Днем Народження! 🎂✨</title>
   <style>
     * {
       margin: 0;
@@ -14,7 +14,7 @@
     }
 
     body {
-      background-color: #010003;
+      background-color: #020005;
       overflow: hidden;
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
       color: #fff;
@@ -34,6 +34,7 @@
       cursor: grabbing;
     }
 
+    /* Подсказка старта в стиле tlanex */
     #start-hint {
       position: fixed;
       bottom: 35px;
@@ -43,25 +44,26 @@
       font-size: 0.82rem;
       letter-spacing: 2.2px;
       text-transform: uppercase;
-      font-weight: 500;
-      color: rgba(255, 175, 210, 0.9);
-      background: rgba(20, 2, 10, 0.55);
-      backdrop-filter: blur(10px);
-      -webkit-backdrop-filter: blur(10px);
-      padding: 11px 26px;
+      font-weight: 600;
+      color: rgba(255, 185, 215, 0.95);
+      background: rgba(24, 3, 14, 0.6);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      padding: 12px 28px;
       border-radius: 30px;
-      border: 1px solid rgba(255, 77, 109, 0.35);
-      box-shadow: 0 0 25px rgba(255, 42, 95, 0.35);
+      border: 1px solid rgba(255, 77, 109, 0.45);
+      box-shadow: 0 0 30px rgba(255, 42, 95, 0.4);
       pointer-events: none;
       animation: pulseHint 2.4s infinite ease-in-out;
       transition: opacity 0.5s ease;
     }
 
     @keyframes pulseHint {
-      0%, 100% { opacity: 0.5; transform: translateX(-50%) scale(0.97); }
+      0%, 100% { opacity: 0.55; transform: translateX(-50%) scale(0.97); }
       50% { opacity: 1; transform: translateX(-50%) scale(1.02); }
     }
 
+    /* Карточка с поздравлениями и фото */
     #photo-card-container {
       position: fixed;
       top: 0;
@@ -75,9 +77,9 @@
       pointer-events: none;
       opacity: 0;
       transition: opacity 0.4s ease;
-      background: radial-gradient(circle at center, rgba(30, 2, 14, 0.65) 0%, rgba(0, 0, 0, 0.88) 100%);
-      backdrop-filter: blur(8px);
-      -webkit-backdrop-filter: blur(8px);
+      background: radial-gradient(circle at center, rgba(35, 3, 18, 0.7) 0%, rgba(0, 0, 0, 0.9) 100%);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
     }
 
     #photo-card-container.active {
@@ -86,9 +88,9 @@
     }
 
     .memory-card {
-      background: rgba(18, 2, 8, 0.94);
-      border: 1px solid rgba(255, 64, 129, 0.45);
-      box-shadow: 0 0 50px rgba(255, 30, 90, 0.4);
+      background: rgba(20, 2, 10, 0.95);
+      border: 1px solid rgba(255, 64, 129, 0.5);
+      box-shadow: 0 0 50px rgba(255, 30, 90, 0.45);
       border-radius: 26px;
       padding: 22px 20px;
       max-width: 320px;
@@ -104,12 +106,12 @@
 
     .memory-card img {
       width: 100%;
-      height: 200px;
+      height: 205px;
       object-fit: cover;
       border-radius: 18px;
-      border: 1px solid rgba(255, 255, 255, 0.15);
+      border: 1px solid rgba(255, 255, 255, 0.18);
       margin-bottom: 14px;
-      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.5);
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.6);
     }
 
     .memory-card h2 {
@@ -117,12 +119,12 @@
       font-weight: 700;
       margin-bottom: 8px;
       color: #ff4d6d;
-      text-shadow: 0 0 10px rgba(255, 77, 109, 0.5);
+      text-shadow: 0 0 12px rgba(255, 77, 109, 0.6);
     }
 
     .memory-card p {
       font-size: 0.92rem;
-      color: #e0d0d8;
+      color: #eedde5;
       line-height: 1.45;
       margin-bottom: 18px;
       padding: 0 4px;
@@ -148,7 +150,7 @@
     .btn-action.next {
       background: linear-gradient(135deg, #ff2a5f, #ff758c);
       border: none;
-      box-shadow: 0 0 15px rgba(255, 42, 95, 0.5);
+      box-shadow: 0 0 18px rgba(255, 42, 95, 0.6);
     }
 
     .btn-action:hover {
@@ -161,10 +163,12 @@
 </head>
 <body>
 
+  <!-- Праздничный трек -->
   <audio id="bg-music" src="music.mp3" loop preload="auto"></audio>
 
-  <div id="start-hint">ТОРКНІТЬСЯ ЕКРАНА, ЩОБ РОЗПОЧАТИ ПОДОРОЖ</div>
+  <div id="start-hint">ТОРКНІТЬСЯ ЕКРАНА, ЩОБ ВІДКРИТИ ПРИВІТАННЯ ✨</div>
 
+  <!-- Окно воспоминаний / поздравлений -->
   <div id="photo-card-container">
     <div class="memory-card">
       <img id="card-img" src="" alt="Спогад">
@@ -180,25 +184,28 @@
   <canvas id="webgl-canvas"></canvas>
 
   <script>
+    // ==========================================
+    // ПОЗДРАВЛЕНИЯ И ВАШИ ФОТО
+    // ==========================================
     const memories = [
       {
-        title: "Кохання Мого Життя ❤️",
-        desc: "Що більше часу ми разом, то сильніше я тебе кохаю.",
+        title: "З Днем Народження! 🎂✨",
+        desc: "Залишайся завжди такою ж неймовірною, яскравою і неперевершеною!",
         image: "https://images.unsplash.com/photo-1518199266791-5375a83190b7?w=700"
       },
       {
-        title: "Ти Моє Серденько ✨",
-        desc: "Якби я міг обрати найбезпечніше місце у світі — це було б поруч із тобою.",
+        title: "Найкращі Спогади 🌸",
+        desc: "Дякую тобі за всі наші спільні моменти, сміх і шалені історії!",
         image: "https://images.unsplash.com/photo-1522673607200-164d1b6ce486?w=700"
       },
       {
-        title: "Нескінченність ♾️",
-        desc: "У будь-якій галактиці та в кожному житті я знову й знову обираю тебе.",
+        title: "Сяй Яскраво 💖",
+        desc: "Нехай усі твої найзаповітніші мрії та цілі здійснюються легко і в кайф.",
         image: "https://images.unsplash.com/photo-1516589178581-6cd7833ae3b2?w=700"
       },
       {
-        title: "Ти і Я 🪐",
-        desc: "Ти — моя найяскравіша зірка у всьому цьому безмежному всесвіті.",
+        title: "Ти Найкраща Подруга 🪐",
+        desc: "Безмежно радий, що ти є в моєму житті. Зі святом тебе! 🎉",
         image: "https://images.unsplash.com/photo-1529333166437-7750a6dd5a70?w=700"
       }
     ];
@@ -216,14 +223,14 @@
     const nextBtn = document.getElementById('next-btn');
     const closeBtn = document.getElementById('close-btn');
 
-    // Мягкая круглая неоновая текстура точки
+    // Мягкая сияющая неоновая частица
     function createGlowDotTexture() {
       const c = document.createElement('canvas');
       c.width = 64; c.height = 64;
       const ctx = c.getContext('2d');
       const grad = ctx.createRadialGradient(32, 32, 0, 32, 32, 32);
       grad.addColorStop(0, 'rgba(255, 255, 255, 1)');
-      grad.addColorStop(0.25, 'rgba(255, 80, 130, 0.9)');
+      grad.addColorStop(0.25, 'rgba(255, 80, 140, 0.9)');
       grad.addColorStop(0.65, 'rgba(255, 20, 80, 0.2)');
       grad.addColorStop(1, 'rgba(0, 0, 0, 0)');
       ctx.fillStyle = grad;
@@ -234,7 +241,7 @@
 
     // 1. Сцена и камера
     const scene = new THREE.Scene();
-    scene.fog = new THREE.FogExp2(0x010003, 0.007);
+    scene.fog = new THREE.FogExp2(0x020005, 0.007);
 
     const camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 1000);
     camera.position.set(0, 0, 36);
@@ -251,7 +258,7 @@
     controls.target.set(0, 0, 0);
     controls.enabled = false;
 
-    // Фоновые мягкие звезды
+    // Звездный фон
     const bgStarsGeo = new THREE.BufferGeometry();
     const bgPos = new Float32Array(3000 * 3);
     for (let i = 0; i < 3000 * 3; i++) bgPos[i] = (Math.random() - 0.5) * 260;
@@ -267,15 +274,13 @@
     }));
     scene.add(bgStars);
 
-    // ==============================================================
-    // 2. ПАДАЮЩИЕ ЗВЕЗДЫ (КОМЕТЫ)
-    // ==============================================================
+    // Падающие праздничные звезды
     const meteors = [];
     for (let i = 0; i < 4; i++) {
       const lineGeo = new THREE.BufferGeometry();
       lineGeo.setFromPoints([new THREE.Vector3(0, 0, 0), new THREE.Vector3(-8, -4, -5)]);
       const lineMat = new THREE.LineBasicMaterial({
-        color: 0xff77aa,
+        color: 0xff85b2,
         transparent: true,
         opacity: 0,
         blending: THREE.AdditiveBlending
@@ -292,26 +297,34 @@
     }
 
     // ==============================================================
-    // 3. ВОРОНКА СЛОВ TLANEX
+    // 2. ВОРОНКА ПОЗДРАВЛЕНИЙ (TLANEX STYLE)
     // ==============================================================
-    function createLoveWordTex(text) {
+    function createBdayWordTex(text) {
       const c = document.createElement('canvas');
-      c.width = 340; c.height = 84;
+      c.width = 380; c.height = 84;
       const ctx = c.getContext('2d');
-      ctx.font = "bold 34px -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif";
+      ctx.font = "bold 33px -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif";
       ctx.textAlign = "center"; ctx.textBaseline = "middle";
       ctx.fillStyle = "#ff4d88"; ctx.shadowColor = "#ff0055"; ctx.shadowBlur = 14;
-      ctx.fillText(text, 170, 42);
+      ctx.fillText(text, 190, 42);
       return new THREE.CanvasTexture(c);
     }
 
-    const wordList = ["Te amo", "I love you", "Кохаю тебе", "Te amo", "Ti amo", "Я тебе кохаю", "Je t'aime"];
+    const bdayPhrases = [
+      "З Днем Народження! ✨",
+      "Happy Birthday 🎂",
+      "Ти найкраща 💖",
+      "Сяй яскраво 🌟",
+      "Будь щасливою 🎉",
+      "З Днем Народження! 🌸",
+      "Зі Святом! 🥳"
+    ];
     const spiralGroup = new THREE.Group();
     scene.add(spiralGroup);
     const spiralWords = [];
 
     for (let i = 0; i < 150; i++) {
-      const tex = createLoveWordTex(wordList[i % wordList.length]);
+      const tex = createBdayWordTex(bdayPhrases[i % bdayPhrases.length]);
       const mat = new THREE.SpriteMaterial({ map: tex, transparent: true, opacity: 0.98, blending: THREE.AdditiveBlending });
       const sprite = new THREE.Sprite(mat);
 
@@ -323,8 +336,8 @@
       sprite.position.y = Math.sin(angle) * radius;
       sprite.position.z = 0;
 
-      const scale = 1.8 + t * 4.6;
-      sprite.scale.set(scale, scale * 0.25, 1);
+      const scale = 1.9 + t * 4.6;
+      sprite.scale.set(scale, scale * 0.24, 1);
       sprite.userData = { baseX: sprite.position.x, baseY: sprite.position.y };
 
       spiralWords.push(sprite);
@@ -332,7 +345,7 @@
     }
 
     // ==============================================================
-    // 4. МИР СЕРДЦА И ГАЛАКТИКИ (БЕЗ ЧЕРНОЙ ДЫРЫ)
+    // 3. МИР СЕРДЦА И ПРАЗДНИЧНОЙ ГАЛАКТИКИ
     // ==============================================================
     const galaxyWorld = new THREE.Group();
     galaxyWorld.position.set(0, 0, 0);
@@ -378,7 +391,7 @@
     }));
     galaxyWorld.add(galaxy);
 
-    // Тонкие неоновые кольца вокруг центра
+    // Тонкие неоновые кольца
     function createCenterRing(r, tiltX, col) {
       const pts = [];
       for (let i = 0; i <= 120; i++) {
@@ -398,7 +411,7 @@
     galaxyWorld.add(ring1);
     galaxyWorld.add(ring2);
 
-    // 5. Пылающее плотное 3D-сердце (18 000 частиц, залитый центр)
+    // 4. Плотное сияющее сердце дружбы (18 000 частиц)
     const heartCenterGroup = new THREE.Group();
     galaxyWorld.add(heartCenterGroup);
 
@@ -406,7 +419,6 @@
     heartLight.position.set(0, 6.5, 0);
     heartCenterGroup.add(heartLight);
 
-    // Внутреннее сияющее теплое ядро
     const coreGeo = new THREE.SphereGeometry(3.6, 32, 32);
     const coreMat = new THREE.MeshBasicMaterial({ color: 0xff1450, transparent: true, opacity: 0.45, blending: THREE.AdditiveBlending });
     const innerCore = new THREE.Mesh(coreGeo, coreMat);
@@ -454,7 +466,7 @@
     }));
     heartCenterGroup.add(heart);
 
-    // Парящие искры, непрерывно поднимающиеся из сердца вверх
+    // Парящие праздничные искры (фейерверк)
     const embersCount = 550;
     const embersGeo = new THREE.BufferGeometry();
     const embersPos = new Float32Array(embersCount * 3);
@@ -477,7 +489,7 @@
     }));
     heartCenterGroup.add(embers);
 
-    // Неоновые надписи на орбитах
+    // Праздничные надписи на орбитах
     function createOrbitText(text) {
       const c = document.createElement('canvas');
       c.width = 512; c.height = 128;
@@ -487,7 +499,7 @@
       ctx.fillText(text, 256, 75);
       return new THREE.Sprite(new THREE.SpriteMaterial({ map: new THREE.CanvasTexture(c), transparent: true }));
     }
-    const words = ["КОХАЮ ТЕБЕ", "НАЗАВЖДИ ∞", "МОЄ СЕРДЕНЬКО", "ВІЧНЕ КОХАННЯ"];
+    const words = ["З ДНЕМ НАРОДЖЕННЯ! 🎂", "СЯЙ ЯСКРАВО ✨", "НАЙКРАЩА ПОДРУГА 💖", "ТВІЙ ДЕНЬ 🎉"];
     const labelsGroup = new THREE.Group();
     galaxyWorld.add(labelsGroup);
     words.forEach((w, idx) => {
@@ -511,7 +523,7 @@
         ctx.save(); ctx.beginPath(); ctx.arc(90, 90, 70, 0, Math.PI * 2); ctx.clip();
         ctx.drawImage(img, 0, 0, 180, 180); ctx.restore();
         ctx.beginPath(); ctx.arc(90, 90, 70, 0, Math.PI * 2); ctx.lineWidth = 6; ctx.strokeStyle = '#ffffff'; ctx.stroke();
-        ctx.font = '26px sans-serif'; ctx.fillText('💖', 135, 155);
+        ctx.font = '26px sans-serif'; ctx.fillText('✨', 135, 155);
         callback(new THREE.CanvasTexture(c));
       };
     }
@@ -580,7 +592,7 @@
       if (e.target === cardContainer) cardContainer.classList.remove('active');
     });
 
-    // 6. Бесшовный пролет в центр
+    // 5. Бесшовный пролет в центр
     let flightActive = false;
     let flightProgress = 0;
     const startCamPos = new THREE.Vector3(0, 0, 36);

@@ -76,7 +76,7 @@
       z-index: 50;
       pointer-events: none;
       opacity: 0;
-      transition: opacity 0.35s ease;
+      transition: opacity 0.45s ease;
       background: radial-gradient(circle at center, rgba(35, 3, 18, 0.75) 0%, rgba(0, 0, 0, 0.92) 100%);
       backdrop-filter: blur(10px);
       -webkit-backdrop-filter: blur(10px);
@@ -156,6 +156,75 @@
     .btn-action:active {
       transform: scale(0.95);
     }
+
+    /* Модальное окно финального видео */
+    #video-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      z-index: 100;
+      background: rgba(0, 0, 0, 0.94);
+      backdrop-filter: blur(15px);
+      -webkit-backdrop-filter: blur(15px);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.8s ease;
+    }
+
+    #video-overlay.active {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .video-wrapper {
+      position: relative;
+      width: 90%;
+      max-width: 480px;
+      max-height: 80vh;
+      border-radius: 20px;
+      overflow: hidden;
+      box-shadow: 0 0 40px rgba(255, 42, 95, 0.6), 0 0 0 2px rgba(255, 255, 255, 0.2);
+    }
+
+    #bday-video {
+      width: 100%;
+      height: 100%;
+      display: block;
+      object-fit: contain;
+      background: #000;
+    }
+
+    .video-hint {
+      margin-top: 18px;
+      font-size: 0.82rem;
+      color: rgba(255, 200, 220, 0.85);
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      font-weight: 500;
+    }
+
+    /* Экран затухания перед релоадом */
+    #fade-screen {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: #000;
+      z-index: 200;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 1.5s ease;
+    }
+    #fade-screen.visible {
+      opacity: 1;
+    }
   </style>
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
@@ -181,11 +250,21 @@
     </div>
   </div>
 
+  <!-- Финальный экран с видео -->
+  <div id="video-overlay">
+    <div class="video-wrapper">
+      <video id="bday-video" src="video.mp4" playsinline controls preload="auto"></video>
+    </div>
+    <div class="video-hint">Особливе відео для тебе 💖</div>
+  </div>
+
+  <div id="fade-screen"></div>
+
   <canvas id="webgl-canvas"></canvas>
 
   <script>
     // ==============================================================
-    // СПИСОК ФОТО (1.jpg, 2.jpg, 3.jpg, 4.jpg, 5.jpg, 6.jpg...)
+    // 6 ФОТОГРАФИЙ (1.jpg ... 6.jpg)
     // ==============================================================
     const memories = [
       {
@@ -221,6 +300,7 @@
     ];
 
     let currentMemoryIndex = 0;
+    let autoVideoTimer = null; // Таймер на 5 секунд
 
     const canvas = document.getElementById('webgl-canvas');
     const startHint = document.getElementById('start-hint');
@@ -232,6 +312,10 @@
     const cardDesc = document.getElementById('card-desc');
     const nextBtn = document.getElementById('next-btn');
     const closeBtn = document.getElementById('close-btn');
+
+    const videoOverlay = document.getElementById('video-overlay');
+    const bdayVideo = document.getElementById('bday-video');
+    const fadeScreen = document.getElementById('fade-screen');
 
     function createGlowDotTexture() {
       const c = document.createElement('canvas');
@@ -274,7 +358,7 @@
     controls.target.set(0, 0, 0);
     controls.enabled = false;
 
-    // Фоновые звезды
+    // Фоновые мягкие звезды
     const bgStarsGeo = new THREE.BufferGeometry();
     const bgPos = new Float32Array(2200 * 3);
     for (let i = 0; i < 2200 * 3; i++) bgPos[i] = (Math.random() - 0.5) * 260;
@@ -540,7 +624,6 @@
     const ropeRadius = isMobile ? 16.5 : 18.5;
     const numPhotos = memories.length;
 
-    // Плавная замкнутая кривая с мягкими волнами
     class GarlandCurve extends THREE.Curve {
       constructor(radius, count) {
         super();
@@ -549,30 +632,21 @@
       }
       getPoint(t, optionalTarget = new THREE.Vector3()) {
         const theta = t * Math.PI * 2;
-        // Мягкое гармоничное провисание между точками крепления
         const sag = Math.cos(theta * this.count) * 0.45;
-
         const x = Math.cos(theta) * this.radius;
         const z = Math.sin(theta) * this.radius;
         const y = -1.6 + sag;
-
         return optionalTarget.set(x, y, z);
       }
     }
 
     const garlandPath = new GarlandCurve(ropeRadius, numPhotos);
 
-    // 1. Светящийся шнур
     const tubeGeo = new THREE.TubeGeometry(garlandPath, 180, 0.08, 8, true);
-    const tubeMat = new THREE.MeshBasicMaterial({
-      color: 0xffe6a3,
-      transparent: true,
-      opacity: 0.95
-    });
+    const tubeMat = new THREE.MeshBasicMaterial({ color: 0xffe6a3, transparent: true, opacity: 0.95 });
     const garlandTube = new THREE.Mesh(tubeGeo, tubeMat);
     garlandGroup.add(garlandTube);
 
-    // 2. Внешнее мягкое неоновое гало вокруг шнура
     const tubeGlowGeo = new THREE.TubeGeometry(garlandPath, 180, 0.24, 8, true);
     const tubeGlowMat = new THREE.MeshBasicMaterial({
       color: 0xff3377,
@@ -584,7 +658,6 @@
     const garlandGlow = new THREE.Mesh(tubeGlowGeo, tubeGlowMat);
     garlandGroup.add(garlandGlow);
 
-    // 3. Светящиеся огоньки-светодиоды на нити
     const bulbCount = 72;
     const bulbGeo = new THREE.BufferGeometry();
     const bulbPos = new Float32Array(bulbCount * 3);
@@ -607,7 +680,7 @@
     garlandGroup.add(garlandBulbs);
 
     // ==============================================================
-    // 6. ПОЛАРОИДЫ, ПОДВЕШЕННЫЕ СТРОГО ПОД НИТЬЮ (БЕЗ ПЕРЕСЕЧЕНИЯ)
+    // 6. ПОЛАРОИДЫ ПОД НИТЬЮ
     // ==============================================================
     function createPolaroidTexture(imgUrl, callback) {
       const img = new Image();
@@ -618,11 +691,9 @@
         c.height = 450;
         const ctx = c.getContext('2d');
 
-        // Глубокое мягкое свечение карточки
         ctx.shadowColor = 'rgba(255, 42, 95, 0.4)';
         ctx.shadowBlur = 28;
 
-        // Белая полароидная рамка (начинается чуть ниже верхушки прищепки)
         ctx.fillStyle = '#ffffff';
         ctx.beginPath();
         ctx.roundRect(18, 42, 304, 396, [12]);
@@ -630,7 +701,6 @@
 
         ctx.shadowBlur = 0;
 
-        // Золотистая прищепка, захватывающая нить сверху
         ctx.fillStyle = '#ffd166';
         ctx.shadowColor = 'rgba(255, 209, 102, 0.8)';
         ctx.shadowBlur = 12;
@@ -638,16 +708,13 @@
         ctx.roundRect(154, 10, 32, 56, [4]);
         ctx.fill();
 
-        // Световой блик на прищепке
         ctx.fillStyle = '#fff4cc';
         ctx.fillRect(158, 14, 6, 48);
 
-        // Металлическая пружинка прищепки
         ctx.fillStyle = '#ffffff';
         ctx.shadowBlur = 0;
         ctx.fillRect(152, 32, 36, 7);
 
-        // Окно фотографии (Object-Fit: Cover)
         const photoX = 34;
         const photoY = 72;
         const photoW = 272;
@@ -676,7 +743,6 @@
         ctx.drawImage(img, sx, sy, sWidth, sHeight, photoX, photoY, photoW, photoH);
         ctx.restore();
 
-        // Подпись на белом поле снизу
         ctx.font = '600 21px -apple-system, sans-serif';
         ctx.fillStyle = '#ff2a5f';
         ctx.textAlign = 'center';
@@ -716,15 +782,11 @@
         const scaleH = scaleW * (450 / 340);
         sprite.scale.set(scaleW, scaleH, 1);
 
-        // КЛЮЧЕВОЙ МОМЕНТ:
-        // Смещаем опорную точку (anchor/center) спрайта к самому верху прищепки (0.94),
-        // чтобы точка подвеса находилась ровно на нити, а фото висело СТРОГО ПОД НЕЙ!
         sprite.center.set(0.5, 0.94);
 
         const tVal = index / memories.length;
         const pt = garlandPath.getPoint(tVal);
 
-        // Позиция точки крепления точно совпадает с нитью гирлянды
         sprite.position.set(pt.x, pt.y, pt.z);
 
         sprite.userData = {
@@ -737,7 +799,6 @@
         };
 
         polaroidSprites.push(sprite);
-        // Добавляем полароид внутрь garlandGroup, чтобы он синхронно вращался вместе с нитью!
         garlandGroup.add(sprite);
       });
     });
@@ -756,7 +817,7 @@
         startHyperspaceFlight();
         return;
       }
-      if (cardContainer.classList.contains('active')) return;
+      if (cardContainer.classList.contains('active') || videoOverlay.classList.contains('active')) return;
       if (Math.hypot(e.clientX - pStartX, e.clientY - pStartY) > 8) return;
 
       mouse.x = (e.clientX / window.innerWidth) * 2 - 1;
@@ -769,29 +830,95 @@
 
     function showMemory(index) {
       currentMemoryIndex = index;
+
+      // Сбрасываем старый таймер, если он был
+      if (autoVideoTimer) {
+        clearTimeout(autoVideoTimer);
+        autoVideoTimer = null;
+      }
+
       const data = memories[index];
       cardImg.src = data.image;
       cardTitle.textContent = data.title;
       cardDesc.textContent = data.desc;
+      nextBtn.textContent = 'ДАЛІ 💌';
+
+      // Если открыто 6-е (последнее) фото — запускаем таймер на 5 секунд
+      if (index === memories.length - 1) {
+        autoVideoTimer = setTimeout(() => {
+          cardContainer.classList.remove('active');
+          launchCelebrationVideo();
+        }, 5000);
+      }
+
       cardContainer.classList.add('active');
     }
 
     nextBtn.addEventListener('click', (e) => {
       e.stopPropagation();
+
+      if (autoVideoTimer) {
+        clearTimeout(autoVideoTimer);
+        autoVideoTimer = null;
+      }
+
+      // Перелистываем по кругу
       currentMemoryIndex = (currentMemoryIndex + 1) % memories.length;
       showMemory(currentMemoryIndex);
     });
 
     closeBtn.addEventListener('click', (e) => {
       e.stopPropagation();
+      if (autoVideoTimer) {
+        clearTimeout(autoVideoTimer);
+        autoVideoTimer = null;
+      }
       cardContainer.classList.remove('active');
     });
 
     cardContainer.addEventListener('click', (e) => {
-      if (e.target === cardContainer) cardContainer.classList.remove('active');
+      if (e.target === cardContainer) {
+        if (autoVideoTimer) {
+          clearTimeout(autoVideoTimer);
+          autoVideoTimer = null;
+        }
+        cardContainer.classList.remove('active');
+      }
     });
 
-    // 7. Бесшовный пролет в центр
+    // ==============================================================
+    // 7. ЗАПУСК ВИДЕО И АВТОМАТИЧЕСКИЙ ПЕРЕЗАПУСК САЙТА
+    // ==============================================================
+    function launchCelebrationVideo() {
+      // Приглушаем фоновую музыку
+      if (bgMusic && !bgMusic.paused) {
+        let fadeAudio = setInterval(() => {
+          if (bgMusic.volume > 0.1) {
+            bgMusic.volume -= 0.1;
+          } else {
+            clearInterval(fadeAudio);
+            bgMusic.pause();
+          }
+        }, 80);
+      }
+
+      // Разворачиваем видеоплеер
+      videoOverlay.classList.add('active');
+      bdayVideo.currentTime = 0;
+      bdayVideo.play().catch(e => {
+        console.log("Video play request:", e);
+      });
+    }
+
+    // Событие: конец видео -> затемнение -> авторелоад страницы
+    bdayVideo.addEventListener('ended', () => {
+      fadeScreen.classList.add('visible');
+      setTimeout(() => {
+        window.location.reload();
+      }, 1600);
+    });
+
+    // 8. Бесшовный пролет в центр
     let flightActive = false;
     let flightProgress = 0;
     const startCamPos = new THREE.Vector3(0, 0, isMobile ? 42 : 36);
@@ -874,26 +1001,23 @@
         galaxy.rotation.y += 0.002;
         nebulaLake.rotation.y = -t * 0.014;
 
-        // Плавное вращение всей гирлянды целиком вместе с фото
+        // Вращение гирлянды
         garlandGroup.rotation.y = t * 0.06;
 
-        // Плавное физическое покачивание полароидов под нитью
+        // Покачивание полароидов
         polaroidSprites.forEach((b) => {
           const d = b.userData;
-          // Легкое покачивание на веревке без смещения с нее
           const swayY = Math.sin(t * d.swingSpeed + d.swingOffset) * 0.12;
           const pt = garlandPath.getPoint(d.tVal);
           b.position.y = pt.y + swayY;
 
-          // Легкий зум при приближении к зрителю
-          // Мировые координаты z с учетом вращения группы
           const worldAngle = (d.tVal * Math.PI * 2) + garlandGroup.rotation.y;
           const worldZ = Math.sin(worldAngle) * ropeRadius;
           const proximity = (worldZ > 0) ? (worldZ / ropeRadius) * 0.28 : 0;
           b.scale.set(d.scaleW * (1 + proximity), d.scaleH * (1 + proximity), 1);
         });
 
-        // Мягкое мерцание светодиодных лампочек на нити
+        // Мерцание лампочек
         garlandBulbs.material.opacity = 0.8 + Math.sin(t * 4.2) * 0.2;
 
         // Пульсация сердца

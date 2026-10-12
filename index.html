@@ -218,7 +218,7 @@
     const nextBtn = document.getElementById('next-btn');
     const closeBtn = document.getElementById('close-btn');
 
-    // Текстура мягкой точки
+    // Текстура мягкого неонового света
     function createGlowDotTexture() {
       const c = document.createElement('canvas');
       c.width = 64; c.height = 64;
@@ -234,7 +234,7 @@
     }
     const glowDotTex = createGlowDotTexture();
 
-    // 1. Сцена и камера с мобильной адаптацией
+    // 1. Сцена и камера с адаптацией под мобилки
     const scene = new THREE.Scene();
     scene.fog = new THREE.FogExp2(0x020005, 0.007);
 
@@ -260,7 +260,7 @@
     controls.target.set(0, 0, 0);
     controls.enabled = false;
 
-    // Фоновые мягкие звезды
+    // Фоновые звезды
     const bgStarsGeo = new THREE.BufferGeometry();
     const bgPos = new Float32Array(2200 * 3);
     for (let i = 0; i < 2200 * 3; i++) bgPos[i] = (Math.random() - 0.5) * 260;
@@ -299,7 +299,7 @@
     }
 
     // ==============================================================
-    // 2. ВОРОНКА ПОЗДРАВЛЕНИЙ (TLANEX)
+    // 2. ВОРОНКА ПОЗДРАВЛЕНИЙ TLANEX
     // ==============================================================
     function createBdayWordTex(text) {
       const c = document.createElement('canvas');
@@ -348,7 +348,7 @@
     }
 
     // ==============================================================
-    // 3. МИР СЕРДЦА, ГАЛАКТИКИ И ЗВЕЗДНОЙ ВУАЛИ ВНИЗУ
+    // 3. МИР СЕРДЦА, ГАЛАКТИКИ И СВЕТЯЩЕГОСЯ НИЖНЕГО ОЗЕРА
     // ==============================================================
     const galaxyWorld = new THREE.Group();
     galaxyWorld.position.set(0, 0, 0);
@@ -395,45 +395,81 @@
     galaxyWorld.add(galaxy);
 
     // ==============================================================
-    // ЗАПОЛНЕНИЕ НИЗА: МАТОВАЯ ЧАША ТУМАННОСТИ И ЗВЕЗДНОЙ ВУАЛИ
+    // ЗАПОЛНЕНИЕ НИЗА: СВЕТЯЩЕЕСЯ ЗВЕЗДНОЕ ОЗЕРО ТУМАННОСТИ
     // ==============================================================
-    const mistCount = isMobile ? 4000 : 6500;
-    const mistGeo = new THREE.BufferGeometry();
-    const mistPos = new Float32Array(mistCount * 3);
-    const mistCols = new Float32Array(mistCount * 3);
-    const colMistCore = new THREE.Color('#ff2a6d');
-    const colMistEdge = new THREE.Color('#4a0320');
+    const nebulaLakeCount = isMobile ? 5500 : 8500;
+    const nebulaLakeGeo = new THREE.BufferGeometry();
+    const nebulaLakePos = new Float32Array(nebulaLakeCount * 3);
+    const nebulaLakeCols = new Float32Array(nebulaLakeCount * 3);
+    const colLakeCore = new THREE.Color('#ff2a6d');
+    const colLakeMid = new THREE.Color('#ff0055');
+    const colLakeEdge = new THREE.Color('#2d0213');
 
-    for (let i = 0; i < mistCount; i++) {
+    for (let i = 0; i < nebulaLakeCount; i++) {
       const i3 = i * 3;
-      const rad = 2.5 + Math.pow(Math.random(), 0.75) * 26;
+      const rad = 1.8 + Math.pow(Math.random(), 0.72) * 28.0;
       const ang = Math.random() * Math.PI * 2;
       
-      // Чашеобразная вогнутая форма, поддерживающая снизу медальоны
-      const depthY = -5.8 + Math.pow(rad / 26, 2) * 2.5 + (Math.random() - 0.5) * 1.6;
+      // Мягкая вогнутая форма, подсвечивающая фотоснизу
+      const depthY = -5.8 + Math.pow(rad / 28.0, 2) * 2.8 + (Math.random() - 0.5) * 1.5;
 
-      mistPos[i3] = Math.cos(ang) * rad;
-      mistPos[i3 + 1] = depthY;
-      mistPos[i3 + 2] = Math.sin(ang) * rad;
+      nebulaLakePos[i3] = Math.cos(ang) * rad;
+      nebulaLakePos[i3 + 1] = depthY;
+      nebulaLakePos[i3 + 2] = Math.sin(ang) * rad;
 
-      const c = colMistCore.clone().lerp(colMistEdge, rad / 26);
-      mistCols[i3] = c.r;
-      mistCols[i3 + 1] = c.g;
-      mistCols[i3 + 2] = c.b;
+      let c = colLakeCore.clone();
+      const norm = rad / 28.0;
+      if (norm < 0.5) {
+        c.lerp(colLakeMid, norm / 0.5);
+      } else {
+        c.lerpColors(colLakeMid, colLakeEdge, (norm - 0.5) / 0.5);
+      }
+
+      nebulaLakeCols[i3] = c.r;
+      nebulaLakeCols[i3 + 1] = c.g;
+      nebulaLakeCols[i3 + 2] = c.b;
     }
-    mistGeo.setAttribute('position', new THREE.BufferAttribute(mistPos, 3));
-    mistGeo.setAttribute('color', new THREE.BufferAttribute(mistCols, 3));
+    nebulaLakeGeo.setAttribute('position', new THREE.BufferAttribute(nebulaLakePos, 3));
+    nebulaLakeGeo.setAttribute('color', new THREE.BufferAttribute(nebulaLakeCols, 3));
 
-    const mistField = new THREE.Points(mistGeo, new THREE.PointsMaterial({
-      size: isMobile ? 0.8 : 0.95,
+    const nebulaLake = new THREE.Points(nebulaLakeGeo, new THREE.PointsMaterial({
+      size: isMobile ? 0.85 : 1.05,
       map: glowDotTex,
       vertexColors: true,
       transparent: true,
-      opacity: 0.65,
+      opacity: 0.7,
       blending: THREE.AdditiveBlending,
       depthWrite: false
     }));
-    galaxyWorld.add(mistField);
+    galaxyWorld.add(nebulaLake);
+
+    // Восходящие светлячки со дна озера к фотографиям
+    const bottomFirefliesCount = isMobile ? 120 : 200;
+    const firefliesGeo = new THREE.BufferGeometry();
+    const firefliesPos = new Float32Array(bottomFirefliesCount * 3);
+    const firefliesVel = [];
+
+    for (let i = 0; i < bottomFirefliesCount; i++) {
+      firefliesPos[i * 3] = (Math.random() - 0.5) * 32;
+      firefliesPos[i * 3 + 1] = -6.0 + Math.random() * 5.5;
+      firefliesPos[i * 3 + 2] = (Math.random() - 0.5) * 32;
+      firefliesVel.push({
+        y: 0.02 + Math.random() * 0.03,
+        x: (Math.random() - 0.5) * 0.015,
+        z: (Math.random() - 0.5) * 0.015
+      });
+    }
+    firefliesGeo.setAttribute('position', new THREE.BufferAttribute(firefliesPos, 3));
+    const fireflies = new THREE.Points(firefliesGeo, new THREE.PointsMaterial({
+      color: 0xffd166,
+      size: 0.65,
+      map: glowDotTex,
+      blending: THREE.AdditiveBlending,
+      transparent: true,
+      opacity: 0.85,
+      depthWrite: false
+    }));
+    galaxyWorld.add(fireflies);
 
     // Тонкие неоновые кольца
     function createCenterRing(r, tiltX, col) {
@@ -554,7 +590,7 @@
       labelsGroup.add(s);
     });
 
-    // Фото-медальоны с увеличенной зоной тапа на мобильных
+    // Фото-медальоны
     function createMiniBadge(imgUrl, callback) {
       const img = new Image();
       img.crossOrigin = "anonymous";
@@ -718,12 +754,13 @@
       // Жизнь мира
       if (flightProgress >= 1) {
         galaxy.rotation.y += 0.002;
-        mistField.rotation.y = -t * 0.012;
+        nebulaLake.rotation.y = -t * 0.014; // плавное переливание нижнего озера
         labelsGroup.rotation.y = -t * 0.08;
 
         ring1.rotation.y = t * 0.05;
         ring2.rotation.y = -t * 0.04;
 
+        // Позиции фото-медальонов
         miniBadges.forEach((b, i) => {
           const curAngle = b.userData.baseAngle + t * 0.1;
           b.position.x = Math.cos(curAngle) * b.userData.radius;
@@ -731,11 +768,27 @@
           b.position.y = -2.5 + Math.sin(t * 2 + i) * 0.4;
         });
 
+        // Движение восходящих золотистых светлячков со дна озера
+        const ffPos = firefliesGeo.attributes.position;
+        for (let i = 0; i < bottomFirefliesCount; i++) {
+          ffPos.array[i * 3 + 1] += firefliesVel[i].y;
+          ffPos.array[i * 3] += firefliesVel[i].x;
+          ffPos.array[i * 3 + 2] += firefliesVel[i].z;
+
+          if (ffPos.array[i * 3 + 1] > 0.5) {
+            ffPos.array[i * 3 + 1] = -6.2;
+            ffPos.array[i * 3] = (Math.random() - 0.5) * 30;
+            ffPos.array[i * 3 + 2] = (Math.random() - 0.5) * 30;
+          }
+        }
+        firefliesGeo.needsUpdate = true;
+
         const beat = 1 + Math.sin(t * 3.4) * 0.07;
         heart.scale.set(beat, beat, beat);
         innerCore.scale.set(beat * 1.1, beat * 1.1, beat * 1.1);
         heartLight.intensity = 2.8 + Math.sin(t * 3.4) * 1.5;
 
+        // Парящие искры из сердца
         const posAttr = embersGeo.attributes.position;
         for (let i = 0; i < embersCount; i++) {
           posAttr.array[i * 3 + 1] += embersVelocity[i].y;

@@ -63,7 +63,7 @@
       50% { opacity: 1; transform: translateX(-50%) scale(1.02); }
     }
 
-    /* Карточка с поздравлениями */
+    /* Модалка с поздравлениями */
     #photo-card-container {
       position: fixed;
       top: 0;
@@ -106,7 +106,7 @@
 
     .memory-card img {
       width: 100%;
-      height: 190px;
+      height: 210px;
       object-fit: cover;
       border-radius: 18px;
       border: 1px solid rgba(255, 255, 255, 0.18);
@@ -163,6 +163,7 @@
 </head>
 <body>
 
+  <!-- Аудио -->
   <audio id="bg-music" src="music.mp3" loop preload="auto"></audio>
 
   <div id="start-hint">ТОРКНІТЬСЯ ЕКРАНА, ЩОБ ВІДКРИТИ ПРИВІТАННЯ ✨</div>
@@ -182,26 +183,29 @@
   <canvas id="webgl-canvas"></canvas>
 
   <script>
+    // ==========================================
+    // ЛОКАЛЬНЫЕ ФОТО (1.jpg, 2.jpg, 3.jpg, 4.jpg)
+    // ==========================================
     const memories = [
       {
         title: "З Днем Народження! 🎂✨",
-        desc: "Залишайся завжди такою ж неймовірною, яскравою і неперевершеною!",
-        image: "https://images.unsplash.com/photo-1518199266791-5375a83190b7?w=700"
+        desc: "Залишайся завжди такою ж яскравою, неповторною і крутою!",
+        image: "1.jpg"
       },
       {
         title: "Найкращі Спогади 🌸",
-        desc: "Дякую тобі за всі наші спільні моменти, сміх і шалені історії!",
-        image: "https://images.unsplash.com/photo-1522673607200-164d1b6ce486?w=700"
+        desc: "Дякую за всі наші спільні моменти, сміх і теплі розмови!",
+        image: "2.jpg"
       },
       {
         title: "Сяй Яскраво 💖",
-        desc: "Нехай усі твої найзаповітніші мрії та цілі здійснюються легко і в кайф.",
-        image: "https://images.unsplash.com/photo-1516589178581-6cd7833ae3b2?w=700"
+        desc: "Нехай усі твої найзаповітніші мрії та плани здійснюються легко!",
+        image: "3.jpg"
       },
       {
         title: "Ти Найкраща Подруга 🪐",
-        desc: "Безмежно радий, що ти є в моєму житті. Зі святом тебе! 🎉",
-        image: "https://images.unsplash.com/photo-1529333166437-7750a6dd5a70?w=700"
+        desc: "Безмежно радий, що ти в мене є. Найкрутішого тобі свята! 🎉",
+        image: "4.jpg"
       }
     ];
 
@@ -218,7 +222,7 @@
     const nextBtn = document.getElementById('next-btn');
     const closeBtn = document.getElementById('close-btn');
 
-    // Текстура мягкого неонового света
+    // Текстура мягкой сияющей точки
     function createGlowDotTexture() {
       const c = document.createElement('canvas');
       c.width = 64; c.height = 64;
@@ -234,7 +238,7 @@
     }
     const glowDotTex = createGlowDotTexture();
 
-    // 1. Сцена и камера с адаптацией под мобилки
+    // 1. Сцена и камера
     const scene = new THREE.Scene();
     scene.fog = new THREE.FogExp2(0x020005, 0.007);
 
@@ -260,7 +264,7 @@
     controls.target.set(0, 0, 0);
     controls.enabled = false;
 
-    // Фоновые звезды
+    // Фоновые мягкие звезды
     const bgStarsGeo = new THREE.BufferGeometry();
     const bgPos = new Float32Array(2200 * 3);
     for (let i = 0; i < 2200 * 3; i++) bgPos[i] = (Math.random() - 0.5) * 260;
@@ -348,7 +352,7 @@
     }
 
     // ==============================================================
-    // 3. МИР СЕРДЦА, ГАЛАКТИКИ И СВЕТЯЩЕГОСЯ НИЖНЕГО ОЗЕРА
+    // 3. МИР СЕРДЦА, ГАЛАКТИКИ И ЗВЕЗДНОГО ОЗЕРА
     // ==============================================================
     const galaxyWorld = new THREE.Group();
     galaxyWorld.position.set(0, 0, 0);
@@ -394,9 +398,7 @@
     }));
     galaxyWorld.add(galaxy);
 
-    // ==============================================================
-    // ЗАПОЛНЕНИЕ НИЗА: СВЕТЯЩЕЕСЯ ЗВЕЗДНОЕ ОЗЕРО ТУМАННОСТИ
-    // ==============================================================
+    // Светящееся звездное озеро снизу под фото
     const nebulaLakeCount = isMobile ? 5500 : 8500;
     const nebulaLakeGeo = new THREE.BufferGeometry();
     const nebulaLakePos = new Float32Array(nebulaLakeCount * 3);
@@ -409,8 +411,6 @@
       const i3 = i * 3;
       const rad = 1.8 + Math.pow(Math.random(), 0.72) * 28.0;
       const ang = Math.random() * Math.PI * 2;
-      
-      // Мягкая вогнутая форма, подсвечивающая фотоснизу
       const depthY = -5.8 + Math.pow(rad / 28.0, 2) * 2.8 + (Math.random() - 0.5) * 1.5;
 
       nebulaLakePos[i3] = Math.cos(ang) * rad;
@@ -443,7 +443,7 @@
     }));
     galaxyWorld.add(nebulaLake);
 
-    // Восходящие светлячки со дна озера к фотографиям
+    // Восходящие светлячки со дна озера к фото
     const bottomFirefliesCount = isMobile ? 120 : 200;
     const firefliesGeo = new THREE.BufferGeometry();
     const firefliesPos = new Float32Array(bottomFirefliesCount * 3);
@@ -590,20 +590,62 @@
       labelsGroup.add(s);
     });
 
-    // Фото-медальоны
-    function createMiniBadge(imgUrl, callback) {
+    // ==============================================================
+    // 5. КРАСИВЫЕ КИНЕМАТОГРАФИЧНЫЕ ФОТО-МЕДАЛЬОНЫ
+    // ==============================================================
+    function createPremiumBadge(imgUrl, callback) {
       const img = new Image();
-      img.crossOrigin = "anonymous";
       img.src = imgUrl;
       img.onload = () => {
         const c = document.createElement('canvas');
-        c.width = 180; c.height = 180;
+        c.width = 200; c.height = 200;
         const ctx = c.getContext('2d');
-        ctx.beginPath(); ctx.arc(90, 90, 78, 0, Math.PI * 2); ctx.fillStyle = '#ff2060'; ctx.shadowColor = '#ff2060'; ctx.shadowBlur = 18; ctx.fill();
-        ctx.save(); ctx.beginPath(); ctx.arc(90, 90, 70, 0, Math.PI * 2); ctx.clip();
-        ctx.drawImage(img, 0, 0, 180, 180); ctx.restore();
-        ctx.beginPath(); ctx.arc(90, 90, 70, 0, Math.PI * 2); ctx.lineWidth = 6; ctx.strokeStyle = '#ffffff'; ctx.stroke();
-        ctx.font = '26px sans-serif'; ctx.fillText('✨', 135, 155);
+
+        // Внешнее мягкое неоновое сияние
+        ctx.beginPath();
+        ctx.arc(100, 100, 88, 0, Math.PI * 2);
+        ctx.fillStyle = '#ff2060';
+        ctx.shadowColor = '#ff3377';
+        ctx.shadowBlur = 22;
+        ctx.fill();
+
+        // Круглое фото
+        ctx.save();
+        ctx.beginPath();
+        ctx.arc(100, 100, 78, 0, Math.PI * 2);
+        ctx.clip();
+        ctx.drawImage(img, 0, 0, 200, 200);
+        ctx.restore();
+
+        // Двойная стеклянная окантовка (белая + золото)
+        ctx.beginPath();
+        ctx.arc(100, 100, 78, 0, Math.PI * 2);
+        ctx.lineWidth = 6;
+        ctx.strokeStyle = '#ffffff';
+        ctx.stroke();
+
+        ctx.beginPath();
+        ctx.arc(100, 100, 84, 0, Math.PI * 2);
+        ctx.lineWidth = 2.5;
+        ctx.strokeStyle = '#ffd166';
+        ctx.stroke();
+
+        // Маленькая золотая искра снизу
+        ctx.font = '28px sans-serif';
+        ctx.fillText('✨', 142, 172);
+
+        callback(new THREE.CanvasTexture(c));
+      };
+
+      // Фолбек, если фото не найдено
+      img.onerror = () => {
+        const c = document.createElement('canvas');
+        c.width = 200; c.height = 200;
+        const ctx = c.getContext('2d');
+        ctx.fillStyle = '#ff2060';
+        ctx.beginPath(); ctx.arc(100, 100, 80, 0, Math.PI * 2); ctx.fill();
+        ctx.font = '60px sans-serif'; ctx.textAlign = 'center';
+        ctx.fillText('📸', 100, 120);
         callback(new THREE.CanvasTexture(c));
       };
     }
@@ -613,20 +655,32 @@
     galaxyWorld.add(badgesGroup);
 
     memories.forEach((mem, index) => {
-      createMiniBadge(mem.image, (texture) => {
+      createPremiumBadge(mem.image, (texture) => {
         const sprite = new THREE.Sprite(new THREE.SpriteMaterial({ map: texture, transparent: true }));
-        const badgeScale = isMobile ? 3.3 : 2.8;
+        const badgeScale = isMobile ? 3.5 : 3.0;
         sprite.scale.set(badgeScale, badgeScale, 1);
+
         const angle = (index / memories.length) * Math.PI * 2;
-        const radius = isMobile ? 15.0 : 16.5;
+        const radius = isMobile ? 15.2 : 16.8;
+
         sprite.position.set(Math.cos(angle) * radius, -2.5, Math.sin(angle) * radius);
-        sprite.userData = { index: index, baseAngle: angle, radius: radius };
+        
+        // Индивидуальные параметры парения для каждого фото
+        sprite.userData = {
+          index: index,
+          baseAngle: angle,
+          radius: radius,
+          floatSpeedY: 1.6 + index * 0.35,
+          floatOffset: index * Math.PI * 0.5,
+          tiltFactor: (index % 2 === 0 ? 1 : -1)
+        };
+
         miniBadges.push(sprite);
         badgesGroup.add(sprite);
       });
     });
 
-    // Клики и тапы без ложных срабатываний
+    // Клики и тапы по фото
     const raycaster = new THREE.Raycaster();
     const mouse = new THREE.Vector2();
     let pStartX = 0, pStartY = 0;
@@ -654,7 +708,9 @@
     function showMemory(index) {
       currentMemoryIndex = index;
       const data = memories[index];
-      cardImg.src = data.image; cardTitle.textContent = data.title; cardDesc.textContent = data.desc;
+      cardImg.src = data.image;
+      cardTitle.textContent = data.title;
+      cardDesc.textContent = data.desc;
       cardContainer.classList.add('active');
     }
 
@@ -673,7 +729,7 @@
       if (e.target === cardContainer) cardContainer.classList.remove('active');
     });
 
-    // 5. Бесшовный пролет в центр
+    // 6. Бесшовный пролет в центр
     let flightActive = false;
     let flightProgress = 0;
     const startCamPos = new THREE.Vector3(0, 0, isMobile ? 42 : 36);
@@ -723,7 +779,7 @@
         spiralGroup.rotation.z = -t * 0.16;
       }
 
-      // Полет
+      // Полет сквозь спираль
       if (flightActive) {
         flightProgress += 0.012;
         const p = Math.min(flightProgress, 1);
@@ -751,24 +807,35 @@
         }
       }
 
-      // Жизнь мира
+      // Жизнь мира после прилета
       if (flightProgress >= 1) {
         galaxy.rotation.y += 0.002;
-        nebulaLake.rotation.y = -t * 0.014; // плавное переливание нижнего озера
+        nebulaLake.rotation.y = -t * 0.014;
         labelsGroup.rotation.y = -t * 0.08;
 
         ring1.rotation.y = t * 0.05;
         ring2.rotation.y = -t * 0.04;
 
-        // Позиции фото-медальонов
-        miniBadges.forEach((b, i) => {
-          const curAngle = b.userData.baseAngle + t * 0.1;
-          b.position.x = Math.cos(curAngle) * b.userData.radius;
-          b.position.z = Math.sin(curAngle) * b.userData.radius;
-          b.position.y = -2.5 + Math.sin(t * 2 + i) * 0.4;
+        // Плавный волнообразный полет фото-медальонов
+        miniBadges.forEach((b) => {
+          const d = b.userData;
+          const curAngle = d.baseAngle + t * 0.1;
+
+          // Радиальное покачивание (Lissajous Wave)
+          const curRadius = d.radius + Math.sin(t * 1.8 + d.floatOffset) * 0.6;
+          b.position.x = Math.cos(curAngle) * curRadius;
+          b.position.z = Math.sin(curAngle) * curRadius;
+
+          // Мягкое вертикальное парение в невесомости
+          b.position.y = -2.4 + Math.sin(t * d.floatSpeedY + d.floatOffset) * 0.65;
+
+          // Дыхание масштаба (легкая пульсация)
+          const baseScale = isMobile ? 3.5 : 3.0;
+          const scalePulse = baseScale * (1 + Math.sin(t * 2.4 + d.floatOffset) * 0.04);
+          b.scale.set(scalePulse, scalePulse, 1);
         });
 
-        // Движение восходящих золотистых светлячков со дна озера
+        // Движение светлячков со дна озера к фото
         const ffPos = firefliesGeo.attributes.position;
         for (let i = 0; i < bottomFirefliesCount; i++) {
           ffPos.array[i * 3 + 1] += firefliesVel[i].y;
@@ -783,6 +850,7 @@
         }
         firefliesGeo.needsUpdate = true;
 
+        // Пульсация сердца
         const beat = 1 + Math.sin(t * 3.4) * 0.07;
         heart.scale.set(beat, beat, beat);
         innerCore.scale.set(beat * 1.1, beat * 1.1, beat * 1.1);

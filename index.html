@@ -106,7 +106,7 @@
 
     .memory-card img {
       width: 100%;
-      height: 210px;
+      height: 220px;
       object-fit: cover;
       border-radius: 18px;
       border: 1px solid rgba(255, 255, 255, 0.18);
@@ -238,7 +238,7 @@
     }
     const glowDotTex = createGlowDotTexture();
 
-    // 1. Сцена и камера
+    // 1. Сцена и камера с мобильной адаптацией
     const scene = new THREE.Scene();
     scene.fog = new THREE.FogExp2(0x020005, 0.007);
 
@@ -591,48 +591,74 @@
     });
 
     // ==============================================================
-    // 5. КРАСИВЫЕ КИНЕМАТОГРАФИЧНЫЕ ФОТО-МЕДАЛЬОНЫ
+    // 5. ПРАВИЛЬНЫЙ РАСЧЕТ ПРОПОРЦИЙ ФОТО (OBJECT-FIT: COVER ДЛЯ CANVAS)
     // ==============================================================
     function createPremiumBadge(imgUrl, callback) {
       const img = new Image();
       img.src = imgUrl;
       img.onload = () => {
         const c = document.createElement('canvas');
-        c.width = 200; c.height = 200;
+        c.width = 256; c.height = 256;
         const ctx = c.getContext('2d');
+
+        const centerX = 128;
+        const centerY = 128;
+        const outerRadius = 110;
+        const photoRadius = 96;
 
         // Внешнее мягкое неоновое сияние
         ctx.beginPath();
-        ctx.arc(100, 100, 88, 0, Math.PI * 2);
+        ctx.arc(centerX, centerY, outerRadius, 0, Math.PI * 2);
         ctx.fillStyle = '#ff2060';
         ctx.shadowColor = '#ff3377';
-        ctx.shadowBlur = 22;
+        ctx.shadowBlur = 24;
         ctx.fill();
 
-        // Круглое фото
+        // Круглая маска кадрирования
         ctx.save();
         ctx.beginPath();
-        ctx.arc(100, 100, 78, 0, Math.PI * 2);
+        ctx.arc(centerX, centerY, photoRadius, 0, Math.PI * 2);
         ctx.clip();
-        ctx.drawImage(img, 0, 0, 200, 200);
+
+        // АЛГОРИТМ OBJECT-FIT COVER:
+        // Вычисляем масштаб, чтобы фото заполняло круг без искажения пропорций
+        const imgAspect = img.width / img.height;
+        let sWidth, sHeight, sx, sy;
+
+        if (imgAspect > 1) {
+          // Горизонтальное фото: обрезаем бока, центрируем
+          sHeight = img.height;
+          sWidth = img.height;
+          sx = (img.width - sWidth) / 2;
+          sy = 0;
+        } else {
+          // Вертикальное фото: обрезаем верх/низ, центрируем
+          sWidth = img.width;
+          sHeight = img.width;
+          sx = 0;
+          sy = (img.height - sHeight) / 2;
+        }
+
+        // Отрисовка без деформации пропорций
+        ctx.drawImage(img, sx, sy, sWidth, sHeight, centerX - photoRadius, centerY - photoRadius, photoRadius * 2, photoRadius * 2);
         ctx.restore();
 
-        // Двойная стеклянная окантовка (белая + золото)
+        // Стеклянная двойная неоновая рамка (белая + золото)
         ctx.beginPath();
-        ctx.arc(100, 100, 78, 0, Math.PI * 2);
-        ctx.lineWidth = 6;
+        ctx.arc(centerX, centerY, photoRadius, 0, Math.PI * 2);
+        ctx.lineWidth = 7;
         ctx.strokeStyle = '#ffffff';
         ctx.stroke();
 
         ctx.beginPath();
-        ctx.arc(100, 100, 84, 0, Math.PI * 2);
-        ctx.lineWidth = 2.5;
+        ctx.arc(centerX, centerY, photoRadius + 6, 0, Math.PI * 2);
+        ctx.lineWidth = 3;
         ctx.strokeStyle = '#ffd166';
         ctx.stroke();
 
-        // Маленькая золотая искра снизу
-        ctx.font = '28px sans-serif';
-        ctx.fillText('✨', 142, 172);
+        // Сияющий акцент снизу
+        ctx.font = '32px sans-serif';
+        ctx.fillText('✨', 180, 218);
 
         callback(new THREE.CanvasTexture(c));
       };
@@ -640,12 +666,12 @@
       // Фолбек, если фото не найдено
       img.onerror = () => {
         const c = document.createElement('canvas');
-        c.width = 200; c.height = 200;
+        c.width = 256; c.height = 256;
         const ctx = c.getContext('2d');
         ctx.fillStyle = '#ff2060';
-        ctx.beginPath(); ctx.arc(100, 100, 80, 0, Math.PI * 2); ctx.fill();
-        ctx.font = '60px sans-serif'; ctx.textAlign = 'center';
-        ctx.fillText('📸', 100, 120);
+        ctx.beginPath(); ctx.arc(128, 128, 100, 0, Math.PI * 2); ctx.fill();
+        ctx.font = '70px sans-serif'; ctx.textAlign = 'center';
+        ctx.fillText('📸', 128, 150);
         callback(new THREE.CanvasTexture(c));
       };
     }
@@ -665,14 +691,12 @@
 
         sprite.position.set(Math.cos(angle) * radius, -2.5, Math.sin(angle) * radius);
         
-        // Индивидуальные параметры парения для каждого фото
         sprite.userData = {
           index: index,
           baseAngle: angle,
           radius: radius,
           floatSpeedY: 1.6 + index * 0.35,
-          floatOffset: index * Math.PI * 0.5,
-          tiltFactor: (index % 2 === 0 ? 1 : -1)
+          floatOffset: index * Math.PI * 0.5
         };
 
         miniBadges.push(sprite);

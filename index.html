@@ -127,9 +127,9 @@
     }
 
     #surprise-timer-bar {
-      font-size: 0.82rem;
+      font-size: 0.85rem;
       color: #ff2a5f;
-      font-weight: 600;
+      font-weight: 700;
       margin-bottom: 12px;
       display: none;
       animation: pulseHint 1.2s infinite ease-in-out;
@@ -178,7 +178,7 @@
       justify-content: center;
       opacity: 0;
       pointer-events: none;
-      transition: opacity 0.8s ease;
+      transition: opacity 0.6s ease;
     }
 
     #video-overlay.active {
@@ -211,16 +211,16 @@
       top: 15px;
       right: 15px;
       z-index: 105;
-      background: rgba(255, 42, 95, 0.85);
+      background: rgba(255, 42, 95, 0.9);
       border: none;
       color: #fff;
-      padding: 8px 14px;
+      padding: 9px 16px;
       border-radius: 20px;
-      font-size: 0.82rem;
-      font-weight: 600;
+      font-size: 0.85rem;
+      font-weight: 700;
       cursor: pointer;
       display: none;
-      box-shadow: 0 0 15px rgba(255, 42, 95, 0.8);
+      box-shadow: 0 0 20px rgba(255, 42, 95, 0.8);
     }
 
     .video-hint {
@@ -263,7 +263,7 @@
       <img id="card-img" src="" alt="Спогад">
       <h2 id="card-title"></h2>
       <p id="card-desc"></p>
-      <div id="surprise-timer-bar">✨ Особливий сюрприз через 5 секунд...</div>
+      <div id="surprise-timer-bar">✨ Усі фото переглянуто! Відео почнеться за 5 сек...</div>
       <div class="card-actions">
         <button class="btn-action next" id="next-btn">ДАЛІ 💌</button>
         <button class="btn-action" id="close-btn">ЗАКРИТИ ✕</button>
@@ -284,40 +284,42 @@
   <canvas id="webgl-canvas"></canvas>
 
   <script>
+    // Ровно 6 фото
     const memories = [
       {
         title: "З Днем Народження! 🎂✨",
-        desc: "Сяй так само яскраво діаманітик💎",
+        desc: "Залишайся завжди такою ж яскравою, неповторною і крутою!",
         image: "1.jpg"
       },
       {
-        title: "Що це за красуння ? 🌸",
-        desc: "Твій прайм буде завжди і скрізь",
+        title: "Найкращі Спогади 🌸",
+        desc: "Дякую за всі наші спільні моменти, сміх і теплі розмови!",
         image: "2.jpg"
       },
       {
-        title: "Моє око побачило діаманіт💖",
-        desc: "Сподіваюсь хтось тобі дасть відчути справжне кохання, щоб ти не думала что ти не зроблена для цього",
+        title: "Сяй Яскраво 💖",
+        desc: "Нехай усі твої найзаповітніші мрії та плани здійснюються легко!",
         image: "3.jpg"
       },
       {
-        title: "...",
-        desc: "Що б все що ти хочеш і коли або будеш бажати виконувалося",
+        title: "Ти Найкраща Подруга 🪐",
+        desc: "Безмежно радий, що ти в мене є. Найкрутішого тобі свята! 🎉",
         image: "4.jpg"
       },
       {
-        title: "Сьогодні твій день ✨",
-        desc: "Що б ти ніколи не думала що все прогавила, пізній старт не скасовує фінішу",
+        title: "Більше Посмішок! ✨",
+        desc: "Нехай кожен день приносить привід щиро радіти життю!",
         image: "5.jpg"
       },
       {
         title: "Твій Особливий День 🥳",
-        desc: "Що б залишалася такою ж красивою та сексуальною дівчиною",
+        desc: "Святкуй на повну та насолоджуйся кожною секундою!",
         image: "6.jpg"
       }
     ];
 
     let currentMemoryIndex = 0;
+    const viewedIndices = new Set();
     let autoVideoTimer = null;
 
     const canvas = document.getElementById('webgl-canvas');
@@ -642,6 +644,8 @@
 
     function showMemory(index) {
       currentMemoryIndex = index;
+      viewedIndices.add(index);
+
       if (autoVideoTimer) {
         clearTimeout(autoVideoTimer);
         autoVideoTimer = null;
@@ -652,14 +656,19 @@
       cardTitle.textContent = data.title;
       cardDesc.textContent = data.desc;
 
-      if (index === memories.length - 1) {
+      // Сюрприз и таймер появятся ТОЛЬКО если просмотрены ВСЕ 6 ФОТО
+      if (viewedIndices.size === 6) {
         surpriseBar.style.display = 'block';
+        nextBtn.textContent = 'ВІДКРИТИ СЮРПРИЗ 🎬✨';
+
+        // 5-секундный таймер
         autoVideoTimer = setTimeout(() => {
           cardContainer.classList.remove('active');
           launchCelebrationVideo();
         }, 5000);
       } else {
         surpriseBar.style.display = 'none';
+        nextBtn.textContent = 'ДАЛІ 💌';
       }
 
       cardContainer.classList.add('active');
@@ -667,9 +676,13 @@
 
     nextBtn.addEventListener('click', (e) => {
       e.stopPropagation();
-      if (autoVideoTimer) clearTimeout(autoVideoTimer);
+      if (autoVideoTimer) {
+        clearTimeout(autoVideoTimer);
+        autoVideoTimer = null;
+      }
 
-      if (currentMemoryIndex === memories.length - 1) {
+      // Если все 6 фото уже просмотрены — запускаем видео прямо по тапу
+      if (viewedIndices.size === 6) {
         cardContainer.classList.remove('active');
         launchCelebrationVideo();
         return;
@@ -681,10 +694,24 @@
 
     closeBtn.addEventListener('click', (e) => {
       e.stopPropagation();
-      if (autoVideoTimer) clearTimeout(autoVideoTimer);
+      if (autoVideoTimer) {
+        clearTimeout(autoVideoTimer);
+        autoVideoTimer = null;
+      }
       cardContainer.classList.remove('active');
     });
 
+    cardContainer.addEventListener('click', (e) => {
+      if (e.target === cardContainer) {
+        if (autoVideoTimer) {
+          clearTimeout(autoVideoTimer);
+          autoVideoTimer = null;
+        }
+        cardContainer.classList.remove('active');
+      }
+    });
+
+    // НАДЁЖНЫЙ ЗАПУСК ВИДЕО НА СМАРТФОНАХ
     function launchCelebrationVideo() {
       if (bgMusic && !bgMusic.paused) {
         let vInterval = setInterval(() => {
@@ -695,34 +722,19 @@
 
       videoOverlay.classList.add('active');
       bdayVideo.currentTime = 0;
-      bdayVideo.muted = true;
 
-      const playVideo = () => {
-        const promise = bdayVideo.play();
-        if (promise !== undefined) {
-          promise.then(() => {
-            setTimeout(() => {
-              bdayVideo.muted = false;
-            }, 100);
+      // Сначала запускаем со звуком
+      bdayVideo.muted = false;
+      const playPromise = bdayVideo.play();
 
-            if (bdayVideo.muted) {
-              unmuteBtn.style.display = 'block';
-            }
-          }).catch(err => {
-            console.warn("Autoplay error, retrying muted:", err);
-            bdayVideo.muted = true;
-            bdayVideo.play().then(() => {
-              unmuteBtn.style.display = 'block';
-            });
-          });
-        }
-      };
-
-      if (bdayVideo.readyState >= 2) {
-        playVideo();
-      } else {
-        bdayVideo.addEventListener('loadeddata', playVideo, { once: true });
-        bdayVideo.load();
+      if (playPromise !== undefined) {
+        playPromise.catch(err => {
+          console.warn("Mobile autoplay restriction. Fallback to muted:", err);
+          // Если iOS заблокировала автоплей со звуком — стартуем muted и показываем кнопку
+          bdayVideo.muted = true;
+          bdayVideo.play();
+          unmuteBtn.style.display = 'block';
+        });
       }
     }
 

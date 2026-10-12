@@ -33,7 +33,6 @@
       z-index: 1;
     }
 
-    /* Подсказка старта tlanex */
     #start-hint {
       position: fixed;
       bottom: calc(30px + env(safe-area-inset-bottom));
@@ -63,7 +62,6 @@
       50% { opacity: 1; transform: translateX(-50%) scale(1.02); }
     }
 
-    /* Полароидная модалка с поздравлениями */
     #photo-card-container {
       position: fixed;
       top: 0;
@@ -92,7 +90,7 @@
       color: #1a1a1a;
       box-shadow: 0 12px 50px rgba(255, 42, 95, 0.55), 0 0 0 1px rgba(255, 255, 255, 0.5);
       border-radius: 14px;
-      padding: 16px 16px 22px 16px;
+      padding: 16px 16px 20px 16px;
       max-width: 320px;
       width: 86%;
       text-align: center;
@@ -106,11 +104,11 @@
 
     .memory-card img {
       width: 100%;
-      height: 240px;
+      height: 230px;
       object-fit: cover;
       border-radius: 8px;
       border: 1px solid rgba(0, 0, 0, 0.08);
-      margin-bottom: 14px;
+      margin-bottom: 12px;
     }
 
     .memory-card h2 {
@@ -124,8 +122,18 @@
       font-size: 0.9rem;
       color: #444;
       line-height: 1.45;
-      margin-bottom: 16px;
+      margin-bottom: 14px;
       padding: 0 4px;
+    }
+
+    /* Таймер-статус перед видео */
+    #surprise-timer-bar {
+      font-size: 0.82rem;
+      color: #ff2a5f;
+      font-weight: 600;
+      margin-bottom: 12px;
+      display: none;
+      animation: pulseHint 1.2s infinite ease-in-out;
     }
 
     .card-actions {
@@ -157,7 +165,7 @@
       transform: scale(0.95);
     }
 
-    /* Модальное окно финального видео */
+    /* Финальное видео */
     #video-overlay {
       position: fixed;
       top: 0;
@@ -165,9 +173,7 @@
       width: 100vw;
       height: 100vh;
       z-index: 100;
-      background: rgba(0, 0, 0, 0.94);
-      backdrop-filter: blur(15px);
-      -webkit-backdrop-filter: blur(15px);
+      background: #000;
       display: flex;
       flex-direction: column;
       align-items: center;
@@ -184,32 +190,50 @@
 
     .video-wrapper {
       position: relative;
-      width: 90%;
-      max-width: 480px;
-      max-height: 80vh;
-      border-radius: 20px;
+      width: 92%;
+      max-width: 500px;
+      max-height: 82vh;
+      border-radius: 18px;
       overflow: hidden;
-      box-shadow: 0 0 40px rgba(255, 42, 95, 0.6), 0 0 0 2px rgba(255, 255, 255, 0.2);
+      box-shadow: 0 0 50px rgba(255, 42, 95, 0.6);
+      background: #000;
     }
 
     #bday-video {
       width: 100%;
       height: 100%;
+      max-height: 75vh;
       display: block;
       object-fit: contain;
       background: #000;
     }
 
-    .video-hint {
-      margin-top: 18px;
+    #unmute-btn {
+      position: absolute;
+      top: 15px;
+      right: 15px;
+      z-index: 105;
+      background: rgba(255, 42, 95, 0.85);
+      border: none;
+      color: #fff;
+      padding: 8px 14px;
+      border-radius: 20px;
       font-size: 0.82rem;
-      color: rgba(255, 200, 220, 0.85);
-      letter-spacing: 1.5px;
-      text-transform: uppercase;
-      font-weight: 500;
+      font-weight: 600;
+      cursor: pointer;
+      display: none;
+      box-shadow: 0 0 15px rgba(255, 42, 95, 0.8);
     }
 
-    /* Экран затухания перед релоадом */
+    .video-hint {
+      margin-top: 16px;
+      font-size: 0.85rem;
+      color: rgba(255, 200, 220, 0.9);
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      font-weight: 600;
+    }
+
     #fade-screen {
       position: fixed;
       top: 0;
@@ -232,17 +256,17 @@
 </head>
 <body>
 
-  <!-- Аудио -->
   <audio id="bg-music" src="music.mp3" loop preload="auto"></audio>
 
   <div id="start-hint">ТОРКНІТЬСЯ ЕКРАНА, ЩОБ ВІДКРИТИ ПРИВІТАННЯ ✨</div>
 
-  <!-- Полароидное модальное окно -->
+  <!-- Полароидное окно -->
   <div id="photo-card-container">
     <div class="memory-card">
       <img id="card-img" src="" alt="Спогад">
       <h2 id="card-title"></h2>
       <p id="card-desc"></p>
+      <div id="surprise-timer-bar">✨ Особливий сюрприз через 5 секунд...</div>
       <div class="card-actions">
         <button class="btn-action next" id="next-btn">ДАЛІ 💌</button>
         <button class="btn-action" id="close-btn">ЗАКРИТИ ✕</button>
@@ -250,10 +274,11 @@
     </div>
   </div>
 
-  <!-- Финальный экран с видео -->
+  <!-- Видео-оверлей -->
   <div id="video-overlay">
     <div class="video-wrapper">
-      <video id="bday-video" src="video.mp4" playsinline controls preload="auto"></video>
+      <video id="bday-video" src="video.mp4" playsinline webkit-playsinline controls preload="auto"></video>
+      <button id="unmute-btn">УВІМКНУТИ ЗВУК 🔊</button>
     </div>
     <div class="video-hint">Особливе відео для тебе 💖</div>
   </div>
@@ -263,9 +288,7 @@
   <canvas id="webgl-canvas"></canvas>
 
   <script>
-    // ==============================================================
-    // 6 ФОТОГРАФИЙ (1.jpg ... 6.jpg)
-    // ==============================================================
+    // Массив фото — код автоматически поймет, какое фото последнее
     const memories = [
       {
         title: "З Днем Народження! 🎂✨",
@@ -300,7 +323,7 @@
     ];
 
     let currentMemoryIndex = 0;
-    let autoVideoTimer = null; // Таймер на 5 секунд
+    let autoVideoTimer = null;
 
     const canvas = document.getElementById('webgl-canvas');
     const startHint = document.getElementById('start-hint');
@@ -310,11 +333,13 @@
     const cardImg = document.getElementById('card-img');
     const cardTitle = document.getElementById('card-title');
     const cardDesc = document.getElementById('card-desc');
+    const surpriseBar = document.getElementById('surprise-timer-bar');
     const nextBtn = document.getElementById('next-btn');
     const closeBtn = document.getElementById('close-btn');
 
     const videoOverlay = document.getElementById('video-overlay');
     const bdayVideo = document.getElementById('bday-video');
+    const unmuteBtn = document.getElementById('unmute-btn');
     const fadeScreen = document.getElementById('fade-screen');
 
     function createGlowDotTexture() {
@@ -337,9 +362,7 @@
     scene.fog = new THREE.FogExp2(0x020005, 0.007);
 
     const isMobile = window.innerWidth < window.innerHeight;
-    const initialFov = isMobile ? 74 : 60;
-
-    const camera = new THREE.PerspectiveCamera(initialFov, window.innerWidth / window.innerHeight, 0.1, 1000);
+    const camera = new THREE.PerspectiveCamera(isMobile ? 74 : 60, window.innerWidth / window.innerHeight, 0.1, 1000);
     camera.position.set(0, 0, isMobile ? 42 : 36);
 
     const renderer = new THREE.WebGLRenderer({
@@ -358,7 +381,7 @@
     controls.target.set(0, 0, 0);
     controls.enabled = false;
 
-    // Фоновые мягкие звезды
+    // Фоновые звезды
     const bgStarsGeo = new THREE.BufferGeometry();
     const bgPos = new Float32Array(2200 * 3);
     for (let i = 0; i < 2200 * 3; i++) bgPos[i] = (Math.random() - 0.5) * 260;
@@ -379,26 +402,13 @@
     for (let i = 0; i < 3; i++) {
       const lineGeo = new THREE.BufferGeometry();
       lineGeo.setFromPoints([new THREE.Vector3(0, 0, 0), new THREE.Vector3(-8, -4, -5)]);
-      const lineMat = new THREE.LineBasicMaterial({
-        color: 0xff85b2,
-        transparent: true,
-        opacity: 0,
-        blending: THREE.AdditiveBlending
-      });
+      const lineMat = new THREE.LineBasicMaterial({ color: 0xff85b2, transparent: true, opacity: 0, blending: THREE.AdditiveBlending });
       const meteor = new THREE.Line(lineGeo, lineMat);
       scene.add(meteor);
-
-      meteors.push({
-        mesh: meteor,
-        active: false,
-        timer: Math.random() * 2.5,
-        speed: 2.2 + Math.random() * 0.8
-      });
+      meteors.push({ mesh: meteor, active: false, timer: Math.random() * 2.5, speed: 2.2 });
     }
 
-    // ==============================================================
-    // 2. ВОРОНКА ПОЗДРАВЛЕНИЙ TLANEX
-    // ==============================================================
+    // 2. Спираль слов
     function createBdayWordTex(text) {
       const c = document.createElement('canvas');
       c.width = 380; c.height = 84;
@@ -410,50 +420,36 @@
       return new THREE.CanvasTexture(c);
     }
 
-    const bdayPhrases = [
-      "З Днем Народження! ✨",
-      "Happy Birthday 🎂",
-      "Ти найкраща 💖",
-      "Сяй яскраво 🌟",
-      "Будь щасливою 🎉",
-      "З Днем Народження! 🌸",
-      "Зі Святом! 🥳"
-    ];
+    const bdayPhrases = ["З Днем Народження! ✨", "Happy Birthday 🎂", "Ти найкраща 💖", "Сяй яскраво 🌟", "Будь щасливою 🎉", "Зі Святом! 🥳"];
     const spiralGroup = new THREE.Group();
     scene.add(spiralGroup);
     const spiralWords = [];
-
     const spiralCount = isMobile ? 110 : 150;
+
     for (let i = 0; i < spiralCount; i++) {
       const tex = createBdayWordTex(bdayPhrases[i % bdayPhrases.length]);
       const mat = new THREE.SpriteMaterial({ map: tex, transparent: true, opacity: 0.98, blending: THREE.AdditiveBlending });
       const sprite = new THREE.Sprite(mat);
-
       const t = i / spiralCount;
       const angle = t * Math.PI * 14; 
       const radius = 1.2 + Math.pow(t, 1.1) * 24.0;
-
       sprite.position.x = Math.cos(angle) * radius;
       sprite.position.y = Math.sin(angle) * radius;
       sprite.position.z = 0;
-
       const scale = (isMobile ? 1.6 : 1.9) + t * 4.2;
       sprite.scale.set(scale, scale * 0.24, 1);
       sprite.userData = { baseX: sprite.position.x, baseY: sprite.position.y };
-
       spiralWords.push(sprite);
       spiralGroup.add(sprite);
     }
 
-    // ==============================================================
-    // 3. МИР СЕРДЦА, ГАЛАКТИКИ И ЗВЕЗДНОГО ОЗЕРА
-    // ==============================================================
+    // 3. Мир сердца и галактики
     const galaxyWorld = new THREE.Group();
     galaxyWorld.position.set(0, 0, 0);
     galaxyWorld.scale.set(0.001, 0.001, 0.001);
     scene.add(galaxyWorld);
 
-    // Спиральный диск галактики
+    // Спиральный диск
     const galaxyCount = isMobile ? 26000 : 38000;
     const galaxyGeo = new THREE.BufferGeometry();
     const positions = new Float32Array(galaxyCount * 3);
@@ -466,33 +462,23 @@
       const radius = 1.5 + Math.pow(Math.random(), 1.3) * 35;
       const spin = radius * 1.7;
       const branchAngle = ((i % 3) * 2 * Math.PI) / 3;
-
       const rx = Math.pow(Math.random(), 3) * (Math.random() < 0.5 ? 1 : -1) * 0.28 * radius;
       const ry = Math.pow(Math.random(), 3) * (Math.random() < 0.5 ? 1 : -1) * 0.1 * radius;
       const rz = Math.pow(Math.random(), 3) * (Math.random() < 0.5 ? 1 : -1) * 0.28 * radius;
-
       positions[i3] = Math.cos(branchAngle + spin) * radius + rx;
       positions[i3 + 1] = ry - 4.5;
       positions[i3 + 2] = Math.sin(branchAngle + spin) * radius + rz;
-
-      const normR = radius / 36.5;
-      const mixed = colorInside.clone().lerp(colorOutside, normR);
+      const mixed = colorInside.clone().lerp(colorOutside, radius / 36.5);
       colors[i3] = mixed.r; colors[i3 + 1] = mixed.g; colors[i3 + 2] = mixed.b;
     }
     galaxyGeo.setAttribute('position', new THREE.BufferAttribute(positions, 3));
     galaxyGeo.setAttribute('color', new THREE.BufferAttribute(colors, 3));
-
     const galaxy = new THREE.Points(galaxyGeo, new THREE.PointsMaterial({
-      size: 0.45,
-      map: glowDotTex,
-      vertexColors: true,
-      blending: THREE.AdditiveBlending,
-      depthWrite: false,
-      transparent: true
+      size: 0.45, map: glowDotTex, vertexColors: true, blending: THREE.AdditiveBlending, depthWrite: false, transparent: true
     }));
     galaxyWorld.add(galaxy);
 
-    // Светящееся звездное озеро снизу под фото
+    // Звездное озеро
     const nebulaLakeCount = isMobile ? 5500 : 8500;
     const nebulaLakeGeo = new THREE.BufferGeometry();
     const nebulaLakePos = new Float32Array(nebulaLakeCount * 3);
@@ -505,49 +491,30 @@
       const i3 = i * 3;
       const rad = 1.8 + Math.pow(Math.random(), 0.72) * 28.0;
       const ang = Math.random() * Math.PI * 2;
-      const depthY = -7.5 + Math.pow(rad / 28.0, 2) * 3.2 + (Math.random() - 0.5) * 1.5;
-
       nebulaLakePos[i3] = Math.cos(ang) * rad;
-      nebulaLakePos[i3 + 1] = depthY;
+      nebulaLakePos[i3 + 1] = -7.5 + Math.pow(rad / 28.0, 2) * 3.2;
       nebulaLakePos[i3 + 2] = Math.sin(ang) * rad;
-
-      let c = colLakeCore.clone();
-      const norm = rad / 28.0;
-      if (norm < 0.5) {
-        c.lerp(colLakeMid, norm / 0.5);
-      } else {
-        c.lerpColors(colLakeMid, colLakeEdge, (norm - 0.5) / 0.5);
-      }
-
-      nebulaLakeCols[i3] = c.r;
-      nebulaLakeCols[i3 + 1] = c.g;
-      nebulaLakeCols[i3 + 2] = c.b;
+      let c = colLakeCore.clone().lerp(rad / 28.0 < 0.5 ? colLakeMid : colLakeEdge, rad / 28.0);
+      nebulaLakeCols[i3] = c.r; nebulaLakeCols[i3 + 1] = c.g; nebulaLakeCols[i3 + 2] = c.b;
     }
     nebulaLakeGeo.setAttribute('position', new THREE.BufferAttribute(nebulaLakePos, 3));
     nebulaLakeGeo.setAttribute('color', new THREE.BufferAttribute(nebulaLakeCols, 3));
-
     const nebulaLake = new THREE.Points(nebulaLakeGeo, new THREE.PointsMaterial({
-      size: isMobile ? 0.85 : 1.05,
-      map: glowDotTex,
-      vertexColors: true,
-      transparent: true,
-      opacity: 0.7,
-      blending: THREE.AdditiveBlending,
-      depthWrite: false
+      size: isMobile ? 0.85 : 1.05, map: glowDotTex, vertexColors: true, transparent: true, opacity: 0.7, blending: THREE.AdditiveBlending, depthWrite: false
     }));
     galaxyWorld.add(nebulaLake);
 
-    // 4. Плотное сияющее сердце дружбы
+    // 4. Сердце
     const heartCenterGroup = new THREE.Group();
     galaxyWorld.add(heartCenterGroup);
-
     const heartLight = new THREE.PointLight(0xff2a6d, 4.2, 60);
     heartLight.position.set(0, 6.5, 0);
     heartCenterGroup.add(heartLight);
 
-    const coreGeo = new THREE.SphereGeometry(3.6, 24, 24);
-    const coreMat = new THREE.MeshBasicMaterial({ color: 0xff1450, transparent: true, opacity: 0.45, blending: THREE.AdditiveBlending });
-    const innerCore = new THREE.Mesh(coreGeo, coreMat);
+    const innerCore = new THREE.Mesh(
+      new THREE.SphereGeometry(3.6, 24, 24),
+      new THREE.MeshBasicMaterial({ color: 0xff1450, transparent: true, opacity: 0.45, blending: THREE.AdditiveBlending })
+    );
     innerCore.position.set(0, 6.5, 0);
     heartCenterGroup.add(innerCore);
 
@@ -565,253 +532,115 @@
       const xBase = 16 * Math.pow(Math.sin(t), 3);
       const yBase = 13 * Math.cos(t) - 5 * Math.cos(2 * t) - 2 * Math.cos(3 * t) - Math.cos(4 * t);
       const fill = Math.pow(Math.random(), 0.55);
-      const zDepth = (Math.random() - 0.5) * 9.0 * fill;
-
       const scale = 0.70 * fill;
       heartPos[i3] = xBase * scale;
       heartPos[i3 + 1] = yBase * scale + 6.5;
-      heartPos[i3 + 2] = zDepth;
-
+      heartPos[i3 + 2] = (Math.random() - 0.5) * 9.0 * fill;
       let c = colEdge.clone();
       if (fill < 0.45) c.lerp(colCore, 1 - fill / 0.45);
       else c.lerp(colInside, 0.5);
-
       heartColors[i3] = c.r; heartColors[i3 + 1] = c.g; heartColors[i3 + 2] = c.b;
     }
     heartGeo.setAttribute('position', new THREE.BufferAttribute(heartPos, 3));
     heartGeo.setAttribute('color', new THREE.BufferAttribute(heartColors, 3));
-
     const heart = new THREE.Points(heartGeo, new THREE.PointsMaterial({
-      size: isMobile ? 0.5 : 0.55,
-      map: glowDotTex,
-      vertexColors: true,
-      blending: THREE.AdditiveBlending,
-      transparent: true,
-      opacity: 0.95,
-      depthWrite: false
+      size: isMobile ? 0.5 : 0.55, map: glowDotTex, vertexColors: true, blending: THREE.AdditiveBlending, transparent: true, opacity: 0.95, depthWrite: false
     }));
     heartCenterGroup.add(heart);
 
-    // Парящие праздничные искры
-    const embersCount = isMobile ? 320 : 500;
-    const embersGeo = new THREE.BufferGeometry();
-    const embersPos = new Float32Array(embersCount * 3);
-    const embersVelocity = [];
-    for (let i = 0; i < embersCount; i++) {
-      embersPos[i * 3] = (Math.random() - 0.5) * 16;
-      embersPos[i * 3 + 1] = 4 + Math.random() * 12;
-      embersPos[i * 3 + 2] = (Math.random() - 0.5) * 12;
-      embersVelocity.push({ y: 0.03 + Math.random() * 0.04, x: (Math.random() - 0.5) * 0.015, z: (Math.random() - 0.5) * 0.015 });
-    }
-    embersGeo.setAttribute('position', new THREE.BufferAttribute(embersPos, 3));
-    const embers = new THREE.Points(embersGeo, new THREE.PointsMaterial({
-      color: 0xff70a0,
-      size: 0.7,
-      map: glowDotTex,
-      blending: THREE.AdditiveBlending,
-      transparent: true,
-      opacity: 0.85,
-      depthWrite: false
-    }));
-    heartCenterGroup.add(embers);
-
-    // ==============================================================
-    // 5. ОБЪЁМНАЯ НЕОНОВАЯ ГИРЛЯНДА
-    // ==============================================================
+    // 5. Гирлянда
     const garlandGroup = new THREE.Group();
     galaxyWorld.add(garlandGroup);
-
     const ropeRadius = isMobile ? 16.5 : 18.5;
     const numPhotos = memories.length;
 
     class GarlandCurve extends THREE.Curve {
-      constructor(radius, count) {
-        super();
-        this.radius = radius;
-        this.count = count;
-      }
+      constructor(radius, count) { super(); this.radius = radius; this.count = count; }
       getPoint(t, optionalTarget = new THREE.Vector3()) {
         const theta = t * Math.PI * 2;
         const sag = Math.cos(theta * this.count) * 0.45;
-        const x = Math.cos(theta) * this.radius;
-        const z = Math.sin(theta) * this.radius;
-        const y = -1.6 + sag;
-        return optionalTarget.set(x, y, z);
+        return optionalTarget.set(Math.cos(theta) * this.radius, -1.6 + sag, Math.sin(theta) * this.radius);
       }
     }
-
     const garlandPath = new GarlandCurve(ropeRadius, numPhotos);
 
-    const tubeGeo = new THREE.TubeGeometry(garlandPath, 180, 0.08, 8, true);
-    const tubeMat = new THREE.MeshBasicMaterial({ color: 0xffe6a3, transparent: true, opacity: 0.95 });
-    const garlandTube = new THREE.Mesh(tubeGeo, tubeMat);
+    const garlandTube = new THREE.Mesh(
+      new THREE.TubeGeometry(garlandPath, 180, 0.08, 8, true),
+      new THREE.MeshBasicMaterial({ color: 0xffe6a3, transparent: true, opacity: 0.95 })
+    );
     garlandGroup.add(garlandTube);
 
-    const tubeGlowGeo = new THREE.TubeGeometry(garlandPath, 180, 0.24, 8, true);
-    const tubeGlowMat = new THREE.MeshBasicMaterial({
-      color: 0xff3377,
-      transparent: true,
-      opacity: 0.35,
-      blending: THREE.AdditiveBlending,
-      side: THREE.BackSide
-    });
-    const garlandGlow = new THREE.Mesh(tubeGlowGeo, tubeGlowMat);
+    const garlandGlow = new THREE.Mesh(
+      new THREE.TubeGeometry(garlandPath, 180, 0.24, 8, true),
+      new THREE.MeshBasicMaterial({ color: 0xff3377, transparent: true, opacity: 0.35, blending: THREE.AdditiveBlending, side: THREE.BackSide })
+    );
     garlandGroup.add(garlandGlow);
 
-    const bulbCount = 72;
-    const bulbGeo = new THREE.BufferGeometry();
-    const bulbPos = new Float32Array(bulbCount * 3);
-    for (let i = 0; i < bulbCount; i++) {
-      const pt = garlandPath.getPoint(i / bulbCount);
-      bulbPos[i * 3] = pt.x;
-      bulbPos[i * 3 + 1] = pt.y;
-      bulbPos[i * 3 + 2] = pt.z;
-    }
-    bulbGeo.setAttribute('position', new THREE.BufferAttribute(bulbPos, 3));
-    const garlandBulbs = new THREE.Points(bulbGeo, new THREE.PointsMaterial({
-      color: 0xffdf80,
-      size: 0.95,
-      map: glowDotTex,
-      transparent: true,
-      opacity: 0.95,
-      blending: THREE.AdditiveBlending,
-      depthWrite: false
-    }));
-    garlandGroup.add(garlandBulbs);
-
-    // ==============================================================
-    // 6. ПОЛАРОИДЫ ПОД НИТЬЮ
-    // ==============================================================
+    // 6. Полароиды
     function createPolaroidTexture(imgUrl, callback) {
       const img = new Image();
       img.src = imgUrl;
       img.onload = () => {
         const c = document.createElement('canvas');
-        c.width = 340;
-        c.height = 450;
+        c.width = 340; c.height = 450;
         const ctx = c.getContext('2d');
-
-        ctx.shadowColor = 'rgba(255, 42, 95, 0.4)';
-        ctx.shadowBlur = 28;
-
+        ctx.shadowColor = 'rgba(255, 42, 95, 0.4)'; ctx.shadowBlur = 28;
         ctx.fillStyle = '#ffffff';
-        ctx.beginPath();
-        ctx.roundRect(18, 42, 304, 396, [12]);
-        ctx.fill();
-
+        ctx.beginPath(); ctx.roundRect(18, 42, 304, 396, [12]); ctx.fill();
         ctx.shadowBlur = 0;
-
         ctx.fillStyle = '#ffd166';
-        ctx.shadowColor = 'rgba(255, 209, 102, 0.8)';
-        ctx.shadowBlur = 12;
-        ctx.beginPath();
-        ctx.roundRect(154, 10, 32, 56, [4]);
-        ctx.fill();
-
-        ctx.fillStyle = '#fff4cc';
-        ctx.fillRect(158, 14, 6, 48);
-
-        ctx.fillStyle = '#ffffff';
-        ctx.shadowBlur = 0;
-        ctx.fillRect(152, 32, 36, 7);
-
-        const photoX = 34;
-        const photoY = 72;
-        const photoW = 272;
-        const photoH = 272;
+        ctx.beginPath(); ctx.roundRect(154, 10, 32, 56, [4]); ctx.fill();
+        ctx.fillStyle = '#ffffff'; ctx.fillRect(152, 32, 36, 7);
 
         ctx.save();
-        ctx.beginPath();
-        ctx.rect(photoX, photoY, photoW, photoH);
-        ctx.clip();
-
+        ctx.beginPath(); ctx.rect(34, 72, 272, 272); ctx.clip();
         const imgAspect = img.width / img.height;
-        let sWidth, sHeight, sx, sy;
-
-        if (imgAspect > 1) {
-          sHeight = img.height;
-          sWidth = img.height;
-          sx = (img.width - sWidth) / 2;
-          sy = 0;
-        } else {
-          sWidth = img.width;
-          sHeight = img.width;
-          sx = 0;
-          sy = (img.height - sHeight) / 2;
-        }
-
-        ctx.drawImage(img, sx, sy, sWidth, sHeight, photoX, photoY, photoW, photoH);
+        let sWidth = imgAspect > 1 ? img.height : img.width;
+        let sHeight = imgAspect > 1 ? img.height : img.width;
+        let sx = imgAspect > 1 ? (img.width - sWidth) / 2 : 0;
+        let sy = imgAspect > 1 ? 0 : (img.height - sHeight) / 2;
+        ctx.drawImage(img, sx, sy, sWidth, sHeight, 34, 72, 272, 272);
         ctx.restore();
 
         ctx.font = '600 21px -apple-system, sans-serif';
         ctx.fillStyle = '#ff2a5f';
         ctx.textAlign = 'center';
         ctx.fillText('Happy Birthday! ✨', 170, 398);
-
         callback(new THREE.CanvasTexture(c));
       };
-
       img.onerror = () => {
         const c = document.createElement('canvas');
-        c.width = 340;
-        c.height = 450;
+        c.width = 340; c.height = 450;
         const ctx = c.getContext('2d');
-        ctx.fillStyle = '#ffffff';
-        ctx.roundRect(18, 42, 304, 396, [12]);
-        ctx.fill();
-        ctx.fillStyle = '#ff2a5f';
-        ctx.font = '80px sans-serif';
-        ctx.textAlign = 'center';
+        ctx.fillStyle = '#ffffff'; ctx.roundRect(18, 42, 304, 396, [12]); ctx.fill();
+        ctx.fillStyle = '#ff2a5f'; ctx.font = '80px sans-serif'; ctx.textAlign = 'center';
         ctx.fillText('📸', 170, 240);
         callback(new THREE.CanvasTexture(c));
       };
     }
 
     const polaroidSprites = [];
-
     memories.forEach((mem, index) => {
       createPolaroidTexture(mem.image, (texture) => {
-        const sprite = new THREE.Sprite(new THREE.SpriteMaterial({
-          map: texture,
-          transparent: true,
-          depthTest: true,
-          depthWrite: false
-        }));
-
+        const sprite = new THREE.Sprite(new THREE.SpriteMaterial({ map: texture, transparent: true, depthWrite: false }));
         const scaleW = isMobile ? 4.6 : 4.4;
-        const scaleH = scaleW * (450 / 340);
-        sprite.scale.set(scaleW, scaleH, 1);
-
+        sprite.scale.set(scaleW, scaleW * (450 / 340), 1);
         sprite.center.set(0.5, 0.94);
-
         const tVal = index / memories.length;
         const pt = garlandPath.getPoint(tVal);
-
         sprite.position.set(pt.x, pt.y, pt.z);
-
-        sprite.userData = {
-          index: index,
-          tVal: tVal,
-          scaleW: scaleW,
-          scaleH: scaleH,
-          swingSpeed: 1.4 + index * 0.2,
-          swingOffset: index * 1.3
-        };
-
+        sprite.userData = { index: index, tVal: tVal, scaleW: scaleW, scaleH: scaleW * (450 / 340), swingSpeed: 1.4 + index * 0.2, swingOffset: index * 1.3 };
         polaroidSprites.push(sprite);
         garlandGroup.add(sprite);
       });
     });
 
-    // Клики и тапы
+    // Клики по полароидам
     const raycaster = new THREE.Raycaster();
     const mouse = new THREE.Vector2();
     let pStartX = 0, pStartY = 0;
 
-    window.addEventListener('pointerdown', (e) => {
-      pStartX = e.clientX; pStartY = e.clientY;
-    }, { passive: true });
-
+    window.addEventListener('pointerdown', (e) => { pStartX = e.clientX; pStartY = e.clientY; }, { passive: true });
     window.addEventListener('pointerup', (e) => {
       if (!flightActive && flightProgress === 0) {
         startHyperspaceFlight();
@@ -822,7 +651,6 @@
 
       mouse.x = (e.clientX / window.innerWidth) * 2 - 1;
       mouse.y = -(e.clientY / window.innerHeight) * 2 + 1;
-
       raycaster.setFromCamera(mouse, camera);
       const hits = raycaster.intersectObjects(polaroidSprites);
       if (hits.length > 0) showMemory(hits[0].object.userData.index);
@@ -830,8 +658,6 @@
 
     function showMemory(index) {
       currentMemoryIndex = index;
-
-      // Сбрасываем старый таймер, если он был
       if (autoVideoTimer) {
         clearTimeout(autoVideoTimer);
         autoVideoTimer = null;
@@ -841,14 +667,17 @@
       cardImg.src = data.image;
       cardTitle.textContent = data.title;
       cardDesc.textContent = data.desc;
-      nextBtn.textContent = 'ДАЛІ 💌';
 
-      // Если открыто 6-е (последнее) фото — запускаем таймер на 5 секунд
+      // Если это последнее фото в массиве
       if (index === memories.length - 1) {
+        surpriseBar.style.display = 'block';
+        // Автозапуск видео через 5 секунд
         autoVideoTimer = setTimeout(() => {
           cardContainer.classList.remove('active');
           launchCelebrationVideo();
         }, 5000);
+      } else {
+        surpriseBar.style.display = 'none';
       }
 
       cardContainer.classList.add('active');
@@ -856,69 +685,64 @@
 
     nextBtn.addEventListener('click', (e) => {
       e.stopPropagation();
+      if (autoVideoTimer) clearTimeout(autoVideoTimer);
 
-      if (autoVideoTimer) {
-        clearTimeout(autoVideoTimer);
-        autoVideoTimer = null;
+      // Если нажали "Далі" на последнем фото — можно сразу запустить видео
+      if (currentMemoryIndex === memories.length - 1) {
+        cardContainer.classList.remove('active');
+        launchCelebrationVideo();
+        return;
       }
 
-      // Перелистываем по кругу
       currentMemoryIndex = (currentMemoryIndex + 1) % memories.length;
       showMemory(currentMemoryIndex);
     });
 
     closeBtn.addEventListener('click', (e) => {
       e.stopPropagation();
-      if (autoVideoTimer) {
-        clearTimeout(autoVideoTimer);
-        autoVideoTimer = null;
-      }
+      if (autoVideoTimer) clearTimeout(autoVideoTimer);
       cardContainer.classList.remove('active');
     });
 
-    cardContainer.addEventListener('click', (e) => {
-      if (e.target === cardContainer) {
-        if (autoVideoTimer) {
-          clearTimeout(autoVideoTimer);
-          autoVideoTimer = null;
-        }
-        cardContainer.classList.remove('active');
-      }
-    });
-
-    // ==============================================================
-    // 7. ЗАПУСК ВИДЕО И АВТОМАТИЧЕСКИЙ ПЕРЕЗАПУСК САЙТА
-    // ==============================================================
+    // 7. НАДЕЖНЫЙ ЗАПУСК ВИДЕО
     function launchCelebrationVideo() {
-      // Приглушаем фоновую музыку
+      // Плавно убавляем фоновую музыку
       if (bgMusic && !bgMusic.paused) {
-        let fadeAudio = setInterval(() => {
-          if (bgMusic.volume > 0.1) {
-            bgMusic.volume -= 0.1;
-          } else {
-            clearInterval(fadeAudio);
-            bgMusic.pause();
-          }
-        }, 80);
+        let vInterval = setInterval(() => {
+          if (bgMusic.volume > 0.1) bgMusic.volume -= 0.15;
+          else { clearInterval(vInterval); bgMusic.pause(); }
+        }, 60);
       }
 
-      // Разворачиваем видеоплеер
       videoOverlay.classList.add('active');
       bdayVideo.currentTime = 0;
-      bdayVideo.play().catch(e => {
-        console.log("Video play request:", e);
-      });
+
+      // Попытка прямого воспроизведения со звуком
+      const playPromise = bdayVideo.play();
+      if (playPromise !== undefined) {
+        playPromise.catch(error => {
+          console.warn("Autoplay blocked by browser policy. Starting muted with unmute button:", error);
+          // Если браузер заблокировал звук без жеста пользователя — включаем muted и показываем кнопку звука
+          bdayVideo.muted = true;
+          bdayVideo.play();
+          unmuteBtn.style.display = 'block';
+        });
+      }
     }
 
-    // Событие: конец видео -> затемнение -> авторелоад страницы
-    bdayVideo.addEventListener('ended', () => {
-      fadeScreen.classList.add('visible');
-      setTimeout(() => {
-        window.location.reload();
-      }, 1600);
+    unmuteBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      bdayVideo.muted = false;
+      unmuteBtn.style.display = 'none';
     });
 
-    // 8. Бесшовный пролет в центр
+    // Конец видео -> релоад
+    bdayVideo.addEventListener('ended', () => {
+      fadeScreen.classList.add('visible');
+      setTimeout(() => { window.location.reload(); }, 1600);
+    });
+
+    // 8. Пролет в центр
     let flightActive = false;
     let flightProgress = 0;
     const startCamPos = new THREE.Vector3(0, 0, isMobile ? 42 : 36);
@@ -929,7 +753,9 @@
       startHint.style.opacity = '0';
       setTimeout(() => startHint.remove(), 400);
 
-      if (bgMusic) bgMusic.play().catch(e => console.log(e));
+      // Предзагрузка медиа при первом клике пользователя
+      if (bgMusic) bgMusic.play().catch(() => {});
+      if (bdayVideo) bdayVideo.load();
     }
 
     const clock = new THREE.Clock();
@@ -938,42 +764,27 @@
       requestAnimationFrame(animate);
       const t = clock.getElapsedTime();
 
-      // Кометы
       meteors.forEach(m => {
         if (!m.active) {
           m.timer -= 0.016;
           if (m.timer <= 0) {
             m.active = true;
-            m.mesh.position.set(
-              (Math.random() - 0.5) * 90 + 20,
-              25 + Math.random() * 20,
-              -30 + (Math.random() - 0.5) * 40
-            );
+            m.mesh.position.set((Math.random() - 0.5) * 90 + 20, 25 + Math.random() * 20, -30 + (Math.random() - 0.5) * 40);
             m.mesh.material.opacity = 0.85;
           }
         } else {
-          m.mesh.position.x -= m.speed;
-          m.mesh.position.y -= m.speed * 0.5;
-          m.mesh.position.z -= m.speed * 0.6;
+          m.mesh.position.x -= m.speed; m.mesh.position.y -= m.speed * 0.5; m.mesh.position.z -= m.speed * 0.6;
           m.mesh.material.opacity -= 0.012;
-          if (m.mesh.material.opacity <= 0) {
-            m.active = false;
-            m.timer = 1.2 + Math.random() * 3.5;
-          }
+          if (m.mesh.material.opacity <= 0) { m.active = false; m.timer = 1.2 + Math.random() * 3.5; }
         }
       });
 
-      // Спираль слов до старта
-      if (!flightActive && flightProgress === 0) {
-        spiralGroup.rotation.z = -t * 0.16;
-      }
+      if (!flightActive && flightProgress === 0) spiralGroup.rotation.z = -t * 0.16;
 
-      // Полет сквозь спираль
       if (flightActive) {
         flightProgress += 0.012;
         const p = Math.min(flightProgress, 1);
         const ease = p * p * (3 - 2 * p);
-
         camera.position.x = (1 - ease) * startCamPos.x + ease * endCamPos.x;
         camera.position.y = Math.sin(ease * Math.PI * 0.5) * endCamPos.y;
         camera.position.z = THREE.MathUtils.lerp(startCamPos.z, endCamPos.z, ease);
@@ -987,24 +798,14 @@
         });
 
         galaxyWorld.scale.set(ease, ease, ease);
-        galaxy.rotation.y += (1 - p) * 0.08;
-
-        if (p >= 1) {
-          flightActive = false;
-          scene.remove(spiralGroup);
-          controls.enabled = true;
-        }
+        if (p >= 1) { flightActive = false; scene.remove(spiralGroup); controls.enabled = true; }
       }
 
-      // Жизнь мира после прилета
       if (flightProgress >= 1) {
         galaxy.rotation.y += 0.002;
         nebulaLake.rotation.y = -t * 0.014;
-
-        // Вращение гирлянды
         garlandGroup.rotation.y = t * 0.06;
 
-        // Покачивание полароидов
         polaroidSprites.forEach((b) => {
           const d = b.userData;
           const swayY = Math.sin(t * d.swingSpeed + d.swingOffset) * 0.12;
@@ -1017,29 +818,10 @@
           b.scale.set(d.scaleW * (1 + proximity), d.scaleH * (1 + proximity), 1);
         });
 
-        // Мерцание лампочек
-        garlandBulbs.material.opacity = 0.8 + Math.sin(t * 4.2) * 0.2;
-
-        // Пульсация сердца
         const beat = 1 + Math.sin(t * 3.4) * 0.07;
         heart.scale.set(beat, beat, beat);
         innerCore.scale.set(beat * 1.1, beat * 1.1, beat * 1.1);
         heartLight.intensity = 2.8 + Math.sin(t * 3.4) * 1.5;
-
-        // Искры
-        const posAttr = embersGeo.attributes.position;
-        for (let i = 0; i < embersCount; i++) {
-          posAttr.array[i * 3 + 1] += embersVelocity[i].y;
-          posAttr.array[i * 3] += embersVelocity[i].x;
-          posAttr.array[i * 3 + 2] += embersVelocity[i].z;
-          if (posAttr.array[i * 3 + 1] > 18) {
-            posAttr.array[i * 3 + 1] = 3.5;
-            posAttr.array[i * 3] = (Math.random() - 0.5) * 10;
-            posAttr.array[i * 3 + 2] = (Math.random() - 0.5) * 8;
-          }
-        }
-        embersGeo.needsUpdate = true;
-
         controls.update();
       }
 

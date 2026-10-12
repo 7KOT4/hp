@@ -2,7 +2,7 @@
 <html lang="uk">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <title>З Днем Народження! 🎂✨</title>
   <style>
     * {
@@ -10,7 +10,9 @@
       padding: 0;
       box-sizing: border-box;
       user-select: none;
+      -webkit-user-select: none;
       -webkit-tap-highlight-color: transparent;
+      touch-action: none;
     }
 
     body {
@@ -18,6 +20,8 @@
       overflow: hidden;
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
       color: #fff;
+      width: 100vw;
+      height: 100vh;
     }
 
     #webgl-canvas {
@@ -27,33 +31,29 @@
       width: 100vw;
       height: 100vh;
       z-index: 1;
-      cursor: grab;
     }
 
-    #webgl-canvas:active {
-      cursor: grabbing;
-    }
-
-    /* Подсказка старта в стиле tlanex */
+    /* Подсказка старта tlanex */
     #start-hint {
       position: fixed;
-      bottom: 35px;
+      bottom: calc(30px + env(safe-area-inset-bottom));
       left: 50%;
       transform: translateX(-50%);
       z-index: 30;
-      font-size: 0.82rem;
-      letter-spacing: 2.2px;
+      font-size: 0.78rem;
+      letter-spacing: 2px;
       text-transform: uppercase;
       font-weight: 600;
       color: rgba(255, 185, 215, 0.95);
-      background: rgba(24, 3, 14, 0.6);
+      background: rgba(24, 3, 14, 0.65);
       backdrop-filter: blur(12px);
       -webkit-backdrop-filter: blur(12px);
-      padding: 12px 28px;
+      padding: 12px 24px;
       border-radius: 30px;
       border: 1px solid rgba(255, 77, 109, 0.45);
       box-shadow: 0 0 30px rgba(255, 42, 95, 0.4);
       pointer-events: none;
+      white-space: nowrap;
       animation: pulseHint 2.4s infinite ease-in-out;
       transition: opacity 0.5s ease;
     }
@@ -63,7 +63,7 @@
       50% { opacity: 1; transform: translateX(-50%) scale(1.02); }
     }
 
-    /* Карточка с поздравлениями и фото */
+    /* Карточка с поздравлениями */
     #photo-card-container {
       position: fixed;
       top: 0;
@@ -73,11 +73,11 @@
       display: flex;
       justify-content: center;
       align-items: center;
-      z-index: 40;
+      z-index: 50;
       pointer-events: none;
       opacity: 0;
-      transition: opacity 0.4s ease;
-      background: radial-gradient(circle at center, rgba(35, 3, 18, 0.7) 0%, rgba(0, 0, 0, 0.9) 100%);
+      transition: opacity 0.35s ease;
+      background: radial-gradient(circle at center, rgba(35, 3, 18, 0.75) 0%, rgba(0, 0, 0, 0.92) 100%);
       backdrop-filter: blur(10px);
       -webkit-backdrop-filter: blur(10px);
     }
@@ -88,16 +88,16 @@
     }
 
     .memory-card {
-      background: rgba(20, 2, 10, 0.95);
+      background: rgba(20, 2, 10, 0.96);
       border: 1px solid rgba(255, 64, 129, 0.5);
       box-shadow: 0 0 50px rgba(255, 30, 90, 0.45);
       border-radius: 26px;
-      padding: 22px 20px;
+      padding: 20px 18px;
       max-width: 320px;
       width: 86%;
       text-align: center;
-      transform: scale(0.7) translateY(40px);
-      transition: transform 0.45s cubic-bezier(0.16, 1, 0.3, 1);
+      transform: scale(0.7) translateY(35px);
+      transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
     }
 
     #photo-card-container.active .memory-card {
@@ -106,42 +106,42 @@
 
     .memory-card img {
       width: 100%;
-      height: 205px;
+      height: 190px;
       object-fit: cover;
       border-radius: 18px;
       border: 1px solid rgba(255, 255, 255, 0.18);
-      margin-bottom: 14px;
+      margin-bottom: 12px;
       box-shadow: 0 6px 20px rgba(0, 0, 0, 0.6);
     }
 
     .memory-card h2 {
-      font-size: 1.25rem;
+      font-size: 1.18rem;
       font-weight: 700;
-      margin-bottom: 8px;
+      margin-bottom: 6px;
       color: #ff4d6d;
       text-shadow: 0 0 12px rgba(255, 77, 109, 0.6);
     }
 
     .memory-card p {
-      font-size: 0.92rem;
+      font-size: 0.88rem;
       color: #eedde5;
-      line-height: 1.45;
-      margin-bottom: 18px;
+      line-height: 1.4;
+      margin-bottom: 16px;
       padding: 0 4px;
     }
 
     .card-actions {
       display: flex;
       justify-content: center;
-      gap: 12px;
+      gap: 10px;
     }
 
     .btn-action {
       background: rgba(255, 255, 255, 0.08);
       border: 1px solid rgba(255, 77, 109, 0.35);
       color: #fff;
-      font-size: 0.88rem;
-      padding: 9px 20px;
+      font-size: 0.85rem;
+      padding: 9px 18px;
       border-radius: 20px;
       cursor: pointer;
       transition: 0.2s all;
@@ -150,11 +150,11 @@
     .btn-action.next {
       background: linear-gradient(135deg, #ff2a5f, #ff758c);
       border: none;
-      box-shadow: 0 0 18px rgba(255, 42, 95, 0.6);
+      box-shadow: 0 0 16px rgba(255, 42, 95, 0.6);
     }
 
-    .btn-action:hover {
-      transform: scale(1.05);
+    .btn-action:active {
+      transform: scale(0.95);
     }
   </style>
 
@@ -163,12 +163,10 @@
 </head>
 <body>
 
-  <!-- Праздничный трек -->
   <audio id="bg-music" src="music.mp3" loop preload="auto"></audio>
 
   <div id="start-hint">ТОРКНІТЬСЯ ЕКРАНА, ЩОБ ВІДКРИТИ ПРИВІТАННЯ ✨</div>
 
-  <!-- Окно воспоминаний / поздравлений -->
   <div id="photo-card-container">
     <div class="memory-card">
       <img id="card-img" src="" alt="Спогад">
@@ -184,9 +182,6 @@
   <canvas id="webgl-canvas"></canvas>
 
   <script>
-    // ==========================================
-    // ПОЗДРАВЛЕНИЯ И ВАШИ ФОТО
-    // ==========================================
     const memories = [
       {
         title: "З Днем Народження! 🎂✨",
@@ -223,7 +218,7 @@
     const nextBtn = document.getElementById('next-btn');
     const closeBtn = document.getElementById('close-btn');
 
-    // Мягкая сияющая неоновая частица
+    // Текстура мягкой точки
     function createGlowDotTexture() {
       const c = document.createElement('canvas');
       c.width = 64; c.height = 64;
@@ -239,29 +234,36 @@
     }
     const glowDotTex = createGlowDotTexture();
 
-    // 1. Сцена и камера
+    // 1. Сцена и камера с мобильной адаптацией
     const scene = new THREE.Scene();
     scene.fog = new THREE.FogExp2(0x020005, 0.007);
 
-    const camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 1000);
-    camera.position.set(0, 0, 36);
+    const isMobile = window.innerWidth < window.innerHeight;
+    const initialFov = isMobile ? 74 : 60;
 
-    const renderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: true, alpha: true, powerPreference: "high-performance" });
+    const camera = new THREE.PerspectiveCamera(initialFov, window.innerWidth / window.innerHeight, 0.1, 1000);
+    camera.position.set(0, 0, isMobile ? 42 : 36);
+
+    const renderer = new THREE.WebGLRenderer({
+      canvas: canvas,
+      antialias: window.devicePixelRatio < 2,
+      powerPreference: "high-performance"
+    });
     renderer.setSize(window.innerWidth, window.innerHeight);
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 
     const controls = new THREE.OrbitControls(camera, renderer.domElement);
     controls.enableDamping = true;
-    controls.dampingFactor = 0.06;
-    controls.maxDistance = 110;
-    controls.minDistance = 12;
+    controls.dampingFactor = 0.07;
+    controls.maxDistance = 120;
+    controls.minDistance = 15;
     controls.target.set(0, 0, 0);
     controls.enabled = false;
 
-    // Звездный фон
+    // Фоновые мягкие звезды
     const bgStarsGeo = new THREE.BufferGeometry();
-    const bgPos = new Float32Array(3000 * 3);
-    for (let i = 0; i < 3000 * 3; i++) bgPos[i] = (Math.random() - 0.5) * 260;
+    const bgPos = new Float32Array(2200 * 3);
+    for (let i = 0; i < 2200 * 3; i++) bgPos[i] = (Math.random() - 0.5) * 260;
     bgStarsGeo.setAttribute('position', new THREE.BufferAttribute(bgPos, 3));
     const bgStars = new THREE.Points(bgStarsGeo, new THREE.PointsMaterial({
       color: 0xffb3c6,
@@ -274,9 +276,9 @@
     }));
     scene.add(bgStars);
 
-    // Падающие праздничные звезды
+    // Падающие кометы
     const meteors = [];
-    for (let i = 0; i < 4; i++) {
+    for (let i = 0; i < 3; i++) {
       const lineGeo = new THREE.BufferGeometry();
       lineGeo.setFromPoints([new THREE.Vector3(0, 0, 0), new THREE.Vector3(-8, -4, -5)]);
       const lineMat = new THREE.LineBasicMaterial({
@@ -297,7 +299,7 @@
     }
 
     // ==============================================================
-    // 2. ВОРОНКА ПОЗДРАВЛЕНИЙ (TLANEX STYLE)
+    // 2. ВОРОНКА ПОЗДРАВЛЕНИЙ (TLANEX)
     // ==============================================================
     function createBdayWordTex(text) {
       const c = document.createElement('canvas');
@@ -323,12 +325,13 @@
     scene.add(spiralGroup);
     const spiralWords = [];
 
-    for (let i = 0; i < 150; i++) {
+    const spiralCount = isMobile ? 110 : 150;
+    for (let i = 0; i < spiralCount; i++) {
       const tex = createBdayWordTex(bdayPhrases[i % bdayPhrases.length]);
       const mat = new THREE.SpriteMaterial({ map: tex, transparent: true, opacity: 0.98, blending: THREE.AdditiveBlending });
       const sprite = new THREE.Sprite(mat);
 
-      const t = i / 150;
+      const t = i / spiralCount;
       const angle = t * Math.PI * 14; 
       const radius = 1.2 + Math.pow(t, 1.1) * 24.0;
 
@@ -336,7 +339,7 @@
       sprite.position.y = Math.sin(angle) * radius;
       sprite.position.z = 0;
 
-      const scale = 1.9 + t * 4.6;
+      const scale = (isMobile ? 1.6 : 1.9) + t * 4.2;
       sprite.scale.set(scale, scale * 0.24, 1);
       sprite.userData = { baseX: sprite.position.x, baseY: sprite.position.y };
 
@@ -345,7 +348,7 @@
     }
 
     // ==============================================================
-    // 3. МИР СЕРДЦА И ПРАЗДНИЧНОЙ ГАЛАКТИКИ
+    // 3. МИР СЕРДЦА, ГАЛАКТИКИ И ЗВЕЗДНОЙ ВУАЛИ ВНИЗУ
     // ==============================================================
     const galaxyWorld = new THREE.Group();
     galaxyWorld.position.set(0, 0, 0);
@@ -353,7 +356,7 @@
     scene.add(galaxyWorld);
 
     // Спиральный диск галактики
-    const galaxyCount = 45000;
+    const galaxyCount = isMobile ? 26000 : 38000;
     const galaxyGeo = new THREE.BufferGeometry();
     const positions = new Float32Array(galaxyCount * 3);
     const colors = new Float32Array(galaxyCount * 3);
@@ -391,11 +394,52 @@
     }));
     galaxyWorld.add(galaxy);
 
+    // ==============================================================
+    // ЗАПОЛНЕНИЕ НИЗА: МАТОВАЯ ЧАША ТУМАННОСТИ И ЗВЕЗДНОЙ ВУАЛИ
+    // ==============================================================
+    const mistCount = isMobile ? 4000 : 6500;
+    const mistGeo = new THREE.BufferGeometry();
+    const mistPos = new Float32Array(mistCount * 3);
+    const mistCols = new Float32Array(mistCount * 3);
+    const colMistCore = new THREE.Color('#ff2a6d');
+    const colMistEdge = new THREE.Color('#4a0320');
+
+    for (let i = 0; i < mistCount; i++) {
+      const i3 = i * 3;
+      const rad = 2.5 + Math.pow(Math.random(), 0.75) * 26;
+      const ang = Math.random() * Math.PI * 2;
+      
+      // Чашеобразная вогнутая форма, поддерживающая снизу медальоны
+      const depthY = -5.8 + Math.pow(rad / 26, 2) * 2.5 + (Math.random() - 0.5) * 1.6;
+
+      mistPos[i3] = Math.cos(ang) * rad;
+      mistPos[i3 + 1] = depthY;
+      mistPos[i3 + 2] = Math.sin(ang) * rad;
+
+      const c = colMistCore.clone().lerp(colMistEdge, rad / 26);
+      mistCols[i3] = c.r;
+      mistCols[i3 + 1] = c.g;
+      mistCols[i3 + 2] = c.b;
+    }
+    mistGeo.setAttribute('position', new THREE.BufferAttribute(mistPos, 3));
+    mistGeo.setAttribute('color', new THREE.BufferAttribute(mistCols, 3));
+
+    const mistField = new THREE.Points(mistGeo, new THREE.PointsMaterial({
+      size: isMobile ? 0.8 : 0.95,
+      map: glowDotTex,
+      vertexColors: true,
+      transparent: true,
+      opacity: 0.65,
+      blending: THREE.AdditiveBlending,
+      depthWrite: false
+    }));
+    galaxyWorld.add(mistField);
+
     // Тонкие неоновые кольца
     function createCenterRing(r, tiltX, col) {
       const pts = [];
-      for (let i = 0; i <= 120; i++) {
-        const a = (i / 120) * Math.PI * 2;
+      for (let i = 0; i <= 100; i++) {
+        const a = (i / 100) * Math.PI * 2;
         pts.push(new THREE.Vector3(Math.cos(a) * r, 0, Math.sin(a) * r));
       }
       const ring = new THREE.Line(
@@ -411,7 +455,7 @@
     galaxyWorld.add(ring1);
     galaxyWorld.add(ring2);
 
-    // 4. Плотное сияющее сердце дружбы (18 000 частиц)
+    // 4. Плотное сияющее сердце дружбы
     const heartCenterGroup = new THREE.Group();
     galaxyWorld.add(heartCenterGroup);
 
@@ -419,13 +463,13 @@
     heartLight.position.set(0, 6.5, 0);
     heartCenterGroup.add(heartLight);
 
-    const coreGeo = new THREE.SphereGeometry(3.6, 32, 32);
+    const coreGeo = new THREE.SphereGeometry(3.6, 24, 24);
     const coreMat = new THREE.MeshBasicMaterial({ color: 0xff1450, transparent: true, opacity: 0.45, blending: THREE.AdditiveBlending });
     const innerCore = new THREE.Mesh(coreGeo, coreMat);
     innerCore.position.set(0, 6.5, 0);
     heartCenterGroup.add(innerCore);
 
-    const heartCount = 18000;
+    const heartCount = isMobile ? 12000 : 18000;
     const heartGeo = new THREE.BufferGeometry();
     const heartPos = new Float32Array(heartCount * 3);
     const heartColors = new Float32Array(heartCount * 3);
@@ -456,7 +500,7 @@
     heartGeo.setAttribute('color', new THREE.BufferAttribute(heartColors, 3));
 
     const heart = new THREE.Points(heartGeo, new THREE.PointsMaterial({
-      size: 0.55,
+      size: isMobile ? 0.5 : 0.55,
       map: glowDotTex,
       vertexColors: true,
       blending: THREE.AdditiveBlending,
@@ -466,8 +510,8 @@
     }));
     heartCenterGroup.add(heart);
 
-    // Парящие праздничные искры (фейерверк)
-    const embersCount = 550;
+    // Парящие праздничные искры
+    const embersCount = isMobile ? 320 : 500;
     const embersGeo = new THREE.BufferGeometry();
     const embersPos = new Float32Array(embersCount * 3);
     const embersVelocity = [];
@@ -510,7 +554,7 @@
       labelsGroup.add(s);
     });
 
-    // Фото-медальоны
+    // Фото-медальоны с увеличенной зоной тапа на мобильных
     function createMiniBadge(imgUrl, callback) {
       const img = new Image();
       img.crossOrigin = "anonymous";
@@ -535,9 +579,10 @@
     memories.forEach((mem, index) => {
       createMiniBadge(mem.image, (texture) => {
         const sprite = new THREE.Sprite(new THREE.SpriteMaterial({ map: texture, transparent: true }));
-        sprite.scale.set(2.8, 2.8, 1);
+        const badgeScale = isMobile ? 3.3 : 2.8;
+        sprite.scale.set(badgeScale, badgeScale, 1);
         const angle = (index / memories.length) * Math.PI * 2;
-        const radius = 16.5;
+        const radius = isMobile ? 15.0 : 16.5;
         sprite.position.set(Math.cos(angle) * radius, -2.5, Math.sin(angle) * radius);
         sprite.userData = { index: index, baseAngle: angle, radius: radius };
         miniBadges.push(sprite);
@@ -545,14 +590,14 @@
       });
     });
 
-    // Клики по фото
+    // Клики и тапы без ложных срабатываний
     const raycaster = new THREE.Raycaster();
     const mouse = new THREE.Vector2();
     let pStartX = 0, pStartY = 0;
 
     window.addEventListener('pointerdown', (e) => {
       pStartX = e.clientX; pStartY = e.clientY;
-    });
+    }, { passive: true });
 
     window.addEventListener('pointerup', (e) => {
       if (!flightActive && flightProgress === 0) {
@@ -560,7 +605,7 @@
         return;
       }
       if (cardContainer.classList.contains('active')) return;
-      if (Math.hypot(e.clientX - pStartX, e.clientY - pStartY) > 6) return;
+      if (Math.hypot(e.clientX - pStartX, e.clientY - pStartY) > 8) return;
 
       mouse.x = (e.clientX / window.innerWidth) * 2 - 1;
       mouse.y = -(e.clientY / window.innerHeight) * 2 + 1;
@@ -595,8 +640,8 @@
     // 5. Бесшовный пролет в центр
     let flightActive = false;
     let flightProgress = 0;
-    const startCamPos = new THREE.Vector3(0, 0, 36);
-    const endCamPos = new THREE.Vector3(0, 26, 56);
+    const startCamPos = new THREE.Vector3(0, 0, isMobile ? 42 : 36);
+    const endCamPos = new THREE.Vector3(0, isMobile ? 28 : 26, isMobile ? 64 : 56);
 
     function startHyperspaceFlight() {
       flightActive = true;
@@ -673,6 +718,7 @@
       // Жизнь мира
       if (flightProgress >= 1) {
         galaxy.rotation.y += 0.002;
+        mistField.rotation.y = -t * 0.012;
         labelsGroup.rotation.y = -t * 0.08;
 
         ring1.rotation.y = t * 0.05;
@@ -711,6 +757,8 @@
     animate();
 
     window.addEventListener('resize', () => {
+      const mob = window.innerWidth < window.innerHeight;
+      camera.fov = mob ? 74 : 60;
       camera.aspect = window.innerWidth / window.innerHeight;
       camera.updateProjectionMatrix();
       renderer.setSize(window.innerWidth, window.innerHeight);
